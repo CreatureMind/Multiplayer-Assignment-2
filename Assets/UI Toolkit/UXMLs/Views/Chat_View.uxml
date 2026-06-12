@@ -1,0 +1,56 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Styles/LobbyStyle.uss?fileID=7433441132597879392&amp;guid=c1ae93633323eed4e9baa1825210ea51&amp;type=3#LobbyStyle"/>
+    <ui:VisualElement name="VisualElement" picking-mode="Ignore" style="flex-grow: 1;">
+        <ui:Button text="Chat" name="chat-btn" style="left: 0; bottom: 0; position: absolute; margin-bottom: 4px; margin-top: 4px;"/>
+        <ui:VisualElement name="chat-container" enabled="true" style="flex-grow: 1; justify-content: flex-end; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); position: absolute; bottom: 54px; left: 0; margin-left: 4px; margin-bottom: 4px; padding-right: 0; padding-bottom: 6px; padding-top: 0; height: 30%; width: 30%;">
+            <ui:VisualElement name="log-container" style="flex-direction: column-reverse; flex-grow: 1; height: auto;">
+                <ui:ScrollView horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" name="chat-scroll-view" mouse-wheel-scroll-size="2" style="flex-grow: 1; margin-left: 4px; margin-right: 4px; padding-left: 4px; background-color: rgba(0, 0, 0, 0.5); margin-top: 4px;">
+                    <ui:VisualElement name="Text_Row_Template" class="chat-msg" style="flex-direction: row; flex-wrap: wrap; margin-top: -7px;">
+                        <ui:Label text="@To CreatureMind:" class="chat-msg__prefix chat-msg__prefix--whisper-to"/>
+                        <ui:Label text="Hello World!" name="Label" class="chat-msg__body"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="Text_Row_Template" class="chat-msg" style="flex-direction: row; flex-wrap: wrap;">
+                        <ui:Label text="@From CreatureMind:" class="chat-msg__prefix chat-msg__prefix--whisper-from"/>
+                        <ui:Label text="Hello World!" name="Label" class="chat-msg__body"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="Text_Row_Template" class="chat-msg" style="flex-direction: row; flex-wrap: wrap; margin-top: -7px;">
+                        <ui:Label text="#CreatureMind:" class="chat-msg__prefix chat-msg__prefix--all"/>
+                        <ui:Label text="Hello World!" name="Label" class="chat-msg__body"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="Text_Row_Template" class="chat-msg" style="flex-direction: row; flex-wrap: wrap; margin-top: -7px;">
+                        <ui:Label text="System:" class="chat-msg__prefix chat-msg__prefix--system"/>
+                        <ui:Label text="Hello World!" name="Label" class="chat-msg__body"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="Text_Row_Template" class="chat-msg" style="flex-direction: row; flex-wrap: wrap; margin-top: -7px;">
+                        <ui:Label text="#CreatureMind:" class="chat-msg__prefix chat-msg__prefix--all"/>
+                        <ui:Label text="Hello World!" name="Label" class="chat-msg__body"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="Text_Row_Template" class="chat-msg" style="flex-direction: row; flex-wrap: wrap; margin-top: -7px;">
+                        <ui:Label text="#CreatureMind:" class="chat-msg__prefix chat-msg__prefix--all"/>
+                        <ui:Label text="Hello World!" name="Label" class="chat-msg__body"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="Text_Row_Template" class="chat-msg" style="flex-direction: row; flex-wrap: wrap; margin-top: -7px;">
+                        <ui:Label text="#CreatureMind:" class="chat-msg__prefix chat-msg__prefix--all"/>
+                        <ui:Label text="Hello World!" name="Label" class="chat-msg__body"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="Text_Row_Template" class="chat-msg" style="flex-direction: row; flex-wrap: wrap; margin-top: -7px;">
+                        <ui:Label text="#CreatureMind:" class="chat-msg__prefix chat-msg__prefix--all"/>
+                        <ui:Label text="Hello World!" name="Label" class="chat-msg__body"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="Text_Row_Template" class="chat-msg" style="flex-direction: row; flex-wrap: wrap; margin-top: -7px;">
+                        <ui:Label text="#CreatureMind:" class="chat-msg__prefix chat-msg__prefix--all"/>
+                        <ui:Label text="Hello World!" name="Label" class="chat-msg__body"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="Text_Row_Template" class="chat-msg" style="flex-direction: row; flex-wrap: wrap; margin-top: -7px;">
+                        <ui:Label text="#CreatureMind:" class="chat-msg__prefix chat-msg__prefix--all"/>
+                        <ui:Label text="Hello World!" name="Label" class="chat-msg__body"/>
+                    </ui:VisualElement>
+                </ui:ScrollView>
+            </ui:VisualElement>
+            <ui:VisualElement name="text-container" style="flex-direction: row; height: auto; flex-grow: 0; flex-shrink: 0; margin-top: 6px;">
+                <ui:DropdownField choices="All,Player 1" name="dropdown-field" index="0" style="width: 170px; align-items: center; align-self: center; font-size: 18px; -unity-text-align: middle-left;"/>
+                <ui:TextField name="text-field" style="flex-grow: 1; align-items: center; align-self: center; font-size: 18px; flex-shrink: 1; margin-right: 8px;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
