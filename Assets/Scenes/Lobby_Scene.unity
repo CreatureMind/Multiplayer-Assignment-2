@@ -654,6 +654,7 @@ MonoBehaviour:
   readyManagerPrefab: {fileID: 9040470044852587027, guid: f3bc5d1fbb1b05d4eaf713a5abbc7fd1, type: 3}
   networkRunnerPrefab: {fileID: 7706314431963058946, guid: 4f5377e4c5bfcbb4c86b84f4a299471d, type: 3}
   playerDataPrefab: {fileID: 4968519751102832067, guid: b15ba0f7073085f4db99bc19739497ed, type: 3}
+  cubeSpawnerPrefab: {fileID: 5106662572830922572, guid: 7d5f7afc50dccb64f931917543052c96, type: 3}
 --- !u!1 &1828490691
 GameObject:
   m_ObjectHideFlags: 0
