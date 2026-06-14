@@ -22,10 +22,44 @@ namespace Events
     
     public struct PlayerListChangedEvent { }
 
+    public struct OnPlayerListChangedEvent
+    {
+        public List<string> PlayerNames;
+    }
+
     public struct PlayerDataChangedEvent 
     { 
         public PlayerRef PlayerRef;
     }
     
     public struct MatchStartedEvent { }
+    
+    public struct ChatCreatedEvent { }
+
+    public struct ChatMessageEvent
+    {
+        public string Sender;
+        public string Target;
+        public string Message;
+    }
+    
+    public struct OnMessageReceivedEvent
+    {
+        public MessageType MessageType;
+        public string Sender;
+        public string Target;
+        public string Message;
+    }
+
+    public struct NetworkMessageReceivedEvent
+    {
+        public string Sender;
+        public string Target;
+        public string Message;
+    }
+
+    public struct HistoryRequestedEvent
+    {
+        public PlayerRef Requester;
+    }
 }

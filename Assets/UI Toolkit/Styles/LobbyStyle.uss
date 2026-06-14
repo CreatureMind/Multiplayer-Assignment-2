@@ -80,3 +80,7 @@ Button {
 }
 
 
+
+.chat--hidden {
+    display: none;
+}

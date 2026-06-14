@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Events;
 using Fusion;
 using UnityEngine;
@@ -18,15 +19,14 @@ public class UIManager : MonoBehaviour
     [SerializeField] private VisualTreeAsset playerRowTemplate;
     
     [Header("Additive UIs")]
-    [SerializeField] private GameObject roomCreationViewPrefab;
-    [SerializeField] private GameObject loadingScreenViewPrefab;
+    [SerializeField] private UIDocument roomCreationViewPrefab;
+    [SerializeField] private UIDocument loadingScreenViewPrefab;
+    [SerializeField] private UIDocument chatViewPrefab;
     
     [Header("UI Elements")]
     [SerializeField] private SessionsListDataSO sessionsListData;
     
     private UIDocument _uiDocument;
-    private UIDocument _roomCreationView;
-    private UIDocument _loadingScreenView;
     private VisualElement _root;
     private VisualElement _roomsScrollView;
     private VisualElement _playerListScrollView;
@@ -38,8 +38,6 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         _uiDocument = GetComponent<UIDocument>();
-        _roomCreationView = roomCreationViewPrefab.GetComponent<UIDocument>();
-        _loadingScreenView = loadingScreenViewPrefab.GetComponent<UIDocument>();
     }
 
     private void OnEnable()
@@ -241,8 +239,8 @@ public class UIManager : MonoBehaviour
 
     private void ShowRoomCreationView()
     {
-        roomCreationViewPrefab.SetActive(true);
-        var root = _roomCreationView.rootVisualElement;
+        roomCreationViewPrefab.gameObject.SetActive(true);
+        var root = roomCreationViewPrefab.rootVisualElement;
 
         var roomNameField = root.Q<TextField>("room-name");                                                 //room-name
         var maxPlayersField = root.Q<SliderInt>("max-players");                                             //max-players
@@ -259,7 +257,7 @@ public class UIManager : MonoBehaviour
                 var maxPlayers = maxPlayersField.value;
                 _ = NetworkManager.Instance.CreateRoomInCurrentLobby(roomName, maxPlayers, _currentLobbyId);
 
-                roomCreationViewPrefab.SetActive(false);
+                roomCreationViewPrefab.gameObject.SetActive(false);
             };
         }
         
@@ -268,7 +266,7 @@ public class UIManager : MonoBehaviour
         {
             backBtn.clicked += () =>
             {
-                roomCreationViewPrefab.SetActive(false);
+                roomCreationViewPrefab.gameObject.SetActive(false);
             };
         }
     }
@@ -333,12 +331,32 @@ public class UIManager : MonoBehaviour
             };
         }
         RefreshStartButton();
+        ShowChatView();
+    }
+
+    private void ShowChatView()
+    {
+        chatViewPrefab.gameObject.SetActive(true);
+        var root = chatViewPrefab.rootVisualElement;
+        
+        var chatContainer = root.Q<VisualElement>("chat-container");
+        
+        var chatBtn = root.Q<Button>("chat-btn");
+        if (chatBtn != null)
+        {
+            chatBtn.clicked += () =>
+            {
+                chatContainer.ToggleInClassList("chat--hidden");
+            };
+        }
     }
     
     private void UpdatePlayerList(PlayerListChangedEvent e)
     {
         if (_playerListScrollView == null) return;
         _playerListScrollView.Clear();
+        
+        var playerNameList = new List<string>();
 
         foreach (var playerData in NetworkManager.Instance.GetAllPlayers())
         {
@@ -369,10 +387,16 @@ public class UIManager : MonoBehaviour
             }
 
             _playerListScrollView.Add(row);
+            playerNameList.Add(playerData.DisplayName.Value);
             
             RefreshReadyButton();
             RefreshStartButton();
         }
+        
+        EventBus.Raise(new OnPlayerListChangedEvent
+        {
+            PlayerNames = playerNameList
+        });
     }
     
     private void OnPlayerDataChanged(PlayerDataChangedEvent e)
@@ -407,9 +431,9 @@ public class UIManager : MonoBehaviour
 
     private void ShowLoadingScreen(ShowLoadingScreenEvent e)
     {
-        loadingScreenViewPrefab.SetActive(true);
+        loadingScreenViewPrefab.gameObject.SetActive(true);
         
-        var root = _loadingScreenView.rootVisualElement;
+        var root = loadingScreenViewPrefab.rootVisualElement;
         
         var loadingSpinner = root.Q<VisualElement>("loading-spinner");                                     //loading-spinner
         if (loadingSpinner != null)
@@ -430,7 +454,7 @@ public class UIManager : MonoBehaviour
     
     private void HideLoadingScreen(HideLoadingScreenEvent e)
     {
-        loadingScreenViewPrefab.SetActive(false);
+        loadingScreenViewPrefab.gameObject.SetActive(false);
         _canSpin = false;
     }
 }

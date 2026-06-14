@@ -417,16 +417,22 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!1 &592545406 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7259980683239559684, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
-  m_PrefabInstance: {fileID: 1884518436683433153}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &592545408 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5118730744084996241, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
   m_PrefabInstance: {fileID: 1884518436683433153}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &592545409 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3972294438330136940, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
+  m_PrefabInstance: {fileID: 1884518436683433153}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
 --- !u!1 &643843310
 GameObject:
   m_ObjectHideFlags: 0
@@ -556,8 +562,9 @@ MonoBehaviour:
   sessionRowTemplate: {fileID: 9197481963319205126, guid: dec3da7e1019c1d478ff2aa11cd25423, type: 3}
   roomRowTemplate: {fileID: 9197481963319205126, guid: 9b893dc89b43345148e01f876e5fb0a9, type: 3}
   playerRowTemplate: {fileID: 9197481963319205126, guid: 9eaf5c57440274d92a8b080d009d0319, type: 3}
-  roomCreationViewPrefab: {fileID: 643843310}
-  loadingScreenViewPrefab: {fileID: 592545406}
+  roomCreationViewPrefab: {fileID: 643843312}
+  loadingScreenViewPrefab: {fileID: 592545409}
+  chatViewPrefab: {fileID: 1334999211}
   sessionsListData: {fileID: 11400000, guid: b04296e5e9812d24e9dc78829d32bb7b, type: 2}
 --- !u!1 &832575517
 GameObject:
@@ -618,6 +625,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1334999210}
   - component: {fileID: 1334999211}
+  - component: {fileID: 1334999212}
   m_Layer: 5
   m_Name: Chat_View
   m_TagString: Untagged
@@ -663,6 +671,19 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
+--- !u!114 &1334999212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334999209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f42f08e8654a4cf98ab3c84b5f73abbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ChatUIController
+  openChatAction: {fileID: 2221957995851655513, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!1 &1668919662
 GameObject:
   m_ObjectHideFlags: 0
@@ -673,6 +694,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1668919663}
   - component: {fileID: 1668919664}
+  - component: {fileID: 1668919665}
   m_Layer: 0
   m_Name: Network_Manager
   m_TagString: Untagged
@@ -709,7 +731,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   readyManagerPrefab: {fileID: 9040470044852587027, guid: f3bc5d1fbb1b05d4eaf713a5abbc7fd1, type: 3}
   networkRunnerPrefab: {fileID: 7706314431963058946, guid: 4f5377e4c5bfcbb4c86b84f4a299471d, type: 3}
+  chatRelayPrefab: {fileID: 4636337649601192298, guid: 586e1286dd37efd45a39688bea54edd0, type: 3}
   playerDataPrefab: {fileID: 4968519751102832067, guid: b15ba0f7073085f4db99bc19739497ed, type: 3}
+--- !u!114 &1668919665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668919662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9be615341687a7a47adcecc44757147a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
 --- !u!1 &1828490691
 GameObject:
   m_ObjectHideFlags: 0

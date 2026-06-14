@@ -13,13 +13,16 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     
     [SerializeField] private ReadyManager readyManagerPrefab;
     [SerializeField] private NetworkRunner networkRunnerPrefab;
+    [SerializeField] private ChatRelay chatRelayPrefab;
     [SerializeField] private PlayerData playerDataPrefab;
     
     public ReadyManager ReadyManagerInstance { get; set; }
+    public ChatNetworkManager ChatNetworkManager { get; private set; }
 
     private const int MIN_PLAYERS_TO_START = 2;
 
     private NetworkRunner _networkRunnerInstance;
+    private ChatRelay _chatRelayInstance;
 
     private string _currentLobbyId;
     public string CurrentLobbyId => _currentLobbyId;
@@ -32,6 +35,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (!Instance) Instance = this;
         else Destroy(gameObject);
+    }
+
+    private void Start()
+    {
+        ChatNetworkManager = GetComponent<ChatNetworkManager>();
     }
 
     #region Player Logic
@@ -233,7 +241,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             runner.Spawn(playerDataPrefab, inputAuthority: player);
 
             if (runner.IsSharedModeMasterClient)
+            {
                 runner.Spawn(readyManagerPrefab);
+
+                _chatRelayInstance = runner.Spawn(chatRelayPrefab);
+            }
         }
         
         EventBus.Raise(new PlayerListChangedEvent());
