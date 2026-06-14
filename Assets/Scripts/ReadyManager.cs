@@ -31,6 +31,7 @@ public class ReadyManager : NetworkBehaviour
         
         Runner.SessionInfo.IsOpen    = false;
         Runner.SessionInfo.IsVisible = false;
+        Runner.LoadScene("Game_Scene");
     }
 
     private void OnMatchStartedChanged()

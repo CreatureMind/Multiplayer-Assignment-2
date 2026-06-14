@@ -1,7 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Events;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public enum MessageType { 
@@ -13,49 +13,45 @@ public enum MessageType {
 
 public class ChatUIController : MonoBehaviour
 {
-    [SerializeField] private InputActionReference openChatAction;
-
     private ScrollView _chatScrollView;
     private TextField _chatTextField;
-    private VisualElement _chatContainer;
     private DropdownField _chatDropdown;
-    private bool _isChatOpen, _inGame = false;
+
     private string _currentTarget = ALL_OPTION;
     private const string ALL_OPTION = "All";
     
-    private void Awake()
-    {
-        openChatAction.action.Enable();
-    }
-
     private void OnEnable()
     {
-        openChatAction.action.performed += OnOpenChatPressed;
-        
         EventBus.Subscribe<OnMessageReceivedEvent>(RenderMessage);
         EventBus.Subscribe<OnPlayerListChangedEvent>(UpdatePlayerDropdown);
-        EventBus.Subscribe<MatchStartedEvent>(GameStarted);
     }
 
     private void OnDisable()
     {
-        openChatAction.action.performed -= OnOpenChatPressed;
-
         EventBus.Unsubscribe<OnMessageReceivedEvent>(RenderMessage);
         EventBus.Unsubscribe<OnPlayerListChangedEvent>(UpdatePlayerDropdown);
-        EventBus.Unsubscribe<MatchStartedEvent>(GameStarted);
         
         _chatTextField.UnregisterCallback<KeyDownEvent>(OnTextFieldKeyDown, TrickleDown.TrickleDown);
     }
-    
+
     private void Start()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
         _chatScrollView = root.Q<ScrollView>("chat-scroll-view");
         _chatScrollView.Clear();
-        _chatContainer = root.Q<VisualElement>("chat-container");
         _chatTextField = root.Q<TextField>("text-field");
         _chatDropdown = root.Q<DropdownField>("dropdown-field");
+        
+        var chatContainer = root.Q<VisualElement>("chat-container");
+        
+        var chatBtn = root.Q<Button>("chat-btn");
+        if (chatBtn != null)
+        {
+            chatBtn.clicked += () =>
+            {
+                chatContainer.ToggleInClassList("chat--hidden");
+            };
+        }
         
         var initialNames = new List<string>();
         if (NetworkManager.Instance)
@@ -100,21 +96,6 @@ public class ChatUIController : MonoBehaviour
             _chatDropdown.value = ALL_OPTION;
         }
     }
-    
-    private void OnOpenChatPressed(InputAction.CallbackContext context)
-    {
-        Debug.Log("OnOpenChatPressed");
-        if (!_isChatOpen && _inGame)
-        {
-            Debug.Log("OpenChat");
-            OpenChat();
-        }
-        else
-        {
-            Debug.Log("Focus");
-            FocusChatField();
-        }
-    }
 
     private void FocusChatField()
     {
@@ -136,17 +117,13 @@ public class ChatUIController : MonoBehaviour
             evt.StopPropagation();
 
             SubmitMessage();
-
-            if (_inGame)
-            {
-                CloseChat();
-            }
         }
     }
 
     private void OnDropDownValueChanged(ChangeEvent<string> evt)
     {
         _currentTarget = evt.newValue;
+        FocusChatField();
     }
 
     private void SubmitMessage()
@@ -182,8 +159,6 @@ public class ChatUIController : MonoBehaviour
         row.Add(prefix);
         row.Add(body);
         _chatScrollView.Insert(0, row);
-
-        _chatScrollView.RegisterCallback<GeometryChangedEvent>(ScrollToBottom);
         
         FocusChatField();
     }
@@ -214,34 +189,10 @@ public class ChatUIController : MonoBehaviour
                 break;
         }
     }
-
-    private void OpenChat()
-    {
-        _isChatOpen = true;
-        _chatContainer.ToggleInClassList("chat--hidden");
-
-        FocusChatField();
-    }
-
-    private void CloseChat()
-    {
-        _isChatOpen = false;
-        _chatTextField.value = string.Empty;
-        _chatTextField.Blur();
-        _chatContainer.ToggleInClassList("chat--hidden");
-    }
     
     private void ScrollToBottom(GeometryChangedEvent evt)
     {
-        // Unregister immediately to avoid scroll tracking bugs during manual scrolling
-        _chatScrollView.UnregisterCallback<GeometryChangedEvent>(ScrollToBottom);
         _chatScrollView.scrollOffset = new Vector2(0, _chatScrollView.verticalScroller.highValue);
-    }
-
-    private void GameStarted(MatchStartedEvent e)
-    {
-        _inGame = true;
-        _chatContainer.RemoveFromClassList("chat--hidden");
     }
     
     private string GetLocalPlayerName()

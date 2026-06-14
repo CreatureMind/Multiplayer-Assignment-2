@@ -36,7 +36,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     
     private void Awake()
     {
-        if (!Instance) Instance = this;
+        if (!Instance)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
         else Destroy(gameObject);
     }
 

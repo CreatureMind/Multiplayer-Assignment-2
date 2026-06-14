@@ -20,7 +20,7 @@ public class UIManager : MonoBehaviour
     [Header("Additive UIs")]
     [SerializeField] private UIDocument roomCreationViewPrefab;
     [SerializeField] private UIDocument loadingScreenViewPrefab;
-    [SerializeField] private UIDocument chatViewPrefab;
+    [SerializeField] private ChatUIController chatViewPrefab;
     
     [Header("UI Elements")]
     [SerializeField] private SessionsListDataSO sessionsListData;
@@ -29,14 +29,18 @@ public class UIManager : MonoBehaviour
     private VisualElement _root;
     private VisualElement _roomsScrollView;
     private VisualElement _playerListScrollView;
+    private ChatUIController _chatViewInstance;
     
     private bool _canSpin = true;
+    private bool _chatToggle = false;
     
     private string _currentLobbyId;
     
     private void Awake()
     {
         _uiDocument = GetComponent<UIDocument>();
+        _chatViewInstance = Instantiate(chatViewPrefab);
+        _chatViewInstance.gameObject.SetActive(_chatToggle);
     }
 
     private void OnEnable()
@@ -89,11 +93,6 @@ public class UIManager : MonoBehaviour
     
     private void Start()
     {
-        // if (lobbiesListView)
-        // {
-        //     ShowSessionsListView();
-        // }
-        
         _uiDocument.visualTreeAsset = null;
     }
     
@@ -104,7 +103,7 @@ public class UIManager : MonoBehaviour
 
     private void StartMatch(MatchStartedEvent e)
     {
-        SceneManager.LoadScene("Game_Scene");
+        EventBus.Raise(new ShowLoadingScreenEvent());
     }
 
     private void ShowSessionsListView()
@@ -181,7 +180,11 @@ public class UIManager : MonoBehaviour
         var leaveBtn = root.Q<Button>("leave-button");                                                      //leave-button
         if (leaveBtn != null)
         {
-            leaveBtn.clicked += ShowSessionsListView;
+            leaveBtn.clicked+= () =>
+            {
+                ToggleChatView();
+                ShowSessionsListView();
+            };
         }
         
         var createRoomBtn = root.Q<Button>("create-button");                                                //create-button
@@ -343,24 +346,13 @@ public class UIManager : MonoBehaviour
             };
         }
         RefreshStartButton();
-        ShowChatView();
+        ToggleChatView();
     }
 
-    private void ShowChatView()
+    private void ToggleChatView()
     {
-        chatViewPrefab.gameObject.SetActive(true);
-        var root = chatViewPrefab.rootVisualElement;
-        
-        var chatContainer = root.Q<VisualElement>("chat-container");
-        
-        var chatBtn = root.Q<Button>("chat-btn");
-        if (chatBtn != null)
-        {
-            chatBtn.clicked += () =>
-            {
-                chatContainer.ToggleInClassList("chat--hidden");
-            };
-        }
+        _chatToggle =  !_chatToggle;
+        _chatViewInstance.gameObject.SetActive(_chatToggle);
     }
     
     private void UpdatePlayerList(PlayerListChangedEvent e)

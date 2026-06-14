@@ -21,12 +21,26 @@ public class ChatNetworkManager : MonoBehaviour
 {
     private readonly Queue<MessageData> _chatHistory = new();
     private const int CHAT_MAX_HISTORY = 200;
-    
+
     // Message types
     private const string ALL = "All";
     private const string SYSTEM = "System";
 
-    public ChatRelay ChatRelay { get; set; }
+    private readonly Dictionary<PlayerRef, string> _trackedNames = new();
+    private readonly HashSet<PlayerRef> _joinedAnnounced = new();
+    private readonly HashSet<PlayerRef> _readyAnnounced = new();
+
+    private ChatRelay _chatRelay;
+    public ChatRelay ChatRelay
+    {
+        get => _chatRelay;
+        set
+        {
+            _chatRelay = value;
+            if (_chatRelay && _chatRelay.HasStateAuthority)
+                SweepPlayers();
+        }
+    }
 
     private void OnEnable()
     {
@@ -34,6 +48,9 @@ public class ChatNetworkManager : MonoBehaviour
         EventBus.Subscribe<NetworkMessageReceivedEvent>(OnNetworkMessageReceived);
         EventBus.Subscribe<ChatCreatedEvent>(LoadChatHistory);
         EventBus.Subscribe<HistoryRequestedEvent>(OnHistoryRequested);
+        EventBus.Subscribe<PlayerListChangedEvent>(OnPlayerListChanged);
+        EventBus.Subscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
+        EventBus.Subscribe<MatchStartedEvent>(OnMatchStarted);
     }
 
     private void OnDisable()
@@ -42,13 +59,28 @@ public class ChatNetworkManager : MonoBehaviour
         EventBus.Unsubscribe<NetworkMessageReceivedEvent>(OnNetworkMessageReceived);
         EventBus.Unsubscribe<ChatCreatedEvent>(LoadChatHistory);
         EventBus.Unsubscribe<HistoryRequestedEvent>(OnHistoryRequested);
+        EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
+        EventBus.Unsubscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
+        EventBus.Unsubscribe<MatchStartedEvent>(OnMatchStarted);
     }
 
     private void OnHistoryRequested(HistoryRequestedEvent e)
     {
         if (!ChatRelay) return;
+        var requesterName = GetPlayerName(e.Requester);
         foreach (var message in _chatHistory)
+        {
+            if (!IsVisibleTo(message, requesterName)) continue;
             ChatRelay.RPC_SendHistoryEntry(e.Requester, message);
+        }
+    }
+
+    private static bool IsVisibleTo(MessageData message, string viewerName)
+    {
+        var target = message.Target.Value;
+        if (target == ALL) return true;
+        if (message.Sender.Value == viewerName) return true;
+        return target == viewerName;
     }
 
     private void OnChatMessageSubmitted(ChatMessageEvent e)
@@ -128,6 +160,95 @@ public class ChatNetworkManager : MonoBehaviour
 
         Debug.LogWarning($"ChatNetworkManager: unresolved message from {sender} to {target}");
         return MessageType.System;
+    }
+
+    private void OnPlayerListChanged(PlayerListChangedEvent _)
+    {
+        if (!HasChatStateAuthority()) return;
+
+        var currentRefs = new HashSet<PlayerRef>();
+        foreach (var data in NetworkManager.Instance.GetAllPlayers())
+            currentRefs.Add(data.Object.InputAuthority);
+
+        var left = new List<PlayerRef>();
+        foreach (var kv in _trackedNames)
+            if (!currentRefs.Contains(kv.Key)) left.Add(kv.Key);
+
+        foreach (var playerRef in left)
+        {
+            BroadcastSystem($"{_trackedNames[playerRef]} left.");
+            _trackedNames.Remove(playerRef);
+            _joinedAnnounced.Remove(playerRef);
+            _readyAnnounced.Remove(playerRef);
+        }
+
+        SweepPlayers();
+    }
+
+    private void OnPlayerDataChanged(PlayerDataChangedEvent e)
+    {
+        if (!HasChatStateAuthority()) return;
+        ProcessPlayer(FindPlayer(e.PlayerRef));
+    }
+
+    private void OnMatchStarted(MatchStartedEvent _)
+    {
+        if (!HasChatStateAuthority()) return;
+        BroadcastSystem("Game starting!");
+    }
+
+    private void SweepPlayers()
+    {
+        if (NetworkManager.Instance == null) return;
+        foreach (var data in NetworkManager.Instance.GetAllPlayers())
+            ProcessPlayer(data);
+    }
+
+    private void ProcessPlayer(PlayerData data)
+    {
+        if (!data) return;
+        var playerRef = data.Object.InputAuthority;
+        var displayName = data.DisplayName.ToString();
+        if (string.IsNullOrEmpty(displayName)) return;
+
+        _trackedNames[playerRef] = displayName;
+
+        if (!_joinedAnnounced.Contains(playerRef) && !displayName.StartsWith("Player_"))
+        {
+            _joinedAnnounced.Add(playerRef);
+            BroadcastSystem($"{displayName} joined.");
+        }
+
+        if (data.IsReady)
+        {
+            if (_readyAnnounced.Add(playerRef))
+                BroadcastSystem($"{displayName} is ready.");
+        }
+        else
+        {
+            _readyAnnounced.Remove(playerRef);
+        }
+    }
+
+    private bool HasChatStateAuthority() => _chatRelay && _chatRelay.HasStateAuthority;
+
+    private void BroadcastSystem(string text)
+    {
+        if (!_chatRelay) return;
+        _chatRelay.RPC_SendMessage(new MessageData(SYSTEM, ALL, text));
+    }
+
+    private PlayerData FindPlayer(PlayerRef playerRef)
+    {
+        foreach (var data in NetworkManager.Instance.GetAllPlayers())
+            if (data.Object.InputAuthority == playerRef) return data;
+        return null;
+    }
+
+    private string GetPlayerName(PlayerRef playerRef)
+    {
+        var data = FindPlayer(playerRef);
+        return data ? data.DisplayName.ToString() : string.Empty;
     }
 
     private string GetLocalPlayerName()
