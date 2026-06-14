@@ -5,8 +5,13 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(UIDocument))]
 public class NameEntryUIController : MonoBehaviour
 {
+    private enum NameEntryState { Hidden, EnteringName, Confirmed, Applied }
+    private NameEntryState _state = NameEntryState.Hidden;
+    
     private UIDocument _doc;
     private VisualElement _root;
+    
+    private string _pendingName;
     
     private const string FIELD_PLAYER_NAME = "player-name-field";
     private const string BTN_CONFIRM = "confirm-button";
@@ -16,14 +21,57 @@ public class NameEntryUIController : MonoBehaviour
     {
         _doc = GetComponent<UIDocument>();
     }
+    
+    private void OnEnable()
+    {
+        EventBus.Subscribe<PlayerListChangedEvent>(OnPlayerListChanged);
+    }
+
+    private void OnDisable()
+    {
+        if (_state == NameEntryState.Applied)
+            EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
+    }
+    
+    private void OnDestroy()
+    {
+        EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
+    }
 
     private void Start()
     {
         ShowPanel();
     }
     
+    private void OnPlayerListChanged(PlayerListChangedEvent e)
+    {
+        if (_state == NameEntryState.EnteringName)
+        {
+            var localData = NetworkManager.Instance?.GetLocalPlayerData();
+            if (!localData)
+                return;
+
+            _root = _doc.rootVisualElement;
+            var nameField = _root.Q<TextField>(FIELD_PLAYER_NAME);
+            if (nameField == null)
+                return;
+
+            var currentName = localData.DisplayName.Value;
+            if (!string.IsNullOrEmpty(currentName) && !currentName.StartsWith("Player_"))
+                nameField.value = currentName;
+
+            return;
+        }
+
+        // If the name was already confirmed but PlayerData wasn't ready at that point,
+        // apply it now that PlayerData has spawned.
+        if (_state == NameEntryState.Confirmed && _pendingName != null)
+            TryApplyPendingName();
+    }
+
     private void ShowPanel()
     {
+        _state = NameEntryState.EnteringName;
         _root = _doc.rootVisualElement;
 
         var nameField = _root.Q<TextField>(FIELD_PLAYER_NAME);
@@ -32,49 +80,66 @@ public class NameEntryUIController : MonoBehaviour
 
         if (nameField == null || confirmBtn == null)
         {
-            Debug.LogError("[NameEntryUIController] Required UI elements not found.");
+            Debug.LogError("[NameEntryUIController] Required UI elements not found in Name_Entry_View.uxml.");
             return;
         }
-        
-        nameField.value = PlayerPrefs.GetString("PlayerName", string.Empty);
+
+        nameField.value = string.Empty;
         if (errorLabel != null)
             errorLabel.style.display = DisplayStyle.None;
 
         confirmBtn.clicked += () => OnConfirmClicked(nameField, errorLabel);
     }
-    
+
     private void OnConfirmClicked(TextField nameField, Label errorLabel)
     {
+        if (_state is NameEntryState.Confirmed or NameEntryState.Applied)
+            return;
+
         var trimmed = nameField.value.Trim();
 
         if (string.IsNullOrEmpty(trimmed))
         {
-            if (errorLabel != null)
-            {
-                errorLabel.text = "Please enter a name.";
-                errorLabel.style.display = DisplayStyle.Flex;
-            }
+            ShowError(errorLabel, "Please enter a name.");
             return;
         }
 
         if (trimmed.Length > 32)
         {
-            if (errorLabel != null)
-            {
-                errorLabel.text = "Name must be 32 characters or fewer.";
-                errorLabel.style.display = DisplayStyle.Flex;
-            }
+            ShowError(errorLabel, "Name must be 32 characters or fewer.");
             return;
         }
-        
-        PlayerPrefs.SetString("PlayerName", trimmed);
-        PlayerPrefs.Save();
+
+        _state = NameEntryState.Confirmed;
+        _pendingName = trimmed;
+
+        TryApplyPendingName();
+
+        gameObject.SetActive(false);
+        EventBus.Raise(new PlayerNameConfirmedEvent { PlayerName = trimmed });
+    }
+
+    private void TryApplyPendingName()
+    {
+        if (_pendingName == null)
+            return;
 
         var localData = NetworkManager.Instance?.GetLocalPlayerData();
-        if (localData)
-            localData.DisplayName = trimmed;
+        if (!localData)
+            return;
+
+        localData.ApplyConfirmedName(_pendingName);
+        _pendingName = null;
+        _state = NameEntryState.Applied;
         
-        EventBus.Raise(new PlayerNameConfirmedEvent { PlayerName = trimmed });
-        gameObject.SetActive(false);
+        EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
+    }
+
+    private static void ShowError(Label errorLabel, string message)
+    {
+        if (errorLabel == null)
+            return;
+        errorLabel.text = message;
+        errorLabel.style.display = DisplayStyle.Flex;
     }
 }

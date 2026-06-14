@@ -145,7 +145,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 79269948}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -218,6 +218,7 @@ Transform:
   m_Children:
   - {fileID: 643843311}
   - {fileID: 592545408}
+  - {fileID: 1633393447}
   m_Father: {fileID: 1828490692}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &330585543
@@ -484,11 +485,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!1 &592545406 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7259980683239559684, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
-  m_PrefabInstance: {fileID: 1884518436683433153}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &592545408 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5118730744084996241, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
@@ -614,17 +610,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 824371407}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16dceabff8efeec47bd202ce4765c5d5, type: 3}
+  m_Script: {fileID: 11500000, guid: e0b051b730fc2df4cbc7f412f7346a60, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
+  m_EditorClassIdentifier: Assembly-CSharp::UIManager
   lobbiesListView: {fileID: 9197481963319205126, guid: 71b967a6e53c1214d919d859736bbba3, type: 3}
   roomsListView: {fileID: 9197481963319205126, guid: cd1b07f45798745ca8e06a49c9d457f5, type: 3}
   roomView: {fileID: 9197481963319205126, guid: f094f8ba955284137b58c232ec42a683, type: 3}
   sessionRowTemplate: {fileID: 9197481963319205126, guid: dec3da7e1019c1d478ff2aa11cd25423, type: 3}
   roomRowTemplate: {fileID: 9197481963319205126, guid: 9b893dc89b43345148e01f876e5fb0a9, type: 3}
   playerRowTemplate: {fileID: 9197481963319205126, guid: 9eaf5c57440274d92a8b080d009d0319, type: 3}
-  roomCreationViewPrefab: {fileID: 643843310}
-  loadingScreenViewPrefab: {fileID: 592545406}
+  roomCreationViewPrefab: {fileID: 643843312}
+  loadingScreenViewPrefab: {fileID: 1884518436683433154}
+  chatViewPrefab: {fileID: 1633393448}
   sessionsListData: {fileID: 11400000, guid: b04296e5e9812d24e9dc78829d32bb7b, type: 2}
 --- !u!1 &832575517
 GameObject:
@@ -675,6 +672,61 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1633393446
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1633393447}
+  - component: {fileID: 1633393448}
+  m_Layer: 0
+  m_Name: Chat_View
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1633393447
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1633393446}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 216556668}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1633393448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1633393446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
+  m_PanelSettings: {fileID: 11400000, guid: 6c08430eecf72264290999c4483ef5d0, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 271ae49acee5ac240aa5a1866618a205, type: 3}
+  m_SortingOrder: 200
+  m_Position: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_WorldSpaceCollider: {fileID: 0}
 --- !u!1 &1668919662
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,6 +773,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   readyManagerPrefab: {fileID: 9040470044852587027, guid: f3bc5d1fbb1b05d4eaf713a5abbc7fd1, type: 3}
   networkRunnerPrefab: {fileID: 7706314431963058946, guid: 4f5377e4c5bfcbb4c86b84f4a299471d, type: 3}
+  chatRelayPrefab: {fileID: 4636337649601192298, guid: 586e1286dd37efd45a39688bea54edd0, type: 3}
   playerDataPrefab: {fileID: 4968519751102832067, guid: b15ba0f7073085f4db99bc19739497ed, type: 3}
   characterSelectionManagerPrefab: {fileID: 3934725427524957727, guid: 5c0a229e5f4c9b74494d25be34b3840c, type: 3}
   characterRegistry: {fileID: 11400000, guid: b078e7d09a00cc84084417637653ba0f, type: 2}
@@ -810,15 +863,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Loading_Screen
       objectReference: {fileID: 0}
-    - target: {fileID: 7259980683239559684, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
+--- !u!114 &1884518436683433154 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3972294438330136940, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
+  m_PrefabInstance: {fileID: 1884518436683433153}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

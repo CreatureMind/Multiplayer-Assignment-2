@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Events;
-using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -42,6 +41,9 @@ public class UIManager : MonoBehaviour
 
     private void OnEnable()
     {
+        // Name Entry
+        EventBus.Subscribe<PlayerNameConfirmedEvent>(OnPlayerNameConfirmed);
+        
         // Sessions List
         EventBus.Subscribe<JoinedLobbyEvent>(ShowRoomsListView);
         EventBus.Subscribe<SessionDataRefreshedEvent>(UpdateRoomsList);
@@ -63,6 +65,9 @@ public class UIManager : MonoBehaviour
 
     private void OnDisable()
     {
+        // Name Entry
+        EventBus.Unsubscribe<PlayerNameConfirmedEvent>(OnPlayerNameConfirmed);
+        
         // Sessions List
         EventBus.Unsubscribe<JoinedLobbyEvent>(ShowRoomsListView);
         EventBus.Unsubscribe<SessionDataRefreshedEvent>(UpdateRoomsList);
@@ -84,10 +89,17 @@ public class UIManager : MonoBehaviour
     
     private void Start()
     {
-        if (lobbiesListView)
-        {
-            ShowSessionsListView();
-        }
+        // if (lobbiesListView)
+        // {
+        //     ShowSessionsListView();
+        // }
+        
+        _uiDocument.visualTreeAsset = null;
+    }
+    
+    private void OnPlayerNameConfirmed(PlayerNameConfirmedEvent e)
+    {
+        ShowSessionsListView();
     }
 
     private void StartMatch(MatchStartedEvent e)
