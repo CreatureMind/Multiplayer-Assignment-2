@@ -65,6 +65,9 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     
     public PlayerData GetLocalPlayerData()
     {
+        if (!_networkRunnerInstance)
+            return null;
+        
         var localPlayer = _networkRunnerInstance.LocalPlayer;
         _playerDataMap.TryGetValue(localPlayer, out var data);
         return data;
@@ -129,7 +132,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         
         await CreateFreshRunner();
         
-        var playerName  = PlayerPrefs.GetString("PlayerName", "Player");
+        var playerName = GetLocalPlayerData()?.DisplayName.Value ?? "Player";
         var sessionName = $"{roomName}_{playerName}_{Guid.NewGuid().ToString("N")[..6]}";
         
         var result = await _networkRunnerInstance.StartGame(new StartGameArgs()

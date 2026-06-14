@@ -3,7 +3,9 @@ using Fusion;
 
 public class CharacterSelectionManager : NetworkBehaviour
 {
-    [Networked] private NetworkArray<PlayerRef> CharacterOwners { get; } = MakeInitializer(new PlayerRef[10]);
+    private const int CHARACTER_COUNT = 10;
+    
+    [Networked, Capacity(CHARACTER_COUNT)] private NetworkArray<PlayerRef> CharacterOwners { get; } = MakeInitializer(new PlayerRef[CHARACTER_COUNT]);
     
     public static CharacterSelectionManager Instance { get; private set; }
 
@@ -22,13 +24,13 @@ public class CharacterSelectionManager : NetworkBehaviour
 
     public bool IsCharacterClaimed(int characterId)
     {
-        if (characterId is < 0 or >= 10)
+        if (characterId is < 0 or >= CHARACTER_COUNT)
             return true;
         return CharacterOwners[characterId] != PlayerRef.None;
     }
 
     public PlayerRef GetCharacterOwner(int characterId)
-        => characterId is < 0 or >= 10 ? PlayerRef.None : CharacterOwners[characterId];
+        => characterId is < 0 or >= CHARACTER_COUNT ? PlayerRef.None : CharacterOwners[characterId];
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RequestCharacterRpc(int characterId, PlayerRef requester)
@@ -36,7 +38,7 @@ public class CharacterSelectionManager : NetworkBehaviour
         if (!HasStateAuthority)
             return;
 
-        if (characterId is < 0 or >= 10)
+        if (characterId is < 0 or >= CHARACTER_COUNT)
         {
             DenyCharacterRpc(characterId, requester);
             return;
@@ -84,11 +86,11 @@ public class CharacterSelectionManager : NetworkBehaviour
             return;
         
         var registry = NetworkManager.Instance.CharacterRegistry;
-        if (registry == null)
+        if (!registry)
             return;
 
         var def = registry.GetById(characterId);
-        if (def == null)
+        if (!def)
             return;
 
         playerData.ApplyCharacterSelection(characterId, def.CharacterColor);
@@ -98,7 +100,7 @@ public class CharacterSelectionManager : NetworkBehaviour
     
     private void ReleaseAllCharactersForPlayer(PlayerRef player)
     {
-        for (var i = 0; i < 10; i++)
+        for (var i = 0; i < CHARACTER_COUNT; i++)
         {
             if (CharacterOwners[i] != player)
                 continue;

@@ -24,15 +24,13 @@ public class PlayerData : NetworkBehaviour
     
     public override void Spawned()
     {
-        base.Spawned();
-        
         if (HasStateAuthority)
         {
-            DisplayName = PlayerPrefs.GetString("PlayerName", $"Player_{Random.Range(1000, 9999)}");
+            DisplayName = $"Player_{Object.InputAuthority.PlayerId}";
             CharacterId = -1;
             HasSelectedCharacter = false;
         }
-        
+
         NetworkManager.Instance.RegisterPlayer(Object.InputAuthority, this);
     }
     
@@ -41,8 +39,17 @@ public class PlayerData : NetworkBehaviour
         NetworkManager.Instance.UnregisterPlayer(Object.InputAuthority);
     }
     
+    public void ApplyConfirmedName(string confirmedName)
+    {
+        if (!HasStateAuthority)
+            return;
+        DisplayName = confirmedName;
+    }
+    
     public void ApplyCharacterSelection(int characterId, Color color)
     {
+        if (!HasStateAuthority)
+            return;
         CharacterId = characterId;
         ColorR = color.r;
         ColorG = color.g;
@@ -50,12 +57,12 @@ public class PlayerData : NetworkBehaviour
         HasSelectedCharacter = true;
     }
 
-    private void OnDisplayNameChanged() => 
+    private void OnDisplayNameChanged() =>
         EventBus.Raise(new PlayerDataChangedEvent { PlayerRef = Object.InputAuthority });
 
     private void OnReadyStatusChanged() =>
         EventBus.Raise(new PlayerDataChangedEvent { PlayerRef = Object.InputAuthority });
-    
+
     private void OnCharacterChanged() =>
         EventBus.Raise(new PlayerDataChangedEvent { PlayerRef = Object.InputAuthority });
 }
