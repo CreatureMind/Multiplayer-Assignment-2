@@ -28,4 +28,32 @@ namespace Events
     }
     
     public struct MatchStartedEvent { }
+    
+    public struct CharacterClaimedEvent
+    {
+        public int CharacterId;
+        public PlayerRef ClaimedBy;
+    }
+
+    public struct CharacterReleasedEvent
+    {
+        public int CharacterId;
+    }
+
+    public struct CharacterSelectionConfirmedEvent
+    {
+        public int CharacterId;
+    }
+
+    public struct CharacterSelectionDeniedEvent
+    {
+        public int CharacterId;
+    }
+
+    public struct PlayerNameConfirmedEvent
+    {
+        public string PlayerName;
+    }
+    
+    public struct CharacterSelectionManagerReadyEvent { }
 }

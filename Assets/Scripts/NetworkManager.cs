@@ -14,6 +14,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private ReadyManager readyManagerPrefab;
     [SerializeField] private NetworkRunner networkRunnerPrefab;
     [SerializeField] private PlayerData playerDataPrefab;
+    [SerializeField] private CharacterSelectionManager characterSelectionManagerPrefab;
+    [SerializeField] private CharacterRegistry characterRegistry;
     
     public ReadyManager ReadyManagerInstance { get; set; }
 
@@ -23,6 +25,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private string _currentLobbyId;
     public string CurrentLobbyId => _currentLobbyId;
+    public CharacterRegistry CharacterRegistry => characterRegistry;
     
     private SessionDataRefreshedEvent? _cachedSessionData;
     
@@ -233,7 +236,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             runner.Spawn(playerDataPrefab, inputAuthority: player);
 
             if (runner.IsSharedModeMasterClient)
+            {
                 runner.Spawn(readyManagerPrefab);
+                runner.Spawn(characterSelectionManagerPrefab);
+            }
         }
         
         EventBus.Raise(new PlayerListChangedEvent());
@@ -242,6 +248,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         _playerDataMap.Remove(player);
+        if (CharacterSelectionManager.Instance)
+            CharacterSelectionManager.Instance.OnPlayerLeft(player);
         EventBus.Raise(new PlayerListChangedEvent());
     }
 
