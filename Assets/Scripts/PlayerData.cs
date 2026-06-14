@@ -1,3 +1,4 @@
+using System.Net;
 using Events;
 using Fusion;
 using UnityEngine;
@@ -5,30 +6,16 @@ using UnityEngine;
 public class PlayerData : NetworkBehaviour
 {
     [Networked, OnChangedRender(nameof(OnDisplayNameChanged))]
-    public NetworkString<_32> DisplayName { get; set; }
+    public NetworkString<_32> DisplayName { get; private set; }
 
     [Networked, OnChangedRender(nameof(OnReadyStatusChanged))]
     public NetworkBool IsReady { get; set; }
-    
-    [Networked, OnChangedRender(nameof(OnCharacterChanged))]
-    public int CharacterId { get; set; } = -1;
-    
-    [Networked, OnChangedRender(nameof(OnCharacterChanged))]
-    public NetworkBool HasSelectedCharacter { get; set; }
-    
-    [Networked] public float ColorR { get; set; }
-    [Networked] public float ColorG { get; set; }
-    [Networked] public float ColorB { get; set; }
-    
-    public Color CharacterColor => new(ColorR, ColorG, ColorB);
     
     public override void Spawned()
     {
         if (HasStateAuthority)
         {
             DisplayName = PlayerPrefs.GetString("PlayerName", $"Player_{Random.Range(1000, 9999)}");
-            CharacterId = -1;
-            HasSelectedCharacter = false;
         }
         
         NetworkManager.Instance.RegisterPlayer(Object.InputAuthority, this);
@@ -38,22 +25,12 @@ public class PlayerData : NetworkBehaviour
     {
         NetworkManager.Instance.UnregisterPlayer(Object.InputAuthority);
     }
-    
-    public void ApplyCharacterSelection(int characterId, Color color)
-    {
-        CharacterId = characterId;
-        ColorR = color.r;
-        ColorG = color.g;
-        ColorB = color.b;
-        HasSelectedCharacter = true;
-    }
 
     private void OnDisplayNameChanged() => 
         EventBus.Raise(new PlayerDataChangedEvent { PlayerRef = Object.InputAuthority });
 
-    private void OnReadyStatusChanged() =>
+    private void OnReadyStatusChanged()
+    {
         EventBus.Raise(new PlayerDataChangedEvent { PlayerRef = Object.InputAuthority });
-    
-    private void OnCharacterChanged() =>
-        EventBus.Raise(new PlayerDataChangedEvent { PlayerRef = Object.InputAuthority });
+    }
 }

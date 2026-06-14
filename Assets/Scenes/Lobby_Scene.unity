@@ -654,7 +654,6 @@ MonoBehaviour:
   readyManagerPrefab: {fileID: 9040470044852587027, guid: f3bc5d1fbb1b05d4eaf713a5abbc7fd1, type: 3}
   networkRunnerPrefab: {fileID: 7706314431963058946, guid: 4f5377e4c5bfcbb4c86b84f4a299471d, type: 3}
   playerDataPrefab: {fileID: 4968519751102832067, guid: b15ba0f7073085f4db99bc19739497ed, type: 3}
-  characterRegistry: {fileID: 11400000, guid: b078e7d09a00cc84084417637653ba0f, type: 2}
 --- !u!1 &1828490691
 GameObject:
   m_ObjectHideFlags: 0
