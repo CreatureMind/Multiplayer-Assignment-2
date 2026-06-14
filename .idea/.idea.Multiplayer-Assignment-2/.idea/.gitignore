@@ -1,15 +1,13 @@
-﻿# Default ignored files
+# Default ignored files
 /shelf/
 /workspace.xml
 # Rider ignored files
+/projectSettingsUpdater.xml
+/.idea.Multiplayer-Assignment-2.iml
 /contentModel.xml
 /modules.xml
-/.idea.Multiplayer-Assignment-2.iml
-/projectSettingsUpdater.xml
 # Editor-based HTTP Client requests
 /httpRequests/
-# Ignored default folder with query files
-/queries/
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml

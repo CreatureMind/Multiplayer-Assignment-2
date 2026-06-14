@@ -24,6 +24,8 @@ public class PlayerData : NetworkBehaviour
     
     public override void Spawned()
     {
+        base.Spawned();
+        
         if (HasStateAuthority)
         {
             DisplayName = PlayerPrefs.GetString("PlayerName", $"Player_{Random.Range(1000, 9999)}");

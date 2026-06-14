@@ -30,10 +30,57 @@ Button {
     padding-right: 25px;
 }
 
-
-
 .Lable {
     -unity-font-definition: url("project://database/Assets/Fonts/GoogleSans/GoogleSansFlex_72pt-Medium.ttf?fileID=12800000&guid=8ef1adb5892f043ad949ae5259924043&type=3#GoogleSansFlex_72pt-Medium");
     font-size: 35px;
     -unity-text-align: middle-left;
+}
+
+#chat-scroll-view .unity-scroll-view__content-container {
+    flex-direction: column-reverse;
+    flex-grow: 1;
+    align-content: flex-end;
+}
+
+.unity-text-element {
+    -unity-font-definition: url("project://database/Assets/Fonts/GoogleSans/GoogleSansFlex_72pt-Medium.ttf?fileID=12800000&guid=8ef1adb5892f043ad949ae5259924043&type=3#GoogleSansFlex_72pt-Medium");
+}
+
+.chat-msg {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: -7px;
+    margin-bottom: -7px;
+    font-size: 18px;
+}
+
+.chat-msg__body {
+    flex-grow: 1;
+    color: rgb(255, 255, 255);
+}
+
+.chat-msg__prefix {
+    flex-shrink: 0;
+}
+
+.chat-msg__prefix--all {
+    color: rgb(227, 52, 46);
+}
+
+.chat-msg__prefix--whisper-from {
+    color: rgb(0, 169, 255);
+}
+
+.chat-msg__prefix--whisper-to {
+    color: rgb(160, 32, 240);
+}
+
+.chat-msg__prefix--system {
+    color: rgb(255, 235, 4);
+}
+
+
+
+.chat--hidden {
+    display: none;
 }
