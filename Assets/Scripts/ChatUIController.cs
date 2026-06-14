@@ -67,6 +67,7 @@ public class ChatUIController : MonoBehaviour
         
         //_chatScrollView.contentContainer.RegisterCallback<GeometryChangedEvent>();
         _chatTextField.RegisterCallback<KeyDownEvent>(OnTextFieldKeyDown, TrickleDown.TrickleDown);
+        _chatScrollView.contentContainer.RegisterCallback<GeometryChangedEvent>(ScrollToBottom);
         _chatDropdown.RegisterValueChangedCallback(OnDropDownValueChanged);
         
         EventBus.Raise(new ChatCreatedEvent());
@@ -102,10 +103,29 @@ public class ChatUIController : MonoBehaviour
     
     private void OnOpenChatPressed(InputAction.CallbackContext context)
     {
-        if (!_isChatOpen)
+        Debug.Log("OnOpenChatPressed");
+        if (!_isChatOpen && _inGame)
         {
+            Debug.Log("OpenChat");
             OpenChat();
         }
+        else
+        {
+            Debug.Log("Focus");
+            FocusChatField();
+        }
+    }
+
+    private void FocusChatField()
+    {
+        _chatTextField.schedule.Execute(() =>
+        {
+            var input = _chatTextField.Q(TextField.textInputUssName);
+            if (input != null)
+                input.Focus();
+            else
+                _chatTextField.Focus();
+        });
     }
 
     private void OnTextFieldKeyDown(KeyDownEvent evt)
@@ -115,10 +135,7 @@ public class ChatUIController : MonoBehaviour
             // Stop UI Toolkit from adding a literal new line (\n) into the text box
             evt.StopPropagation();
 
-            if (!string.IsNullOrEmpty(_chatTextField.value))
-            {
-                SubmitMessage(_chatTextField.value);
-            }
+            SubmitMessage();
 
             if (_inGame)
             {
@@ -132,8 +149,11 @@ public class ChatUIController : MonoBehaviour
         _currentTarget = evt.newValue;
     }
 
-    private void SubmitMessage(string message)
+    private void SubmitMessage()
     {
+        var message = _chatTextField.value.Trim();
+        if (string.IsNullOrEmpty(message)) return;
+        
         EventBus.Raise(new ChatMessageEvent
         {
             Sender = GetLocalPlayerName(),
@@ -162,6 +182,10 @@ public class ChatUIController : MonoBehaviour
         row.Add(prefix);
         row.Add(body);
         _chatScrollView.Insert(0, row);
+
+        _chatScrollView.RegisterCallback<GeometryChangedEvent>(ScrollToBottom);
+        
+        FocusChatField();
     }
 
     private void ApplyPrefix(Label prefix, MessageType type, string sender, string target)
@@ -194,9 +218,9 @@ public class ChatUIController : MonoBehaviour
     private void OpenChat()
     {
         _isChatOpen = true;
-        _chatContainer.style.display = DisplayStyle.Flex;
-        
-        _chatTextField.Focus();
+        _chatContainer.ToggleInClassList("chat--hidden");
+
+        FocusChatField();
     }
 
     private void CloseChat()
@@ -204,13 +228,20 @@ public class ChatUIController : MonoBehaviour
         _isChatOpen = false;
         _chatTextField.value = string.Empty;
         _chatTextField.Blur();
-        _chatContainer.style.display = DisplayStyle.None;
+        _chatContainer.ToggleInClassList("chat--hidden");
+    }
+    
+    private void ScrollToBottom(GeometryChangedEvent evt)
+    {
+        // Unregister immediately to avoid scroll tracking bugs during manual scrolling
+        _chatScrollView.UnregisterCallback<GeometryChangedEvent>(ScrollToBottom);
+        _chatScrollView.scrollOffset = new Vector2(0, _chatScrollView.verticalScroller.highValue);
     }
 
     private void GameStarted(MatchStartedEvent e)
     {
         _inGame = true;
-        _chatContainer.style.display = DisplayStyle.None;
+        _chatContainer.RemoveFromClassList("chat--hidden");
     }
     
     private string GetLocalPlayerName()

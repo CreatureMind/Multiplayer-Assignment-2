@@ -584,10 +584,21 @@
                 {
                     "name": "",
                     "id": "c533a98d-543c-4016-b801-f61f96c9ba99",
-                    "path": "<Keyboard>/enter",
+                    "path": "<Keyboard>/numpadEnter",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
+                    "action": "Enter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a6d44a89-b3a9-420a-ba61-b3029eb58212",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
                     "action": "Enter",
                     "isComposite": false,
                     "isPartOfComposite": false
