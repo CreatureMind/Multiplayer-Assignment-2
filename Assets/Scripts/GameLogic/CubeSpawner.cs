@@ -6,13 +6,25 @@ public class CubeSpawner : NetworkBehaviour
     [SerializeField] private CubeMaterialChanger cubePrefab;
 
     private PlayerInputHandler inputHandler;
+    
+    private PlayerData playerData;
+
+    private Color playerChosenColor; 
 
 
     public override void Spawned()
     {
         if (!HasStateAuthority) return;
+        
         inputHandler = PlayerInputHandler.Instance;
         if (inputHandler != null) inputHandler.OnMouseInput += HandleMouseInput;
+
+        playerData = NetworkManager.Instance.GetLocalPlayerData();
+        
+        if (playerData != null)
+        {
+            playerChosenColor = playerData.CharacterColor;
+        }
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState)
@@ -40,7 +52,7 @@ public class CubeSpawner : NetworkBehaviour
             Vector3 spawnPos = hit.point;
             // Spawn with ownership of this player (Object.InputAuthority) and optional init callback
             var cube = Runner.Spawn(cubePrefab, spawnPos, Quaternion.identity, Object.InputAuthority);
-            cube.InstantiateMaterialColor(Random.ColorHSV());
+            cube.InstantiateMaterialColor(playerChosenColor);
         }
 
         if (hit.collider.CompareTag("Cube"))

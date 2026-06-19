@@ -1,4 +1,5 @@
 using System;
+using Events;
 using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,6 +11,12 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        EventBus.Subscribe<CharacterClaimedEvent>(SpawnCubeSpawner);
+    }
+    
+
+    private void SpawnCubeSpawner(CharacterClaimedEvent e)
+    {
         _networkRunnerInstance = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
         if (_networkRunnerInstance == null)
         {
@@ -17,5 +24,11 @@ public class GameManager : MonoBehaviour
         }
         
         _networkRunnerInstance.Spawn(cubeSpawnerPrefab, Vector3.zero, Quaternion.identity);
+    }
+
+    
+    private void OnDestroy()
+    {
+        EventBus.Unsubscribe<CharacterClaimedEvent>(SpawnCubeSpawner);
     }
 }
