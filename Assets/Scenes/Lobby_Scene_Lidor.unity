@@ -610,9 +610,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 824371407}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0b051b730fc2df4cbc7f412f7346a60, type: 3}
+  m_Script: {fileID: 11500000, guid: 16dceabff8efeec47bd202ce4765c5d5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  m_EditorClassIdentifier: '::'
   lobbiesListView: {fileID: 9197481963319205126, guid: 71b967a6e53c1214d919d859736bbba3, type: 3}
   roomsListView: {fileID: 9197481963319205126, guid: cd1b07f45798745ca8e06a49c9d457f5, type: 3}
   roomView: {fileID: 9197481963319205126, guid: f094f8ba955284137b58c232ec42a683, type: 3}
@@ -621,7 +621,7 @@ MonoBehaviour:
   playerRowTemplate: {fileID: 9197481963319205126, guid: 9eaf5c57440274d92a8b080d009d0319, type: 3}
   roomCreationViewPrefab: {fileID: 643843312}
   loadingScreenViewPrefab: {fileID: 1884518436683433154}
-  chatViewPrefab: {fileID: 1633393448}
+  chatViewPrefab: {fileID: 6575760504648723879, guid: 046a7adf8e10133479ecfb5dccccb912, type: 3}
   sessionsListData: {fileID: 11400000, guid: b04296e5e9812d24e9dc78829d32bb7b, type: 2}
 --- !u!1 &832575517
 GameObject:

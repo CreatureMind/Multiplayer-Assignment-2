@@ -281,7 +281,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             {
                 runner.Spawn(readyManagerPrefab);
                 _chatRelayInstance = runner.Spawn(chatRelayPrefab);
-                runner.Spawn(characterSelectionManagerPrefab);
             }
         }
     }
@@ -354,7 +353,14 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
-    public void OnSceneLoadDone(NetworkRunner runner) { }
+    public void OnSceneLoadDone(NetworkRunner runner)
+    {
+        if (!GetLocalPlayerData())
+            runner.Spawn(playerDataPrefab, inputAuthority: runner.LocalPlayer);
+        
+        if (runner.IsSharedModeMasterClient && !CharacterSelectionManager.Instance)
+            runner.Spawn(characterSelectionManagerPrefab);
+    }
 
     public void OnSceneLoadStart(NetworkRunner runner) { }
 
