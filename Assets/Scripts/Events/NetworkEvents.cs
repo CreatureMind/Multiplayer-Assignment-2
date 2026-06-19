@@ -58,10 +58,14 @@ namespace Events
         public string Message;
     }
 
-    public struct HistoryRequestedEvent
+    public struct ChatHistoryRequestedEvent
     {
         public PlayerRef Requester;
     }
+    
+    public struct OnChatRelaySpawnedEvent{}
+    
+    public struct OnChatRelayDespawnedEvent{}
     
     public struct CharacterClaimedEvent
     {

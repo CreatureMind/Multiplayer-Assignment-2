@@ -32,15 +32,12 @@ public class UIManager : MonoBehaviour
     private ChatUIController _chatViewInstance;
     
     private bool _canSpin = true;
-    private bool _chatToggle = false;
     
     private string _currentLobbyId;
     
     private void Awake()
     {
         _uiDocument = GetComponent<UIDocument>();
-        _chatViewInstance = Instantiate(chatViewPrefab);
-        _chatViewInstance.gameObject.SetActive(_chatToggle);
     }
 
     private void OnEnable()
@@ -65,6 +62,10 @@ public class UIManager : MonoBehaviour
         
         //Ready manager
         EventBus.Subscribe<MatchStartedEvent>(StartMatch);
+        
+        //Chat
+        EventBus.Subscribe<OnChatRelaySpawnedEvent>(CreateNewChat);
+        EventBus.Subscribe<OnChatRelayDespawnedEvent>(DestroyChatView);
     }
 
     private void OnDisable()
@@ -89,6 +90,10 @@ public class UIManager : MonoBehaviour
         
         //Ready manager
         EventBus.Unsubscribe<MatchStartedEvent>(StartMatch);
+        
+        //Chat
+        EventBus.Unsubscribe<OnChatRelaySpawnedEvent>(CreateNewChat);
+        EventBus.Unsubscribe<OnChatRelayDespawnedEvent>(DestroyChatView);
     }
     
     private void Start()
@@ -180,11 +185,7 @@ public class UIManager : MonoBehaviour
         var leaveBtn = root.Q<Button>("leave-button");                                                      //leave-button
         if (leaveBtn != null)
         {
-            leaveBtn.clicked+= () =>
-            {
-                ToggleChatView();
-                ShowSessionsListView();
-            };
+            leaveBtn.clicked+= ShowSessionsListView;
         }
         
         var createRoomBtn = root.Q<Button>("create-button");                                                //create-button
@@ -346,13 +347,6 @@ public class UIManager : MonoBehaviour
             };
         }
         RefreshStartButton();
-        ToggleChatView();
-    }
-
-    private void ToggleChatView()
-    {
-        _chatToggle =  !_chatToggle;
-        _chatViewInstance.gameObject.SetActive(_chatToggle);
     }
     
     private void UpdatePlayerList(PlayerListChangedEvent e)
@@ -401,6 +395,19 @@ public class UIManager : MonoBehaviour
         {
             PlayerNames = playerNameList
         });
+    }
+
+    private void CreateNewChat(OnChatRelaySpawnedEvent e)
+    {
+        if (_chatViewInstance) return;
+        
+        _chatViewInstance = Instantiate(chatViewPrefab);
+    }
+
+    private void DestroyChatView(OnChatRelayDespawnedEvent e)
+    {
+        if (_chatViewInstance)
+            Destroy(_chatViewInstance.gameObject);
     }
     
     private void OnPlayerDataChanged(PlayerDataChangedEvent e)

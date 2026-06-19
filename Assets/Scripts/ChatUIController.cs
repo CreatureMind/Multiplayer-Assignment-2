@@ -61,7 +61,6 @@ public class ChatUIController : MonoBehaviour
         }
         UpdatePlayerDropdown(new OnPlayerListChangedEvent { PlayerNames = initialNames });
         
-        //_chatScrollView.contentContainer.RegisterCallback<GeometryChangedEvent>();
         _chatTextField.RegisterCallback<KeyDownEvent>(OnTextFieldKeyDown, TrickleDown.TrickleDown);
         _chatScrollView.contentContainer.RegisterCallback<GeometryChangedEvent>(ScrollToBottom);
         _chatDropdown.RegisterValueChangedCallback(OnDropDownValueChanged);

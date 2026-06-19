@@ -51,17 +51,44 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     #region Player Logic
     
-    public void RegisterPlayer(PlayerRef player, PlayerData data)
+    public async void RegisterPlayer(PlayerRef player, PlayerData data)
     {
-        Debug.Log($"Registering player: {player.ToString()}");
-        _playerDataMap[player] = data;
-        EventBus.Raise(new PlayerListChangedEvent());
+        try
+        {
+            if (!_playerDataMap.ContainsKey(player))
+            {
+                Debug.Log($"Registering player: {player.ToString()}");
+                _playerDataMap.Add(player, data);
+            }
+
+            await Task.Yield();
+        
+            if (data == null || !_networkRunnerInstance || !_networkRunnerInstance.IsRunning) return;
+
+            EventBus.Raise(new PlayerListChangedEvent());
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(new Exception($"Tried to register {player}: {e.Message}"));
+        }
     }
 
     public void UnregisterPlayer(PlayerRef player)
     {
+        if (!Application.isPlaying) return;
+        if (!_networkRunnerInstance || !_networkRunnerInstance.IsRunning) return;
+        
+        if (_networkRunnerInstance.IsShutdown) return;
+        
         Debug.Log($"Unregistering player: {player.ToString()}");
         _playerDataMap.Remove(player);
+
+        var remainingPlayers = _playerDataMap.Count;
+        //Last player left. Skipping event broadcast.
+        if  (remainingPlayers <= 0) return;
+        
+        if (!Application.isPlaying) return;
+        
         EventBus.Raise(new PlayerListChangedEvent());
     }
 
@@ -257,8 +284,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
                 runner.Spawn(characterSelectionManagerPrefab);
             }
         }
-        
-        EventBus.Raise(new PlayerListChangedEvent());
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)

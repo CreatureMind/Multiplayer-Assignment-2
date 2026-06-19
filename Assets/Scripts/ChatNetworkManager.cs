@@ -47,7 +47,7 @@ public class ChatNetworkManager : MonoBehaviour
         EventBus.Subscribe<ChatMessageEvent>(OnChatMessageSubmitted);
         EventBus.Subscribe<NetworkMessageReceivedEvent>(OnNetworkMessageReceived);
         EventBus.Subscribe<ChatCreatedEvent>(LoadChatHistory);
-        EventBus.Subscribe<HistoryRequestedEvent>(OnHistoryRequested);
+        EventBus.Subscribe<ChatHistoryRequestedEvent>(OnHistoryRequested);
         EventBus.Subscribe<PlayerListChangedEvent>(OnPlayerListChanged);
         EventBus.Subscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
         EventBus.Subscribe<MatchStartedEvent>(OnMatchStarted);
@@ -58,13 +58,13 @@ public class ChatNetworkManager : MonoBehaviour
         EventBus.Unsubscribe<ChatMessageEvent>(OnChatMessageSubmitted);
         EventBus.Unsubscribe<NetworkMessageReceivedEvent>(OnNetworkMessageReceived);
         EventBus.Unsubscribe<ChatCreatedEvent>(LoadChatHistory);
-        EventBus.Unsubscribe<HistoryRequestedEvent>(OnHistoryRequested);
+        EventBus.Unsubscribe<ChatHistoryRequestedEvent>(OnHistoryRequested);
         EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
         EventBus.Unsubscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
         EventBus.Unsubscribe<MatchStartedEvent>(OnMatchStarted);
     }
 
-    private void OnHistoryRequested(HistoryRequestedEvent e)
+    private void OnHistoryRequested(ChatHistoryRequestedEvent e)
     {
         if (!ChatRelay) return;
         var requesterName = GetPlayerName(e.Requester);
@@ -222,11 +222,12 @@ public class ChatNetworkManager : MonoBehaviour
         if (data.IsReady)
         {
             if (_readyAnnounced.Add(playerRef))
-                BroadcastSystem($"{displayName} is ready.");
+                BroadcastSystem($"{displayName} is now ready.");
         }
         else
         {
-            _readyAnnounced.Remove(playerRef);
+            if (_readyAnnounced.Remove(playerRef))
+                BroadcastSystem($"{displayName} is now not ready!");
         }
     }
 

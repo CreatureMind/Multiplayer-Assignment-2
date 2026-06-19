@@ -10,12 +10,16 @@ public class ChatRelay : NetworkBehaviour
 
         if (!HasStateAuthority)
             RPC_RequestHistory(Runner.LocalPlayer);
+        
+        EventBus.Raise(new OnChatRelaySpawnedEvent());
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
         var manager = NetworkManager.Instance?.ChatNetworkManager;
         if (manager && manager.ChatRelay == this) manager.ChatRelay = null;
+        
+        EventBus.Raise(new OnChatRelayDespawnedEvent());
     }
 
     [Rpc(RpcSources.All, RpcTargets.All, Channel = RpcChannel.Reliable, TickAligned = false)]
@@ -43,7 +47,7 @@ public class ChatRelay : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_RequestHistory(PlayerRef requester)
     {
-        EventBus.Raise(new HistoryRequestedEvent { Requester = requester });
+        EventBus.Raise(new ChatHistoryRequestedEvent { Requester = requester });
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
