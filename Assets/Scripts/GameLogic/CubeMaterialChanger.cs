@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class CubeMaterialChanger : NetworkBehaviour
 {
-    [SerializeField] private MeshRenderer renderer;
+    [SerializeField] private new MeshRenderer renderer;
     
     [Networked, OnChangedRender(nameof(OnChangedMaterial))]
     private Color NetworkedColor { get; set; }
@@ -21,5 +21,9 @@ public class CubeMaterialChanger : NetworkBehaviour
     {
         renderer.material.color = NetworkedColor;
     }
-    
+
+    public override void Spawned()
+    {
+        InstantiateMaterialColor(NetworkedColor);
+    }
 }
