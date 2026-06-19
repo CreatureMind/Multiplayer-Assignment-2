@@ -5,13 +5,15 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(UIDocument))]
 public class NameEntryUIController : MonoBehaviour
 {
-    private enum NameEntryState { Hidden, EnteringName, Confirmed, Applied }
+    private enum NameEntryState { Hidden, EnteringName, Confirmed }
     private NameEntryState _state = NameEntryState.Hidden;
     
     private UIDocument _doc;
     private VisualElement _root;
     
-    private string _pendingName;
+    private string _confirmedName;
+
+    private PlayerData _lastAppliedTo;
     
     private const string FIELD_PLAYER_NAME = "player-name-field";
     private const string BTN_CONFIRM = "confirm-button";
@@ -25,12 +27,6 @@ public class NameEntryUIController : MonoBehaviour
     private void OnEnable()
     {
         EventBus.Subscribe<PlayerListChangedEvent>(OnPlayerListChanged);
-    }
-
-    private void OnDisable()
-    {
-        if (_state == NameEntryState.Applied)
-            EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
     }
     
     private void OnDestroy()
@@ -65,8 +61,8 @@ public class NameEntryUIController : MonoBehaviour
 
         // If the name was already confirmed but PlayerData wasn't ready at that point,
         // apply it now that PlayerData has spawned.
-        if (_state == NameEntryState.Confirmed && _pendingName != null)
-            TryApplyPendingName();
+        if (_state == NameEntryState.Confirmed)
+            TryApplyConfirmedName();
     }
 
     private void ShowPanel()
@@ -93,7 +89,7 @@ public class NameEntryUIController : MonoBehaviour
 
     private void OnConfirmClicked(TextField nameField, Label errorLabel)
     {
-        if (_state is NameEntryState.Confirmed or NameEntryState.Applied)
+        if (_state == NameEntryState.Confirmed)
             return;
 
         var trimmed = nameField.value.Trim();
@@ -111,28 +107,29 @@ public class NameEntryUIController : MonoBehaviour
         }
 
         _state = NameEntryState.Confirmed;
-        _pendingName = trimmed;
+        _confirmedName = trimmed;
+        _lastAppliedTo = null;
 
-        TryApplyPendingName();
+        TryApplyConfirmedName();
 
         gameObject.SetActive(false);
         EventBus.Raise(new PlayerNameConfirmedEvent { PlayerName = trimmed });
     }
 
-    private void TryApplyPendingName()
+    private void TryApplyConfirmedName()
     {
-        if (_pendingName == null)
+        if (_confirmedName == null)
             return;
 
         var localData = NetworkManager.Instance?.GetLocalPlayerData();
         if (!localData)
             return;
 
-        localData.ApplyConfirmedName(_pendingName);
-        _pendingName = null;
-        _state = NameEntryState.Applied;
-        
-        EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
+        if (localData == _lastAppliedTo)
+            return;
+
+        localData.ApplyConfirmedName(_confirmedName);
+        _lastAppliedTo = localData;
     }
 
     private static void ShowError(Label errorLabel, string message)

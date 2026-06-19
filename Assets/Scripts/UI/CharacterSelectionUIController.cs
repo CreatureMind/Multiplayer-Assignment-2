@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Events;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -15,6 +17,7 @@ public class CharacterSelectionUIController : MonoBehaviour
     private readonly Dictionary<int, CharacterSlotState> _slotStates = new();
     
     private int _localPlayerCharacterId = -1;
+    private Coroutine _waitForManagerRoutine;
     
     private const string CONTAINER_CHARACTER_GRID = "character-grid";
     
@@ -25,7 +28,6 @@ public class CharacterSelectionUIController : MonoBehaviour
     
     private void OnEnable()
     {
-        EventBus.Subscribe<PlayerNameConfirmedEvent>(OnNameConfirmed);
         EventBus.Subscribe<CharacterSelectionManagerReadyEvent>(OnSelectionManagerReady);
         EventBus.Subscribe<CharacterClaimedEvent>(OnCharacterClaimed);
         EventBus.Subscribe<CharacterReleasedEvent>(OnCharacterReleased);
@@ -35,17 +37,48 @@ public class CharacterSelectionUIController : MonoBehaviour
 
     private void OnDisable()
     {
-        EventBus.Unsubscribe<PlayerNameConfirmedEvent>(OnNameConfirmed);
         EventBus.Unsubscribe<CharacterSelectionManagerReadyEvent>(OnSelectionManagerReady);
         EventBus.Unsubscribe<CharacterClaimedEvent>(OnCharacterClaimed);
         EventBus.Unsubscribe<CharacterReleasedEvent>(OnCharacterReleased);
         EventBus.Unsubscribe<CharacterSelectionConfirmedEvent>(OnSelectionConfirmed);
         EventBus.Unsubscribe<CharacterSelectionDeniedEvent>(OnSelectionDenied);
+        
+        if (_waitForManagerRoutine != null)
+        {
+            StopCoroutine(_waitForManagerRoutine);
+            _waitForManagerRoutine = null;
+        }
     }
     
-    private void OnNameConfirmed(PlayerNameConfirmedEvent e)
+    private void Start()
     {
         gameObject.SetActive(true);
+        
+        if (CharacterSelectionManager.Instance)
+            TryBuildGrid();
+        else
+            _waitForManagerRoutine = StartCoroutine(WaitForSelectionManagerThenBuild());
+    }
+    
+    private IEnumerator WaitForSelectionManagerThenBuild()
+    {
+        const int maxFramesToWait = 300; // ~5 seconds at 60fps — generous safety margin.
+        var framesWaited = 0;
+
+        while (!CharacterSelectionManager.Instance && framesWaited < maxFramesToWait)
+        {
+            framesWaited++;
+            yield return null;
+        }
+
+        _waitForManagerRoutine = null;
+
+        if (!CharacterSelectionManager.Instance)
+        {
+            Debug.LogError("[CharacterSelectionUI] Timed out waiting for CharacterSelectionManager.Instance.");
+            yield break;
+        }
+
         TryBuildGrid();
     }
     
@@ -72,8 +105,7 @@ public class CharacterSelectionUIController : MonoBehaviour
     private void OnSelectionConfirmed(CharacterSelectionConfirmedEvent e)
     {
         _localPlayerCharacterId = e.CharacterId;
-        // TODO: Hide or dim the selection UI and show a "waiting for others" message.
-        Debug.Log($"[CharacterSelectionUI] Character {e.CharacterId} confirmed for local player.");
+        gameObject.SetActive(false);
     }
     
     private void OnSelectionDenied(CharacterSelectionDeniedEvent e)
@@ -84,9 +116,15 @@ public class CharacterSelectionUIController : MonoBehaviour
         if (_buttonMap.Count > 0)
             return;
         if (!characterRegistry)
+        {
+            Debug.LogError("[CharacterSelectionUI] characterRegistry is NULL — assign it in the Inspector.");
             return;
+        }
         if (!CharacterSelectionManager.Instance)
+        {
+            Debug.LogWarning("[CharacterSelectionUI] CharacterSelectionManager.Instance is null — grid not built yet.");
             return;
+        }
 
         _root = _doc.rootVisualElement;
         var grid = _root.Q<VisualElement>(CONTAINER_CHARACTER_GRID);
@@ -134,7 +172,6 @@ public class CharacterSelectionUIController : MonoBehaviour
             }
         };
 
-        // Capture id for the closure.
         var characterId = def.CharacterId;
         button.clicked += () => OnCharacterButtonClicked(characterId);
 
@@ -151,14 +188,18 @@ public class CharacterSelectionUIController : MonoBehaviour
         
         var localPlayer = NetworkManager.Instance.GetLocalPlayerData();
         if (!localPlayer)
+        {
+            Debug.LogWarning("[CharacterSelectionUI] localPlayer is null — cannot send request.");
             return;
-
+        }
+        
         CharacterSelectionManager.Instance.RequestCharacterRpc(characterId, localPlayer.Object.InputAuthority);
     }
     
     private void RefreshButton(int characterId)
     {
-        if (!_buttonMap.TryGetValue(characterId, out var button)) return;
+        if (!_buttonMap.TryGetValue(characterId, out var button))
+            return;
 
         var state = _slotStates.GetValueOrDefault(characterId, CharacterSlotState.Available);
 
