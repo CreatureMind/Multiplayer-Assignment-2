@@ -58,7 +58,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             if (!_playerDataMap.ContainsKey(player))
             {
                 Debug.Log($"Registering player: {player.ToString()}");
-                _playerDataMap.Add(player, data);
+                _playerDataMap[player] = data;
             }
 
             await Task.Yield();
@@ -261,6 +261,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         }
         
         _networkRunnerInstance = null;
+        _playerDataMap.Clear();
     }
 
     #endregion

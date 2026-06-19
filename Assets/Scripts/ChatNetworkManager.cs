@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Events;
 using Fusion;
@@ -164,8 +165,6 @@ public class ChatNetworkManager : MonoBehaviour
 
     private void OnPlayerListChanged(PlayerListChangedEvent _)
     {
-        if (!HasChatStateAuthority()) return;
-
         var currentRefs = new HashSet<PlayerRef>();
         foreach (var data in NetworkManager.Instance.GetAllPlayers())
             currentRefs.Add(data.Object.InputAuthority);
@@ -176,7 +175,8 @@ public class ChatNetworkManager : MonoBehaviour
 
         foreach (var playerRef in left)
         {
-            BroadcastSystem($"{_trackedNames[playerRef]} left.");
+            if (HasChatStateAuthority())
+                BroadcastSystem($"{_trackedNames[playerRef]} left.");
             _trackedNames.Remove(playerRef);
             _joinedAnnounced.Remove(playerRef);
             _readyAnnounced.Remove(playerRef);
@@ -187,7 +187,6 @@ public class ChatNetworkManager : MonoBehaviour
 
     private void OnPlayerDataChanged(PlayerDataChangedEvent e)
     {
-        if (!HasChatStateAuthority()) return;
         ProcessPlayer(FindPlayer(e.PlayerRef));
     }
 
@@ -216,17 +215,18 @@ public class ChatNetworkManager : MonoBehaviour
         if (!_joinedAnnounced.Contains(playerRef) && !displayName.StartsWith("Player_"))
         {
             _joinedAnnounced.Add(playerRef);
-            BroadcastSystem($"{displayName} joined.");
+            if (HasChatStateAuthority())
+                BroadcastSystem($"{displayName} joined.");
         }
 
         if (data.IsReady)
         {
-            if (_readyAnnounced.Add(playerRef))
+            if (_readyAnnounced.Add(playerRef) && HasChatStateAuthority())
                 BroadcastSystem($"{displayName} is now ready.");
         }
         else
         {
-            if (_readyAnnounced.Remove(playerRef))
+            if (_readyAnnounced.Remove(playerRef) && HasChatStateAuthority())
                 BroadcastSystem($"{displayName} is now not ready!");
         }
     }
@@ -268,5 +268,13 @@ public class ChatNetworkManager : MonoBehaviour
         }
         playerRef = default;
         return false;
+    }
+
+    internal void ResetSessionState()
+    {
+        _chatHistory.Clear();
+        _trackedNames.Clear();
+        _joinedAnnounced.Clear();
+        _readyAnnounced.Clear();
     }
 }

@@ -358,6 +358,8 @@ public class UIManager : MonoBehaviour
 
         foreach (var playerData in NetworkManager.Instance.GetAllPlayers())
         {
+            if (playerData == null || !playerData.Object || !playerData.Object.IsValid) continue;
+            
             var row = playerRowTemplate.CloneTree();
 
             var nameLabel = row.Q<Label>("player-name");                                                    //player-name

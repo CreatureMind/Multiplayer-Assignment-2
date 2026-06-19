@@ -18,6 +18,7 @@ public class ChatRelay : NetworkBehaviour
     {
         var manager = NetworkManager.Instance?.ChatNetworkManager;
         if (manager && manager.ChatRelay == this) manager.ChatRelay = null;
+        manager?.ResetSessionState();
         
         EventBus.Raise(new OnChatRelayDespawnedEvent());
     }
