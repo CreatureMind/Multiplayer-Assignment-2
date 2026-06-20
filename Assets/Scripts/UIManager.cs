@@ -65,7 +65,6 @@ public class UIManager : MonoBehaviour
         
         //Chat
         EventBus.Subscribe<OnChatRelaySpawnedEvent>(CreateNewChat);
-        EventBus.Subscribe<OnChatRelayDespawnedEvent>(DestroyChatView);
     }
 
     private void OnDisable()
@@ -93,7 +92,6 @@ public class UIManager : MonoBehaviour
         
         //Chat
         EventBus.Unsubscribe<OnChatRelaySpawnedEvent>(CreateNewChat);
-        EventBus.Unsubscribe<OnChatRelayDespawnedEvent>(DestroyChatView);
     }
     
     private void Start()
@@ -404,12 +402,6 @@ public class UIManager : MonoBehaviour
         if (_chatViewInstance) return;
         
         _chatViewInstance = Instantiate(chatViewPrefab);
-    }
-
-    private void DestroyChatView(OnChatRelayDespawnedEvent e)
-    {
-        if (_chatViewInstance)
-            Destroy(_chatViewInstance.gameObject);
     }
     
     private void OnPlayerDataChanged(PlayerDataChangedEvent e)

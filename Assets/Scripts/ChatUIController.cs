@@ -23,15 +23,19 @@ public class ChatUIController : MonoBehaviour
     private void OnEnable()
     {
         EventBus.Subscribe<OnMessageReceivedEvent>(RenderMessage);
-        EventBus.Subscribe<OnPlayerListChangedEvent>(UpdatePlayerDropdown);
+        EventBus.Subscribe<PlayerListChangedEvent>(OnPlayerListChanged);
+        EventBus.Subscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
+        EventBus.Subscribe<OnChatRelayDespawnedEvent>(OnChatRelayDespawned);
     }
 
     private void OnDisable()
     {
         EventBus.Unsubscribe<OnMessageReceivedEvent>(RenderMessage);
-        EventBus.Unsubscribe<OnPlayerListChangedEvent>(UpdatePlayerDropdown);
-        
-        _chatTextField.UnregisterCallback<KeyDownEvent>(OnTextFieldKeyDown, TrickleDown.TrickleDown);
+        EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
+        EventBus.Unsubscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
+        EventBus.Unsubscribe<OnChatRelayDespawnedEvent>(OnChatRelayDespawned);
+
+        _chatTextField?.UnregisterCallback<KeyDownEvent>(OnTextFieldKeyDown, TrickleDown.TrickleDown);
     }
 
     private void Start()
@@ -53,30 +57,46 @@ public class ChatUIController : MonoBehaviour
             };
         }
         
-        var initialNames = new List<string>();
-        if (NetworkManager.Instance)
-        {
-            foreach (var p in NetworkManager.Instance.GetAllPlayers())
-                initialNames.Add(p.DisplayName.ToString());
-        }
-        UpdatePlayerDropdown(new OnPlayerListChangedEvent { PlayerNames = initialNames });
+        RefreshPlayerDropdown();
         
         _chatTextField.RegisterCallback<KeyDownEvent>(OnTextFieldKeyDown, TrickleDown.TrickleDown);
         _chatScrollView.contentContainer.RegisterCallback<GeometryChangedEvent>(ScrollToBottom);
         _chatDropdown.RegisterValueChangedCallback(OnDropDownValueChanged);
         
         EventBus.Raise(new ChatCreatedEvent());
+        DontDestroyOnLoad(gameObject);
     }
 
-    private void UpdatePlayerDropdown(OnPlayerListChangedEvent e)
+    private void OnPlayerListChanged(PlayerListChangedEvent _) => RefreshPlayerDropdown();
+    private void OnPlayerDataChanged(PlayerDataChangedEvent _) => RefreshPlayerDropdown();
+
+    // Built directly from the persistent player list so the dropdown stays
+    // correct in the game scene too (UIManager, the old source, is lobby-only).
+    private void RefreshPlayerDropdown()
+    {
+        var playerNames = new List<string>();
+        if (NetworkManager.Instance)
+        {
+            foreach (var p in NetworkManager.Instance.GetAllPlayers())
+            {
+                if (p == null || !p.Object || !p.Object.IsValid) continue;
+                var displayName = p.DisplayName.ToString();
+                if (!string.IsNullOrEmpty(displayName))
+                    playerNames.Add(displayName);
+            }
+        }
+        UpdatePlayerDropdown(playerNames);
+    }
+
+    private void UpdatePlayerDropdown(List<string> playerNames)
     {
         if (_chatDropdown == null) return;
 
         var currentlySelectedValue = _chatDropdown.value;
-        
+
         List<string> displayChoices = new() { ALL_OPTION };
-        
-        foreach (var playerName in e.PlayerNames)
+
+        foreach (var playerName in playerNames)
         {
             if (playerName == GetLocalPlayerName())
                 continue;
@@ -87,13 +107,9 @@ public class ChatUIController : MonoBehaviour
         _chatDropdown.choices = displayChoices;
 
         if (displayChoices.Contains(currentlySelectedValue))
-        {
             _chatDropdown.value = currentlySelectedValue;
-        }
         else
-        {
             _chatDropdown.value = ALL_OPTION;
-        }
     }
 
     private void FocusChatField()
@@ -198,5 +214,11 @@ public class ChatUIController : MonoBehaviour
     {
         var data = NetworkManager.Instance ? NetworkManager.Instance.GetLocalPlayerData() : null;
         return data ? data.DisplayName.ToString() : string.Empty;
+    }
+    
+    private void OnChatRelayDespawned(OnChatRelayDespawnedEvent e)
+    {
+        Debug.Log("OnChatRelayDespawned");
+        Destroy(gameObject);
     }
 }

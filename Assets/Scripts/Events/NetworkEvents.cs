@@ -33,6 +33,13 @@ namespace Events
     }
     
     public struct MatchStartedEvent { }
+
+    // Raised on every client when a networked scene load begins, before any
+    // network objects are despawned.
+    public struct SceneLoadStartedEvent { }
+
+    // Raised on every client once a networked scene load has finished.
+    public struct SceneLoadDoneEvent { }
     
     public struct ChatCreatedEvent { }
 
@@ -53,9 +60,7 @@ namespace Events
 
     public struct NetworkMessageReceivedEvent
     {
-        public string Sender;
-        public string Target;
-        public string Message;
+        public MessageData Message;
     }
 
     public struct ChatHistoryRequestedEvent

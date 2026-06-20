@@ -110,6 +110,11 @@ public class NameEntryUIController : MonoBehaviour
         _confirmedName = trimmed;
         _lastAppliedTo = null;
 
+        // Persist on the (DontDestroyOnLoad) NetworkManager so a PlayerData
+        // respawned in the game scene can restore this name.
+        if (NetworkManager.Instance)
+            NetworkManager.Instance.LocalConfirmedName = trimmed;
+
         TryApplyConfirmedName();
 
         gameObject.SetActive(false);

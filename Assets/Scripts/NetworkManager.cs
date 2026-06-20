@@ -5,6 +5,7 @@ using Events;
 using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Linq;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
@@ -29,6 +30,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     private string _currentLobbyId;
     public string CurrentLobbyId => _currentLobbyId;
     public CharacterRegistry CharacterRegistry => characterRegistry;
+
+    // Cached so a PlayerData respawned in the game scene keeps the chosen name
+    // instead of falling back to the default "Player_<id>".
+    public string LocalConfirmedName { get; set; }
     
     private SessionDataRefreshedEvent? _cachedSessionData;
     
@@ -105,6 +110,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     public bool IsLocalPlayer(PlayerRef player) => _networkRunnerInstance.LocalPlayer == player;
+
+    public PlayerRef LocalPlayer => _networkRunnerInstance ? _networkRunnerInstance.LocalPlayer : default;
     
     public void KickPlayer(PlayerRef player)
     {
@@ -282,6 +289,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             {
                 runner.Spawn(readyManagerPrefab);
                 _chatRelayInstance = runner.Spawn(chatRelayPrefab);
+                _chatRelayInstance.name = $"ChatRelay({runner.LocalPlayer.ToString()})";
             }
         }
     }
@@ -296,7 +304,15 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
-        Debug.Log("ShutDown call because " + shutdownReason);
+        if (shutdownReason == ShutdownReason.Ok)
+        {
+            Debug.Log("Joining a room...");
+        }
+        else
+        {
+            Debug.Log("Disconnected from session. Reason: " + shutdownReason);
+            SceneManager.LoadScene(0);
+        }
     }
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
@@ -361,9 +377,23 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         
         if (runner.IsSharedModeMasterClient && !CharacterSelectionManager.Instance)
             runner.Spawn(characterSelectionManagerPrefab);
+        
+        if (SceneManager.GetActiveScene().name == "Game_Scene")
+        {
+            if (runner.IsSharedModeMasterClient && !_chatRelayInstance)
+            {
+                _chatRelayInstance = runner.Spawn(chatRelayPrefab);
+                _chatRelayInstance.name = $"ChatRelay({runner.LocalPlayer.ToString()})";
+            }
+        }
+
+        EventBus.Raise(new SceneLoadDoneEvent());
     }
 
-    public void OnSceneLoadStart(NetworkRunner runner) { }
+    public void OnSceneLoadStart(NetworkRunner runner)
+    {
+        EventBus.Raise(new SceneLoadStartedEvent());
+    }
 
     #endregion
     

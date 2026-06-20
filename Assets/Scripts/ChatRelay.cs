@@ -18,31 +18,27 @@ public class ChatRelay : NetworkBehaviour
     {
         var manager = NetworkManager.Instance?.ChatNetworkManager;
         if (manager && manager.ChatRelay == this) manager.ChatRelay = null;
-        manager?.ResetSessionState();
-        
-        EventBus.Raise(new OnChatRelayDespawnedEvent());
+
+        // Only wipe chat state and tear down the chat UI when the session is
+        // actually ending (leaving the room). On a scene transition the runner
+        // keeps running, so the chat log and window must persist.
+        if (runner == null || runner.IsShutdown)
+        {
+            manager?.ResetSessionState();
+            EventBus.Raise(new OnChatRelayDespawnedEvent());
+        }
     }
 
     [Rpc(RpcSources.All, RpcTargets.All, Channel = RpcChannel.Reliable, TickAligned = false)]
     public void RPC_SendMessage(MessageData message)
     {
-        EventBus.Raise(new NetworkMessageReceivedEvent
-        {
-            Sender = message.Sender.Value,
-            Target = message.Target.Value,
-            Message = message.Message.Value
-        });
+        EventBus.Raise(new NetworkMessageReceivedEvent { Message = message });
     }
 
     [Rpc(RpcSources.All, RpcTargets.All, Channel = RpcChannel.Reliable, TickAligned = false)]
     public void RPC_SendWhisper([RpcTarget] PlayerRef target, MessageData message)
     {
-        EventBus.Raise(new NetworkMessageReceivedEvent
-        {
-            Sender = message.Sender.Value,
-            Target = message.Target.Value,
-            Message = message.Message.Value
-        });
+        EventBus.Raise(new NetworkMessageReceivedEvent { Message = message });
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
@@ -54,11 +50,6 @@ public class ChatRelay : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
     public void RPC_SendHistoryEntry([RpcTarget] PlayerRef target, MessageData message)
     {
-        EventBus.Raise(new NetworkMessageReceivedEvent
-        {
-            Sender = message.Sender.Value,
-            Target = message.Target.Value,
-            Message = message.Message.Value
-        });
+        EventBus.Raise(new NetworkMessageReceivedEvent { Message = message });
     }
 }
