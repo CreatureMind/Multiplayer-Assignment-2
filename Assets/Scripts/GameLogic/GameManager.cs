@@ -7,28 +7,34 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private CubeSpawner cubeSpawnerPrefab;
-    private NetworkRunner _networkRunnerInstance;
+    
+    private bool _cubeSpawnerSpawned;
 
     private void Awake()
     {
-        EventBus.Subscribe<CharacterClaimedEvent>(SpawnCubeSpawner);
+        EventBus.Subscribe<CharacterSelectionConfirmedEvent>(SpawnCubeSpawner);
     }
     
 
-    private void SpawnCubeSpawner(CharacterClaimedEvent e)
+    private void SpawnCubeSpawner(CharacterSelectionConfirmedEvent e)
     {
-        _networkRunnerInstance = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
-        if (_networkRunnerInstance == null)
+        if (_cubeSpawnerSpawned)
+            return;
+        
+        var runner = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
+        if (!runner)
         {
             Debug.LogError("No NetworkRunner found in the scene. Please ensure a NetworkRunner is present.");
+            return;
         }
         
-        _networkRunnerInstance.Spawn(cubeSpawnerPrefab, Vector3.zero, Quaternion.identity);
+        runner.Spawn(cubeSpawnerPrefab, Vector3.zero, Quaternion.identity);
+        _cubeSpawnerSpawned = true;
     }
 
     
     private void OnDestroy()
     {
-        EventBus.Unsubscribe<CharacterClaimedEvent>(SpawnCubeSpawner);
+        EventBus.Unsubscribe<CharacterSelectionConfirmedEvent>(SpawnCubeSpawner);
     }
 }

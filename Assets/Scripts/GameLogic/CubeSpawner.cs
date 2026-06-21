@@ -6,11 +6,6 @@ public class CubeSpawner : NetworkBehaviour
     [SerializeField] private CubeMaterialChanger cubePrefab;
 
     private PlayerInputHandler inputHandler;
-    
-    private PlayerData playerData;
-
-    private Color playerChosenColor; 
-
 
     public override void Spawned()
     {
@@ -18,13 +13,6 @@ public class CubeSpawner : NetworkBehaviour
         
         inputHandler = PlayerInputHandler.Instance;
         if (inputHandler != null) inputHandler.OnMouseInput += HandleMouseInput;
-
-        playerData = NetworkManager.Instance.GetLocalPlayerData();
-        
-        if (playerData != null)
-        {
-            playerChosenColor = playerData.CharacterColor;
-        }
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState)
@@ -48,18 +36,27 @@ public class CubeSpawner : NetworkBehaviour
         if (!Physics.Raycast(ray, out RaycastHit hit)) return;
 
         if (hit.collider.CompareTag("Floor"))
-        {
-            Vector3 spawnPos = hit.point;
-            // Spawn with ownership of this player (Object.InputAuthority) and optional init callback
-            var cube = Runner.Spawn(cubePrefab, spawnPos, Quaternion.identity, Object.InputAuthority);
-            cube.InstantiateMaterialColor(playerChosenColor);
-        }
+            SpawnCube(hit.point);
+        else if (hit.collider.CompareTag("Cube"))
+            DestroyCube(hit.collider);
+    }
 
-        if (hit.collider.CompareTag("Cube"))
+    private void SpawnCube(Vector3 spawnPos)
+    {
+        var playerData = NetworkManager.Instance.GetLocalPlayerData();
+        if (playerData == null)
         {
-            var cmc = hit.collider.GetComponent<CubeMaterialChanger>().Object;
-            
-            Runner.Despawn(cmc);
+            Debug.LogWarning("CubeSpawner: playerData is null");
+            return;
         }
+        var cube = Runner.Spawn(cubePrefab, spawnPos, Quaternion.identity, inputAuthority: Runner.LocalPlayer);
+        cube.InstantiateMaterialColor(playerData.CharacterColor);
+    }
+
+    private void DestroyCube(Collider cubeCollider)
+    {
+        var cmc = cubeCollider.GetComponent<CubeMaterialChanger>();
+        if (cmc == null || cmc.Object == null) return;
+        Runner.Despawn(cmc.Object);
     }
 }
