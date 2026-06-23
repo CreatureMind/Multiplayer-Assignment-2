@@ -35,7 +35,6 @@ public class PlayerInputHandler : MonoBehaviour
         mousePosAction.action.performed += ctx =>
         {
             mouseScreenPosition = ctx.ReadValue<Vector2>();
-            // Handle mouse position input if needed
         };
     }
     

@@ -22,6 +22,11 @@ namespace Events
     
     public struct PlayerListChangedEvent { }
 
+    public struct PlayerLeftEvent
+    {
+        public PlayerRef Player;
+    }
+
     public struct OnPlayerListChangedEvent
     {
         public List<string> PlayerNames;
@@ -34,11 +39,9 @@ namespace Events
     
     public struct MatchStartedEvent { }
 
-    // Raised on every client when a networked scene load begins, before any
-    // network objects are despawned.
-    public struct SceneLoadStartedEvent { }
 
-    // Raised on every client once a networked scene load has finished.
+    public struct SceneLoadStartedEvent { }
+    
     public struct SceneLoadDoneEvent { }
     
     public struct ChatCreatedEvent { }

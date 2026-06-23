@@ -49,7 +49,6 @@ public class GameUIManager : MonoBehaviour
 
     private void OnPlayerListChanged(PlayerListChangedEvent e)
     {
-        // Check for master client changes when player list changes
         if (_presenter != null)
         {
             _presenter.CheckForMasterClientChange();

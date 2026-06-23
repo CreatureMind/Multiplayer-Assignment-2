@@ -41,14 +41,14 @@ public class ChatUIController : MonoBehaviour
     private void Start()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
-        _chatScrollView = root.Q<ScrollView>("chat-scroll-view");
+        _chatScrollView = root.Q<ScrollView>(UI_Chat_View.chat_scroll_view);
         _chatScrollView.Clear();
-        _chatTextField = root.Q<TextField>("text-field");
-        _chatDropdown = root.Q<DropdownField>("dropdown-field");
-        
-        var chatContainer = root.Q<VisualElement>("chat-container");
-        
-        var chatBtn = root.Q<Button>("chat-btn");
+        _chatTextField = root.Q<TextField>(UI_Chat_View.text_field);
+        _chatDropdown = root.Q<DropdownField>(UI_Chat_View.dropdown_field);
+
+        var chatContainer = root.Q<VisualElement>(UI_Chat_View.chat_container);
+
+        var chatBtn = root.Q<Button>(UI_Chat_View.chat_btn);
         if (chatBtn != null)
         {
             chatBtn.clicked += () =>
@@ -69,9 +69,7 @@ public class ChatUIController : MonoBehaviour
 
     private void OnPlayerListChanged(PlayerListChangedEvent _) => RefreshPlayerDropdown();
     private void OnPlayerDataChanged(PlayerDataChangedEvent _) => RefreshPlayerDropdown();
-
-    // Built directly from the persistent player list so the dropdown stays
-    // correct in the game scene too (UIManager, the old source, is lobby-only).
+    
     private void RefreshPlayerDropdown()
     {
         var playerNames = new List<string>();

@@ -37,14 +37,10 @@ public class ChatNetworkManager : MonoBehaviour
     private readonly Dictionary<PlayerRef, string> _trackedNames = new();
     private readonly HashSet<PlayerRef> _joinedAnnounced = new();
     private readonly HashSet<PlayerRef> _readyAnnounced = new();
-
-    // Per-message identity used to drop duplicates that arrive both as a live
-    // broadcast and as a replayed history entry during the join window.
+    
     private readonly HashSet<long> _seenMessages = new();
     private int _outSeq;
-
-    // While true (during a match/scene transition) presence announcements are
-    // muted so despawning/respawning players don't spam join/ready/left lines.
+    
     private bool _suppressAnnouncements;
 
     private ChatRelay _chatRelay;
@@ -66,6 +62,7 @@ public class ChatNetworkManager : MonoBehaviour
         EventBus.Subscribe<ChatCreatedEvent>(LoadChatHistory);
         EventBus.Subscribe<ChatHistoryRequestedEvent>(OnHistoryRequested);
         EventBus.Subscribe<PlayerListChangedEvent>(OnPlayerListChanged);
+        EventBus.Subscribe<PlayerLeftEvent>(OnPlayerLeft);
         EventBus.Subscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
         EventBus.Subscribe<SceneLoadStartedEvent>(OnSceneLoadStarted);
         EventBus.Subscribe<SceneLoadDoneEvent>(OnSceneLoadDone);
@@ -78,6 +75,7 @@ public class ChatNetworkManager : MonoBehaviour
         EventBus.Unsubscribe<ChatCreatedEvent>(LoadChatHistory);
         EventBus.Unsubscribe<ChatHistoryRequestedEvent>(OnHistoryRequested);
         EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
+        EventBus.Unsubscribe<PlayerLeftEvent>(OnPlayerLeft);
         EventBus.Unsubscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
         EventBus.Unsubscribe<SceneLoadStartedEvent>(OnSceneLoadStarted);
         EventBus.Unsubscribe<SceneLoadDoneEvent>(OnSceneLoadDone);
@@ -114,12 +112,10 @@ public class ChatNetworkManager : MonoBehaviour
 
         if (e.Target == ALL)
         {
-            // All-chat echoes back to the sender, so don't render locally
             ChatRelay.RPC_SendMessage(message);
             return;
         }
-
-        // Whisper: target won't echo to the sender, so render+save locally
+        
         if (!TryGetPlayerRefByName(e.Target, out var targetRef))
         {
             Debug.LogWarning($"Whisper target '{e.Target}' not found");
@@ -143,12 +139,10 @@ public class ChatNetworkManager : MonoBehaviour
 
     private void SaveAndRender(MessageData message)
     {
-        // Drop a message we've already shown (live broadcast + history replay race).
+        // Drop a message we've already shown
         var key = ((long)message.SenderId << 32) | (uint)message.Seq;
         if (!_seenMessages.Add(key)) return;
-
-        // System lines (joined/ready/left/game-starting) are live-only: they are
-        // never replayed to late joiners, only real chat is kept in history.
+        
         if (message.Sender.Value != SYSTEM)
         {
             _chatHistory.Enqueue(message);
@@ -192,26 +186,32 @@ public class ChatNetworkManager : MonoBehaviour
 
     private void OnPlayerListChanged(PlayerListChangedEvent _)
     {
-        if (PresenceMuted()) return;
-
-        var currentRefs = new HashSet<PlayerRef>();
-        foreach (var data in NetworkManager.Instance.GetAllPlayers())
-            currentRefs.Add(data.Object.InputAuthority);
-
-        var left = new List<PlayerRef>();
-        foreach (var kv in _trackedNames)
-            if (!currentRefs.Contains(kv.Key)) left.Add(kv.Key);
-
-        foreach (var playerRef in left)
-        {
-            if (HasChatStateAuthority())
-                BroadcastSystem($"{_trackedNames[playerRef]} left.");
-            _trackedNames.Remove(playerRef);
-            _joinedAnnounced.Remove(playerRef);
-            _readyAnnounced.Remove(playerRef);
-        }
-
+        TrackPresentNames();
+        if (_suppressAnnouncements) return;
         SweepPlayers();
+    }
+
+    // Keep names current in every scene so a leaver can be named when they leave.
+    private void TrackPresentNames()
+    {
+        if (NetworkManager.Instance == null) return;
+        foreach (var data in NetworkManager.Instance.GetAllPlayers())
+        {
+            if (!data || !data.Object) continue;
+            var displayName = data.DisplayName.ToString();
+            if (!string.IsNullOrEmpty(displayName))
+                _trackedNames[data.Object.InputAuthority] = displayName;
+        }
+    }
+
+    private void OnPlayerLeft(PlayerLeftEvent e)
+    {
+        if (_trackedNames.TryGetValue(e.Player, out var displayName) && HasChatStateAuthority())
+            BroadcastSystem($"{displayName} left.");
+
+        _trackedNames.Remove(e.Player);
+        _joinedAnnounced.Remove(e.Player);
+        _readyAnnounced.Remove(e.Player);
     }
 
     private void OnPlayerDataChanged(PlayerDataChangedEvent e)
@@ -222,21 +222,12 @@ public class ChatNetworkManager : MonoBehaviour
 
     private void OnSceneLoadStarted(SceneLoadStartedEvent _)
     {
-        // Fires before any object despawns, while the lobby is still the active
-        // scene. Mute presence spam for the unload window (PresenceMuted() takes
-        // over via the scene check once the game scene is active). "Game
-        // starting!" is rendered locally on each client because the relay is
-        // about to despawn and an RPC racing the scene load would be dropped.
         _suppressAnnouncements = true;
         RenderLocalSystem("Game starting!");
     }
-
-    // Game scene is now active; the scene check in PresenceMuted() keeps presence
-    // announcements muted from here, so the unload-window flag can be released.
+    
     private void OnSceneLoadDone(SceneLoadDoneEvent _) => _suppressAnnouncements = false;
 
-    // Presence announcements (joined/ready/left) are a lobby-only feature. Mute
-    // them in the game scene and during the transition's unload window.
     private bool PresenceMuted()
         => _suppressAnnouncements || SceneManager.GetActiveScene().name == GAME_SCENE;
 
@@ -295,8 +286,6 @@ public class ChatNetworkManager : MonoBehaviour
         _chatRelay.RPC_SendMessage(NewMessage(SYSTEM, ALL, text));
     }
 
-    // Stamps each outgoing message with a unique (senderId, seq) identity so
-    // receivers can dedup a live broadcast against its history replay.
     private MessageData NewMessage(string sender, string target, string text)
     {
         var senderId = NetworkManager.Instance ? NetworkManager.Instance.LocalPlayer.PlayerId : 0;

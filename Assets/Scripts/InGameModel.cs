@@ -15,9 +15,12 @@ public class InGameModel
         return NetworkManager.Instance.CanStartGame();
     }
 
-    public void ReturnToLobby()
+    public void ReturnToLobby(float flushDelay = 0f)
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(LOBBY_SCENE);
+        if (NetworkManager.Instance)
+            _ = NetworkManager.Instance.ReturnToLobbyAsync(flushDelay);
+        else
+            UnityEngine.SceneManagement.SceneManager.LoadScene(LOBBY_SCENE);
     }
 
     public void CheckMasterClientStatus()

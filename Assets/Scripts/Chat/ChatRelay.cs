@@ -18,10 +18,7 @@ public class ChatRelay : NetworkBehaviour
     {
         var manager = NetworkManager.Instance?.ChatNetworkManager;
         if (manager && manager.ChatRelay == this) manager.ChatRelay = null;
-
-        // Only wipe chat state and tear down the chat UI when the session is
-        // actually ending (leaving the room). On a scene transition the runner
-        // keeps running, so the chat log and window must persist.
+        
         if (runner == null || runner.IsShutdown)
         {
             manager?.ResetSessionState();

@@ -114,7 +114,7 @@ public class UIManager : MonoBehaviour
         _uiDocument.visualTreeAsset = lobbiesListView;
         _root = _uiDocument.rootVisualElement;
 
-        var scrollView = _root.Q<ScrollView>("sessions-scroll-view");                                       //sessions-scroll-view
+        var scrollView = _root.Q<ScrollView>(UI_Lobbies_List_View.sessions_scroll_view);                                       //sessions-scroll-view
         if (scrollView == null)
         {
             Debug.LogError("Could not find ScrollView named 'session-scroll-view' in sessionsListView.");
@@ -140,13 +140,13 @@ public class UIManager : MonoBehaviour
         {
             var sessionRow = sessionRowTemplate.CloneTree();
             
-            var sessionNameLabel = sessionRow.Q<Label>("lobby-name");                                       //lobby-name
+            var sessionNameLabel = sessionRow.Q<Label>(UI_Session_Row_Template.lobby_name);                                       //lobby-name
             if (sessionNameLabel != null)
             {
                 sessionNameLabel.text = session.sessionName;
             }
 
-            var enterBtn = sessionRow.Q<Button>("enter-button");                                            //enter-button
+            var enterBtn = sessionRow.Q<Button>(UI_Session_Row_Template.enter_button);                                            //enter-button
             if (enterBtn != null)
             {
                 enterBtn.clicked += () =>
@@ -165,34 +165,38 @@ public class UIManager : MonoBehaviour
 
     private void ShowRoomsListView(JoinedLobbyEvent e)
     {
+        // Sync from the persistent manager (set even when returning from a match).
+        if (NetworkManager.Instance && !string.IsNullOrEmpty(NetworkManager.Instance.CurrentLobbyId))
+            _currentLobbyId = NetworkManager.Instance.CurrentLobbyId;
+
         _uiDocument.visualTreeAsset = roomsListView;
         _root = _uiDocument.rootVisualElement;
         
-        var headerLabel = _root.Q<Label>("header");                                                          //header
+        var headerLabel = _root.Q<Label>(UI_Rooms_List_View.header);                                                          //header
         headerLabel.text = _currentLobbyId + " / Rooms";
         
         SetRoomsListButtons(_root);
         
-        _roomsScrollView = _root.Q<ScrollView>("rooms-scroll-view");                                        //rooms-scroll-view
+        _roomsScrollView = _root.Q<ScrollView>(UI_Rooms_List_View.rooms_scroll_view);                                        //rooms-scroll-view
         if (_roomsScrollView == null)
             Debug.LogError("Could not find ScrollView named 'rooms-scroll-view' in roomsListView.");
     }
 
     private void SetRoomsListButtons(VisualElement root)
     {
-        var leaveBtn = root.Q<Button>("leave-button");                                                      //leave-button
+        var leaveBtn = root.Q<Button>(UI_Rooms_List_View.leave_button);                                                      //leave-button
         if (leaveBtn != null)
         {
             leaveBtn.clicked+= ShowSessionsListView;
         }
         
-        var createRoomBtn = root.Q<Button>("create-button");                                                //create-button
+        var createRoomBtn = root.Q<Button>(UI_Rooms_List_View.create_button);                                                //create-button
         if (createRoomBtn != null)
         {
             createRoomBtn.clicked += ShowRoomCreationView;
         }
 
-        var refreshBtn = root.Q<Button>("refresh-button");                                                  //refresh-button
+        var refreshBtn = root.Q<Button>(UI_Rooms_List_View.refresh_button);                                                  //refresh-button
         if (refreshBtn != null)
         {
             refreshBtn.clicked += () =>
@@ -219,13 +223,13 @@ public class UIManager : MonoBehaviour
             
             var displayName= room.Properties.TryGetValue("DisplayName", out var dn);
             
-            var roomNameLabel = roomRow.Q<Label>("room-name");                                              //room-name
+            var roomNameLabel = roomRow.Q<Label>(UI_Room_Row_Template.room_name);                                              //room-name
             if (roomNameLabel != null)
             {
                 roomNameLabel.text = dn;
             }
 
-            var enterBtn = roomRow.Q<Button>("enter-button");                                               //enter-button
+            var enterBtn = roomRow.Q<Button>(UI_Room_Row_Template.enter_button);                                               //enter-button
             if (enterBtn != null)
             {
                 var isFull = room.PlayerCount >= room.MaxPlayers;
@@ -241,7 +245,7 @@ public class UIManager : MonoBehaviour
                 };
             }
             
-            var playerCountLabel = roomRow.Q<Label>("player-count");                                         //player-count
+            var playerCountLabel = roomRow.Q<Label>(UI_Room_Row_Template.player_count);                                         //player-count
             if (playerCountLabel != null) playerCountLabel.text = $"{room.PlayerCount}/{room.MaxPlayers}";
             
             _roomsScrollView.Add(roomRow);
@@ -250,7 +254,7 @@ public class UIManager : MonoBehaviour
     
     private void UpdatePlayerCountInLobby(int totalPlayers)
     {
-        var playerCountLabel = _root.Q<Label>("online-label");                                              //online-label
+        var playerCountLabel = _root.Q<Label>(UI_Rooms_List_View.online_label);                                              //online-label
         if (playerCountLabel != null) playerCountLabel.text = $"Online Players: {totalPlayers}";
     }
 
@@ -259,10 +263,10 @@ public class UIManager : MonoBehaviour
         roomCreationViewPrefab.gameObject.SetActive(true);
         var root = roomCreationViewPrefab.rootVisualElement;
 
-        var roomNameField = root.Q<TextField>("room-name");                                                 //room-name
-        var maxPlayersField = root.Q<SliderInt>("max-players");                                             //max-players
+        var roomNameField = root.Q<TextField>(UI_Room_Creation_View.room_name);                                                 //room-name
+        var maxPlayersField = root.Q<SliderInt>(UI_Room_Creation_View.max_players);                                             //max-players
 
-        var createBtn = root.Q<Button>("create-button");                                                    //create-button
+        var createBtn = root.Q<Button>(UI_Room_Creation_View.create_button);                                                    //create-button
         if (createBtn != null)
         {
             createBtn.clicked += () =>
@@ -280,7 +284,7 @@ public class UIManager : MonoBehaviour
             };
         }
         
-        var backBtn = root.Q<Button>("back-button");                                                        //back-button
+        var backBtn = root.Q<Button>(UI_Room_Creation_View.back_button);                                                        //back-button
         if (backBtn != null)
         {
             backBtn.clicked += () =>
@@ -305,17 +309,17 @@ public class UIManager : MonoBehaviour
         _uiDocument.visualTreeAsset = roomView;
         _root = _uiDocument.rootVisualElement;
         
-        var headerLabel = _root.Q<Label>("header");                                                        //header
+        var headerLabel = _root.Q<Label>(UI_Room_View.header);                                                        //header
         if (headerLabel != null)
         {
             headerLabel.text = roomName;
         }
         
-        _playerListScrollView = _root.Q<ScrollView>("players-scroll-view");                                        //rooms-scroll-view
+        _playerListScrollView = _root.Q<ScrollView>(UI_Room_View.players_scroll_view);                                        //rooms-scroll-view
         if (_playerListScrollView == null)
             Debug.LogError("Could not find ScrollView named 'players-scroll-view' in roomsListView.");
         
-        var leaveBtn = _root.Q<Button>("leave-button");                                                     //leave-button
+        var leaveBtn = _root.Q<Button>(UI_Room_View.leave_button);                                                     //leave-button
         if (leaveBtn != null)
         {
             leaveBtn.clicked += async () =>
@@ -327,7 +331,7 @@ public class UIManager : MonoBehaviour
             };
         }
         
-        var readyBtn = _root.Q<Button>("ready-button");                                                     //ready-button
+        var readyBtn = _root.Q<Button>(UI_Room_View.ready_button);                                                     //ready-button
         if (readyBtn != null)
         {
             readyBtn.clicked += () =>
@@ -340,7 +344,7 @@ public class UIManager : MonoBehaviour
             };
         }
         
-        var startBtn = _root.Q<Button>("start-button");
+        var startBtn = _root.Q<Button>(UI_Room_View.start_button);
         if (startBtn != null)
         {
             startBtn.clicked += () =>
@@ -365,15 +369,15 @@ public class UIManager : MonoBehaviour
             
             var row = playerRowTemplate.CloneTree();
 
-            var nameLabel = row.Q<Label>("player-name");                                                    //player-name
+            var nameLabel = row.Q<Label>(UI_Player_Row_Template.player_name);                                                    //player-name
             if (nameLabel != null)
                 nameLabel.text = playerData.DisplayName.Value;
 
-            var readyLabel = row.Q<Label>("ready-status");                                                  //ready-status
+            var readyLabel = row.Q<Label>(UI_Player_Row_Template.ready_status);                                                  //ready-status
             if (readyLabel != null)
                 readyLabel.text = playerData.IsReady ? "is Ready!" : "is Not Ready.";
             
-            var kickBtn = row.Q<Button>("kick-button");                                                     //kick-button
+            var kickBtn = row.Q<Button>(UI_Player_Row_Template.kick_button);                                                     //kick-button
             if (kickBtn != null)
             {
                 if (!NetworkManager.Instance) return;
@@ -416,7 +420,7 @@ public class UIManager : MonoBehaviour
     
     private void RefreshReadyButton()
     {
-        var readyBtn = _root?.Q<Button>("ready-button");
+        var readyBtn = _root?.Q<Button>(UI_Room_View.ready_button);
         if (readyBtn == null) return;
         
         var data = NetworkManager.Instance?.GetLocalPlayerData();
@@ -429,7 +433,7 @@ public class UIManager : MonoBehaviour
     {
         if (_root == null || !NetworkManager.Instance) return;
 
-        var startBtn = _root.Q<Button>("start-button");
+        var startBtn = _root.Q<Button>(UI_Room_View.start_button);
         if (startBtn == null) return;
 
         var isMaster = NetworkManager.Instance.CanStartGame();
@@ -445,7 +449,7 @@ public class UIManager : MonoBehaviour
         
         var root = loadingScreenViewPrefab.rootVisualElement;
         
-        var loadingSpinner = root.Q<VisualElement>("loading-spinner");                                     //loading-spinner
+        var loadingSpinner = root.Q<VisualElement>(UI_Loading_View.loading_spinner);                                     //loading-spinner
         if (loadingSpinner != null)
         {
             SpinLoading(loadingSpinner);

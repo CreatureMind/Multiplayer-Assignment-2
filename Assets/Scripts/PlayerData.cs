@@ -26,8 +26,6 @@ public class PlayerData : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            // Restore the chosen name after a game-scene respawn; fall back to
-            // the default only before the player has confirmed a name.
             var confirmedName = NetworkManager.Instance ? NetworkManager.Instance.LocalConfirmedName : null;
             DisplayName = string.IsNullOrEmpty(confirmedName)
                 ? $"Player_{Object.InputAuthority.PlayerId}"

@@ -62,21 +62,15 @@ public class InGamePresenter
     {
         var isMasterClient = _model.IsMasterClient();
         _view.SetEndGameButtonVisible(isMasterClient);
-        _view.SetLeaveButtonVisible(true); // All players can see the leave button
+        _view.SetLeaveButtonVisible(true);
     }
 
     private void HandleGameEnded(bool isMasterClient)
     {
         if (isMasterClient)
-        {
-            // Master client immediately returns to lobby
-            _model.ReturnToLobby();
-        }
+            _model.ReturnToLobby(0.3f); // delay so the end signal reaches others first
         else
-        {
-            // Other players see the popup
             _view.ShowEndGamePopup();
-        }
     }
 
     public void CheckForMasterClientChange()

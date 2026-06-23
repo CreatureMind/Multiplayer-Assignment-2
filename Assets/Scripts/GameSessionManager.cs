@@ -5,6 +5,9 @@ public class GameSessionManager : NetworkBehaviour
 {
     public static GameSessionManager Instance { get; private set; }
 
+    [Networked, OnChangedRender(nameof(OnGameEndedChanged))]
+    private NetworkBool GameEnded { get; set; }
+
     public override void Spawned()
     {
         Instance = this;
@@ -13,15 +16,16 @@ public class GameSessionManager : NetworkBehaviour
     public void EndGameSession()
     {
         if (!HasStateAuthority) return;
-        
-        RPC_NotifyGameEnded();
+
+        GameEnded = true;
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_NotifyGameEnded()
+    private void OnGameEndedChanged()
     {
+        if (!GameEnded) return;
+
         var isMasterClient = Runner.IsSharedModeMasterClient;
-        
+
         if (GameUIManager.Instance)
         {
             GameUIManager.Instance.OnGameEnded(isMasterClient);

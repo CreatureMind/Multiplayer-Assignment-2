@@ -31,8 +31,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public string CurrentLobbyId => _currentLobbyId;
     public CharacterRegistry CharacterRegistry => characterRegistry;
 
-    // Cached so a PlayerData respawned in the game scene keeps the chosen name
-    // instead of falling back to the default "Player_<id>".
+    private const string LOBBY_SCENE = "Lobby_Scene";
+    
+    public bool IsReturningFromMatch { get; private set; }
+    
     public string LocalConfirmedName { get; set; }
     
     private SessionDataRefreshedEvent? _cachedSessionData;
@@ -237,7 +239,35 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         await ShutdownRunner();
         await ConnectToCustomLobby(lobbyId);
     }
-    
+
+    // Leave the match: disconnect, reload the lobby scene, rejoin the same lobby.
+    public async Task ReturnToLobbyAsync(float flushDelay = 0f)
+    {
+        var lobbyId = _currentLobbyId;
+        
+        if (flushDelay > 0f)
+            await Task.Delay((int)(flushDelay * 1000));
+
+        await ShutdownRunner();
+
+        IsReturningFromMatch = true;
+
+        await LoadSceneAsync(LOBBY_SCENE);
+
+        if (!string.IsNullOrEmpty(lobbyId))
+            await ConnectToCustomLobby(lobbyId);
+
+        IsReturningFromMatch = false;
+    }
+
+    private static Task LoadSceneAsync(string sceneName)
+    {
+        var tcs = new TaskCompletionSource<bool>();
+        var op = SceneManager.LoadSceneAsync(sceneName);
+        op.completed += _ => tcs.TrySetResult(true);
+        return tcs.Task;
+    }
+
     #endregion
 
     #region Network Runner
@@ -296,6 +326,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
+        EventBus.Raise(new PlayerLeftEvent { Player = player });
         _playerDataMap.Remove(player);
         if (CharacterSelectionManager.Instance)
             CharacterSelectionManager.Instance.OnPlayerLeft(player);

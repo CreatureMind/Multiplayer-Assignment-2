@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Character_Selection_View.uxml
-// Updated: 2026-06-23 19:20 UTC
+// Updated: 2026-06-23 21:09 UTC
 
 using System.Collections.Generic;
 

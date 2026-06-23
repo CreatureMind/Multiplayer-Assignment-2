@@ -36,6 +36,15 @@ public class NameEntryUIController : MonoBehaviour
 
     private void Start()
     {
+        // Returning from a match: name already confirmed, skip entry.
+        if (NetworkManager.Instance && NetworkManager.Instance.IsReturningFromMatch)
+        {
+            _state = NameEntryState.Confirmed;
+            _confirmedName = NetworkManager.Instance.LocalConfirmedName;
+            gameObject.SetActive(false);
+            return;
+        }
+
         ShowPanel();
     }
     
@@ -59,7 +68,6 @@ public class NameEntryUIController : MonoBehaviour
             return;
         }
 
-        // If the name was already confirmed but PlayerData wasn't ready at that point,
         // apply it now that PlayerData has spawned.
         if (_state == NameEntryState.Confirmed)
             TryApplyConfirmedName();
@@ -109,9 +117,7 @@ public class NameEntryUIController : MonoBehaviour
         _state = NameEntryState.Confirmed;
         _confirmedName = trimmed;
         _lastAppliedTo = null;
-
-        // Persist on the (DontDestroyOnLoad) NetworkManager so a PlayerData
-        // respawned in the game scene can restore this name.
+        
         if (NetworkManager.Instance)
             NetworkManager.Instance.LocalConfirmedName = trimmed;
 
