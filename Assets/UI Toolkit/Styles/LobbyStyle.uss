@@ -79,8 +79,10 @@ Button {
     color: rgb(255, 235, 4);
 }
 
-
-
 .chat--hidden {
+    display: none;
+}
+
+.hidden {
     display: none;
 }

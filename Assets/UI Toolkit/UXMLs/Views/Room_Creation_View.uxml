@@ -7,7 +7,7 @@
                 <ui:VisualElement style="flex-grow: 1; margin-left: 100px; margin-right: 100px; margin-top: 50px; margin-bottom: 50px;">
                     <ui:TextField label="Room name" placeholder-text="Pompo lo pompo" name="room-name" class="Lable"/>
                     <ui:VisualElement name="spacer" style="flex-basis: 10px;"/>
-                    <ui:SliderInt label="Max Players" value="4" high-value="8" show-input-field="true" low-value="1" name="max-players" class="Lable" style="justify-content: flex-start; align-items: stretch;"/>
+                    <ui:SliderInt label="Max Players" value="10" high-value="10" show-input-field="true" low-value="1" name="max-players" enabled="true" class="Lable chat--hidden" style="justify-content: flex-start; align-items: stretch;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="bottom-container" style="flex-grow: 1; position: absolute; top: auto; left: 400px; right: 400px; bottom: 0; flex-direction: row; height: 400px; justify-content: space-between; align-items: flex-start; padding-top: 5px;">

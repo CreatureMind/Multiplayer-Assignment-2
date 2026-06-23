@@ -197,7 +197,10 @@ public class UIManager : MonoBehaviour
         {
             refreshBtn.clicked += () =>
             {
+                if (!NetworkManager.Instance) return;
+                    
                 refreshBtn.SetEnabled(false);
+                _ = NetworkManager.Instance.ConnectToCustomLobby(_currentLobbyId);
             };
         }
     }
@@ -265,6 +268,8 @@ public class UIManager : MonoBehaviour
             createBtn.clicked += () =>
             {
                 if (!NetworkManager.Instance) return;
+                
+                if (string.IsNullOrEmpty(roomNameField.value)) return;
 
                 createBtn.SetEnabled(false);
                 var roomName = roomNameField.value;
