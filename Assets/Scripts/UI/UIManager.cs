@@ -8,12 +8,14 @@ using UnityEngine.UIElements;
 public class UIManager : MonoBehaviour
 {
     [Header("Menus")]
-    [SerializeField] private VisualTreeAsset lobbiesListView;
+    // commented out for assignment 3
+    //[SerializeField] private VisualTreeAsset lobbiesListView;
     [SerializeField] private VisualTreeAsset roomsListView;
     [SerializeField] private VisualTreeAsset roomView;
     
     [Header("Templates")]
-    [SerializeField] private VisualTreeAsset sessionRowTemplate;
+    // commented out for assignment 3
+    //[SerializeField] private VisualTreeAsset sessionRowTemplate;
     [SerializeField] private VisualTreeAsset roomRowTemplate;
     [SerializeField] private VisualTreeAsset playerRowTemplate;
     
@@ -101,7 +103,9 @@ public class UIManager : MonoBehaviour
     
     private void OnPlayerNameConfirmed(PlayerNameConfirmedEvent e)
     {
-        ShowSessionsListView();
+        // commented out for assignment 3
+        //ShowSessionsListView();
+        EnterGlobalLobby();
     }
 
     private void StartMatch(MatchStartedEvent e)
@@ -109,7 +113,8 @@ public class UIManager : MonoBehaviour
         EventBus.Raise(new ShowLoadingScreenEvent());
     }
 
-    private void ShowSessionsListView()
+    // commented out for assignment 3
+    /*private void ShowSessionsListView()
     {
         _uiDocument.visualTreeAsset = lobbiesListView;
         _root = _uiDocument.rootVisualElement;
@@ -122,9 +127,10 @@ public class UIManager : MonoBehaviour
         }
 
         UpdateLobbyList(scrollView);
-    }
+    }*/
     
-    private void UpdateLobbyList(ScrollView scrollView)
+    // commented out for assignment 3
+    /*private void UpdateLobbyList(ScrollView scrollView)
     {
         scrollView.Clear();
         
@@ -161,6 +167,16 @@ public class UIManager : MonoBehaviour
             
             scrollView.Add(sessionRow);
         }
+    }*/
+
+    private void EnterGlobalLobby()
+    {
+        var session = sessionsListData.sessionsList[0];
+        
+        if (!NetworkManager.Instance) return;
+        
+        _ = NetworkManager.Instance.ConnectToCustomLobby(session.sessionName);
+        _currentLobbyId = session.sessionName;
     }
 
     private void ShowRoomsListView(JoinedLobbyEvent e)
@@ -172,23 +188,24 @@ public class UIManager : MonoBehaviour
         _uiDocument.visualTreeAsset = roomsListView;
         _root = _uiDocument.rootVisualElement;
         
-        var headerLabel = _root.Q<Label>(UI_Rooms_List_View.header);                                                          //header
+        var headerLabel = _root.Q<Label>(UI_Rooms_List_View_v3.header);                                                          //header
         headerLabel.text = _currentLobbyId + " / Rooms";
         
         SetRoomsListButtons(_root);
         
-        _roomsScrollView = _root.Q<ScrollView>(UI_Rooms_List_View.rooms_scroll_view);                                        //rooms-scroll-view
+        _roomsScrollView = _root.Q<ScrollView>(UI_Rooms_List_View_v3.rooms_scroll_view);                                        //rooms-scroll-view
         if (_roomsScrollView == null)
             Debug.LogError("Could not find ScrollView named 'rooms-scroll-view' in roomsListView.");
     }
 
     private void SetRoomsListButtons(VisualElement root)
     {
-        var leaveBtn = root.Q<Button>(UI_Rooms_List_View.leave_button);                                                      //leave-button
+        // commented out for assignment 3
+        /*var leaveBtn = root.Q<Button>(UI_Rooms_List_View.leave_button);                                                      //leave-button
         if (leaveBtn != null)
         {
             leaveBtn.clicked+= ShowSessionsListView;
-        }
+        }*/
         
         var createRoomBtn = root.Q<Button>(UI_Rooms_List_View.create_button);                                                //create-button
         if (createRoomBtn != null)

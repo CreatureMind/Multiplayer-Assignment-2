@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: SessionsListData
   m_EditorClassIdentifier: Assembly-CSharp::LobbyRowSO
   sessionsList:
+  - sessionName: Global Lobby
   - sessionName: Free for All
   - sessionName: Team
   - sessionName: Timed
