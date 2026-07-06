@@ -9,8 +9,6 @@ public class CubeSpawner : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (!HasStateAuthority) return;
-        
         inputHandler = PlayerInputHandler.Instance;
         if (inputHandler != null) inputHandler.OnMouseInput += HandleMouseInput;
     }
@@ -22,7 +20,6 @@ public class CubeSpawner : NetworkBehaviour
 
     private void HandleMouseInput(InputType type, bool performed, Vector2 pos)
     {
-        if (!HasStateAuthority) return;
         if (type != InputType.LMB || !performed) return;
         if (Camera.main == null || Runner == null) return;
 
@@ -36,7 +33,10 @@ public class CubeSpawner : NetworkBehaviour
         if (!Physics.Raycast(ray, out RaycastHit hit)) return;
 
         if (hit.collider.CompareTag("Floor"))
+        {
+            if (!HasStateAuthority) return;
             SpawnCube(hit.point);
+        }
         else if (hit.collider.CompareTag("Cube"))
             DestroyCube(hit.collider);
     }
@@ -56,7 +56,7 @@ public class CubeSpawner : NetworkBehaviour
     private void DestroyCube(Collider cubeCollider)
     {
         var cmc = cubeCollider.GetComponent<CubeMaterialChanger>();
-        if (cmc == null || cmc.Object == null) return;
-        Runner.Despawn(cmc.Object);
+        if (cmc == null) return;
+        cmc.RequestDestroy();
     }
 }

@@ -26,4 +26,16 @@ public class CubeMaterialChanger : NetworkBehaviour
     {
         InstantiateMaterialColor(NetworkedColor);
     }
+
+    public void RequestDestroy()
+    {
+        if (!Object.HasInputAuthority) return;
+        Rpc_RequestDestroy();
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void Rpc_RequestDestroy()
+    {
+        Runner.Despawn(Object);
+    }
 }
