@@ -55,8 +55,12 @@ public class CubeSpawner : NetworkBehaviour
 
     private void DestroyCube(Collider cubeCollider)
     {
-        var cmc = cubeCollider.GetComponent<CubeMaterialChanger>();
+        var netObj = cubeCollider.GetComponent<NetworkObject>();
+        if (!netObj || !netObj.IsValid) return;
+
+        var cmc = netObj.GetComponent<CubeMaterialChanger>();
         if (cmc == null) return;
-        cmc.RequestDestroy();
+
+        cmc.RequestDestroy(Runner.LocalPlayer);
     }
 }

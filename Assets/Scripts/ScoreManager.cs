@@ -9,12 +9,12 @@ using System;
         public static event Action OnScoresChanged;
     
         [Networked, Capacity(MaxPlayers)] private NetworkDictionary<PlayerRef, int> PlayerScores => default;
-    
+
         private ChangeDetector _changeDetector;
     
-        const int MaxPlayers = 10;
-        const int ScoreToAdd = 10;
-        const int DefaultScore = 0;
+        public const int MaxPlayers = 10;
+        public const int ScoreToAdd = 10;
+        public const int DefaultScore = 0;
     
         public override void Spawned()
         {
@@ -35,6 +35,7 @@ using System;
                 if (change == nameof(PlayerScores))
                 {
                     OnScoresChanged?.Invoke();
+                    Debug.Log("ScoresChanged");
                 }
             }
         }
@@ -52,10 +53,16 @@ using System;
             }
         }
     
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        public void Rpc_AddScore(PlayerRef player)
+        {
+            AddScore(player);
+        }
+
         public void AddScore(PlayerRef player)
         {
             if (!Object.HasStateAuthority) return;
-    
+
             if (PlayerScores.ContainsKey(player))
             {
                 PlayerScores.Set(player, PlayerScores[player] + ScoreToAdd);
@@ -64,6 +71,7 @@ using System;
             {
                 PlayerScores.Add(player, ScoreToAdd);
             }
+            Debug.Log($"Added score {player}");
         }
     
         public int GetScore(PlayerRef player)

@@ -136,6 +136,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         if (!data) return;
         data.IsReady = isReady;
     }
+    
+    public Dictionary<PlayerRef, PlayerData> GetPlayerDataMap() => _playerDataMap;
 
     #endregion
 

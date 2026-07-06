@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Loading_View.uxml
-// Updated: 2026-07-06 15:04 UTC
+// Updated: 2026-07-06 20:33 UTC
 
 using System.Collections.Generic;
 
