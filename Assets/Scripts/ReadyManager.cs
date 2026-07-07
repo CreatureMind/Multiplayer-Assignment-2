@@ -24,14 +24,20 @@ public class ReadyManager : NetworkBehaviour
         }
     }
 
-    public void StartMatch()
+    public void StartMatch(string modeName, string mapName)
     {
         if (!HasStateAuthority) return;
         MatchStarted = true;
         
         Runner.SessionInfo.IsOpen    = false;
+<<<<<<< HEAD
         Runner.SessionInfo.IsVisible = false;
         Runner.LoadScene("Game_Scene_1");
+=======
+        // commented for assignment 3
+        //Runner.SessionInfo.IsVisible = false;
+        Runner.LoadScene("Game_Scene");
+>>>>>>> artur/UIFixes
     }
 
     private void OnMatchStartedChanged()

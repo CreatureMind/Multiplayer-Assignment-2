@@ -8,6 +8,9 @@ namespace Events
     public struct RoomCreatedEvent
     {
         public string RoomName;
+        //Assignment 3
+        public string ModeName;
+        public string MapName;
     }
 
     public struct SessionDataRefreshedEvent

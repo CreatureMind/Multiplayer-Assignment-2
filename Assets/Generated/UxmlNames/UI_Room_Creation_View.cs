@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Room_Creation_View.uxml
-// Updated: 2026-07-05 21:24 UTC
+// Updated: 2026-07-07 19:17 UTC
 
 using System.Collections.Generic;
 
@@ -15,8 +15,11 @@ public enum UI_Room_Creation_View
     spacer,
     max_players,
     spacer_2,
+    modes_dropdown,
     spacer_3,
+    maps_dropdown,
     spacer_4,
+    public_toggle,
     bottom_container,
     back_button,
     create_button,
@@ -36,8 +39,11 @@ internal static class UI_Room_Creation_View_Map
             { UI_Room_Creation_View.spacer, "spacer" },
             { UI_Room_Creation_View.max_players, "max-players" },
             { UI_Room_Creation_View.spacer_2, "spacer" },
+            { UI_Room_Creation_View.modes_dropdown, "modes-dropdown" },
             { UI_Room_Creation_View.spacer_3, "spacer" },
+            { UI_Room_Creation_View.maps_dropdown, "maps-dropdown" },
             { UI_Room_Creation_View.spacer_4, "spacer" },
+            { UI_Room_Creation_View.public_toggle, "public-toggle" },
             { UI_Room_Creation_View.bottom_container, "bottom-container" },
             { UI_Room_Creation_View.back_button, "back-button" },
             { UI_Room_Creation_View.create_button, "create-button" },

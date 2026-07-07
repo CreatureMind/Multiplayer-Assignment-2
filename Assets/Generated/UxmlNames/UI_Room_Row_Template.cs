@@ -1,12 +1,13 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Templates/Room_Row_Template.uxml
-// Updated: 2026-07-05 21:31 UTC
+// Updated: 2026-07-07 19:17 UTC
 
 using System.Collections.Generic;
 
 public enum UI_Room_Row_Template
 {
     container,
+    play_indicator,
     room_name,
     seperator,
     room_mode,
@@ -24,6 +25,7 @@ internal static class UI_Room_Row_Template_Map
         new Dictionary<UI_Room_Row_Template, string>
         {
             { UI_Room_Row_Template.container, "container" },
+            { UI_Room_Row_Template.play_indicator, "play-indicator" },
             { UI_Room_Row_Template.room_name, "room-name" },
             { UI_Room_Row_Template.seperator, "seperator" },
             { UI_Room_Row_Template.room_mode, "room-mode" },
