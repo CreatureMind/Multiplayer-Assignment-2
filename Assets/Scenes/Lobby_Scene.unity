@@ -544,10 +544,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16dceabff8efeec47bd202ce4765c5d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  lobbiesListView: {fileID: 9197481963319205126, guid: 71b967a6e53c1214d919d859736bbba3, type: 3}
-  roomsListView: {fileID: 9197481963319205126, guid: cd1b07f45798745ca8e06a49c9d457f5, type: 3}
+  roomsListView: {fileID: 9197481963319205126, guid: f047fc1c0e53ee74b9bed415afe459df, type: 3}
   roomView: {fileID: 9197481963319205126, guid: f094f8ba955284137b58c232ec42a683, type: 3}
-  sessionRowTemplate: {fileID: 9197481963319205126, guid: dec3da7e1019c1d478ff2aa11cd25423, type: 3}
   roomRowTemplate: {fileID: 9197481963319205126, guid: 9b893dc89b43345148e01f876e5fb0a9, type: 3}
   playerRowTemplate: {fileID: 9197481963319205126, guid: 9eaf5c57440274d92a8b080d009d0319, type: 3}
   roomCreationViewPrefab: {fileID: 643843312}
