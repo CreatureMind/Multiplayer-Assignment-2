@@ -2,7 +2,7 @@ using System;
     using Fusion;
     using UnityEngine;
     
-    public class ScoreManager : NetworkBehaviour, IPlayerLeft
+    public class ScoreManager : NetworkBehaviour, IPlayerLeft, IStateAuthorityChanged
     {
         public static ScoreManager Instance { get; private set; }
     
@@ -26,6 +26,18 @@ using System;
     
             Instance = this;
             _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            if (Instance == this)
+                Instance = null;
+        }
+        
+        public void StateAuthorityChanged()
+        {
+            Debug.Log($"[ScoreManager] Authority changed. Scores preserved: {PlayerScores.Count} entries.");
+            OnScoresChanged?.Invoke();
         }
     
         public override void Render()

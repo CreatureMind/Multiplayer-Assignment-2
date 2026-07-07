@@ -12,11 +12,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     public static NetworkManager Instance;
     
-    [SerializeField] private ReadyManager readyManagerPrefab;
     [SerializeField] private NetworkRunner networkRunnerPrefab;
-    [SerializeField] private ChatRelay chatRelayPrefab;
     [SerializeField] private PlayerData playerDataPrefab;
-    [SerializeField] private CharacterSelectionManager characterSelectionManagerPrefab;
     [SerializeField] private CharacterRegistry characterRegistry;
     
     public ReadyManager ReadyManagerInstance { get; set; }
@@ -25,7 +22,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     private const int MIN_PLAYERS_TO_START = 2;
 
     private NetworkRunner _networkRunnerInstance;
-    private ChatRelay _chatRelayInstance;
+    // assignment 3
+    private MasterClientObjectSpawner _masterObjectSpawner;
 
     private string _currentLobbyId;
     public string CurrentLobbyId => _currentLobbyId;
@@ -57,6 +55,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     private void Start()
     {
         ChatNetworkManager = GetComponent<ChatNetworkManager>();
+        _masterObjectSpawner = GetComponent<MasterClientObjectSpawner>();
     }
 
     #region Player Logic
@@ -322,19 +321,14 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
 
+    // assignment 3
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        if (runner.LocalPlayer == player)
-        {
-            runner.Spawn(playerDataPrefab, inputAuthority: player);
-
-            if (runner.IsSharedModeMasterClient)
-            {
-                runner.Spawn(readyManagerPrefab);
-                _chatRelayInstance = runner.Spawn(chatRelayPrefab);
-                _chatRelayInstance.name = $"ChatRelay({runner.LocalPlayer.ToString()})";
-            }
-        }
+        if (runner.LocalPlayer != player)
+            return;
+        
+        runner.Spawn(playerDataPrefab, inputAuthority: player);
+        _masterObjectSpawner.EnsureLobbyObjects(runner);
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -414,22 +408,13 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
+    // assignment 3
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         if (!GetLocalPlayerData())
             runner.Spawn(playerDataPrefab, inputAuthority: runner.LocalPlayer);
-        
-        if (runner.IsSharedModeMasterClient && !CharacterSelectionManager.Instance)
-            runner.Spawn(characterSelectionManagerPrefab);
-        
-        if (SceneManager.GetActiveScene().name == "Game_Scene")
-        {
-            if (runner.IsSharedModeMasterClient && !_chatRelayInstance)
-            {
-                _chatRelayInstance = runner.Spawn(chatRelayPrefab);
-                _chatRelayInstance.name = $"ChatRelay({runner.LocalPlayer.ToString()})";
-            }
-        }
+
+        _masterObjectSpawner.EnsureGameObjects(runner);
 
         EventBus.Raise(new SceneLoadDoneEvent());
     }

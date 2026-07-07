@@ -1,7 +1,7 @@
 using Fusion;
 using UnityEngine;
 
-public class GameSessionManager : NetworkBehaviour
+public class GameSessionManager : NetworkBehaviour, IStateAuthorityChanged
 {
     public static GameSessionManager Instance { get; private set; }
 
@@ -11,6 +11,12 @@ public class GameSessionManager : NetworkBehaviour
     public override void Spawned()
     {
         Instance = this;
+    }
+    
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     public void EndGameSession()
@@ -30,5 +36,11 @@ public class GameSessionManager : NetworkBehaviour
         {
             GameUIManager.Instance.OnGameEnded(isMasterClient);
         }
+    }
+    
+    public void StateAuthorityChanged()
+    {
+        if (GameUIManager.Instance)
+            GameUIManager.Instance.NotifyMasterClientMightHaveChanged();
     }
 }

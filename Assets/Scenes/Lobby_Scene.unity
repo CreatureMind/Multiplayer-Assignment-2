@@ -612,6 +612,7 @@ GameObject:
   - component: {fileID: 1668919663}
   - component: {fileID: 1668919664}
   - component: {fileID: 1668919665}
+  - component: {fileID: 1668919666}
   m_Layer: 0
   m_Name: Network_Manager
   m_TagString: Untagged
@@ -664,6 +665,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9be615341687a7a47adcecc44757147a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChatNetworkManager
+--- !u!114 &1668919666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668919662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e9eb73441c10154790123e1af14ed4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MasterClientObjectSpawner
+  readyManagerPrefab: {fileID: 9040470044852587027, guid: f3bc5d1fbb1b05d4eaf713a5abbc7fd1, type: 3}
+  chatRelayPrefab: {fileID: 4636337649601192298, guid: 586e1286dd37efd45a39688bea54edd0, type: 3}
+  characterSelectionManagerPrefab: {fileID: 3934725427524957727, guid: 5c0a229e5f4c9b74494d25be34b3840c, type: 3}
 --- !u!1 &1828490691
 GameObject:
   m_ObjectHideFlags: 0

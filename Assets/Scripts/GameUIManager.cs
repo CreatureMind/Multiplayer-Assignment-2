@@ -62,6 +62,11 @@ public class GameUIManager : MonoBehaviour
             _model.NotifyGameEnded(isMasterClient);
         }
     }
+    
+    public void NotifyMasterClientMightHaveChanged()
+    {
+        _presenter?.CheckForMasterClientChange();
+    }
 
     private void OnDestroy()
     {

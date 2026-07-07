@@ -14,6 +14,13 @@ public class ReadyManager : NetworkBehaviour
         NetworkManager.Instance.ReadyManagerInstance = this;
     }
     
+    // assignment 3
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        if (NetworkManager.Instance && NetworkManager.Instance.ReadyManagerInstance == this)
+            NetworkManager.Instance.ReadyManagerInstance = null;
+    }
+    
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void KickPlayerRpc(PlayerRef playerToKick)
     {
@@ -30,14 +37,9 @@ public class ReadyManager : NetworkBehaviour
         MatchStarted = true;
         
         Runner.SessionInfo.IsOpen    = false;
-<<<<<<< HEAD
-        Runner.SessionInfo.IsVisible = false;
-        Runner.LoadScene("Game_Scene_1");
-=======
         // commented for assignment 3
         //Runner.SessionInfo.IsVisible = false;
         Runner.LoadScene("Game_Scene");
->>>>>>> artur/UIFixes
     }
 
     private void OnMatchStartedChanged()
