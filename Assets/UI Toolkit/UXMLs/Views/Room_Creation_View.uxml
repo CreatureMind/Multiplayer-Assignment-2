@@ -9,11 +9,11 @@
                     <ui:VisualElement name="spacer" style="flex-basis: 10px;"/>
                     <ui:SliderInt label="Max Players" value="4" high-value="8" show-input-field="true" low-value="1" name="max-players" enabled="true" class="Lable" style="justify-content: flex-start; align-items: stretch;"/>
                     <ui:VisualElement name="spacer" style="flex-basis: 10px;"/>
-                    <ui:DropdownField label="Mode" choices="Free for All,2 vs 2" index="0" class="Lable" style="padding-right: 400px;"/>
+                    <ui:DropdownField label="Mode" choices="Free for All,2 vs 2" index="0" name="modes-dropdown" class="Lable" style="padding-right: 400px;"/>
                     <ui:VisualElement name="spacer" style="flex-basis: 10px;"/>
-                    <ui:DropdownField label="Map" choices="Basic,Plus,Chokepoint" index="0" class="Lable" style="padding-right: 400px;"/>
+                    <ui:DropdownField label="Map" choices="Basic,Plus,Chokepoint" index="0" name="maps-dropdown" class="Lable" style="padding-right: 400px;"/>
                     <ui:VisualElement name="spacer" style="flex-basis: 10px;"/>
-                    <ui:Toggle label="Public" class="Lable" style="align-self: auto;"/>
+                    <ui:Toggle label="Public" name="public-toggle" value="true" class="Lable" style="align-self: auto;"/>
                 </ui:VisualElement>
                 <ui:VisualElement name="bottom-container" style="flex-direction: row; justify-content: space-between; align-items: flex-start; margin-top: 5px;">
                     <ui:Button text="Back" name="back-button" style="align-items: auto; align-self: auto; font-size: 32px;"/>

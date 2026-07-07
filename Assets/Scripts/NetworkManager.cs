@@ -32,7 +32,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public CharacterRegistry CharacterRegistry => characterRegistry;
 
     private const string LOBBY_SCENE = "Lobby_Scene";
-    
+    private const string DisplayName = "DisplayName";
+    private const string ModeName = "ModeName";
+    private const string MapName = "MapName";
+
     public bool IsReturningFromMatch { get; private set; }
     
     public string LocalConfirmedName { get; set; }
@@ -166,7 +169,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
     
-    public async Task CreateRoomInCurrentLobby(string roomName, int maxPlayers, string lobbyId)
+    public async Task CreateRoomInCurrentLobby(string roomName, int maxPlayers, string lobbyId, string mode, string map, bool isPublic)
     {
         EventBus.Raise(new ShowLoadingScreenEvent());
         
@@ -181,9 +184,14 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             SessionName = sessionName,
             PlayerCount = maxPlayers,
             CustomLobbyName = lobbyId,
+            //Assignment 3
+            IsVisible = isPublic,
             SessionProperties = new Dictionary<string, SessionProperty>
             {
-                { "DisplayName", roomName },
+                { DisplayName, roomName },
+                //Assignment 3
+                { ModeName, mode },
+                { MapName, map },
             },
         });
         
@@ -197,7 +205,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             
             EventBus.Raise(new RoomCreatedEvent
             {
-                RoomName = roomName
+                RoomName = roomName,
+                //Assignment 3
+                ModeName = mode,
+                MapName = map,
             });
         } 
         else

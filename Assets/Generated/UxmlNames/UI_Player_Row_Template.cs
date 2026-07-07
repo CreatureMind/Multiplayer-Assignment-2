@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Templates/Player_Row_Template.uxml
-// Updated: 2026-07-05 20:41 UTC
+// Updated: 2026-07-07 19:17 UTC
 
 using System.Collections.Generic;
 

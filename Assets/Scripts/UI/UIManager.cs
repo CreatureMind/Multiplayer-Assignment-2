@@ -7,6 +7,10 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(UIDocument))]
 public class UIManager : MonoBehaviour
 {
+    private const string DisplayName = "DisplayName";
+    private const string ModeName = "ModeName";
+    private const string MapName = "MapName";
+
     [Header("Menus")]
     // commented out for assignment 3
     //[SerializeField] private VisualTreeAsset lobbiesListView;
@@ -238,12 +242,34 @@ public class UIManager : MonoBehaviour
         {
             var roomRow = roomRowTemplate.CloneTree();
             
-            var displayName= room.Properties.TryGetValue("DisplayName", out var dn);
+            room.Properties.TryGetValue(DisplayName, out var displayName);
+            room.Properties.TryGetValue(ModeName, out var modeName);
+            room.Properties.TryGetValue(MapName, out var mapName);
             
+            if(!room.IsVisible)
+                continue;
+            
+            roomRow.tooltip = room.IsOpen ? "Waiting for players" : "Match is in progress";
+            
+            var playIndicator = roomRow.Q<VisualElement>(UI_Room_Row_Template.play_indicator);
+            playIndicator?.EnableInClassList("green", room.IsOpen);
+
             var roomNameLabel = roomRow.Q<Label>(UI_Room_Row_Template.room_name);                                              //room-name
             if (roomNameLabel != null)
             {
-                roomNameLabel.text = dn;
+                roomNameLabel.text = displayName;
+            }
+            
+            var roomModeLabel = roomRow.Q<Label>(UI_Room_Row_Template.room_mode);
+            if (roomModeLabel != null)
+            {
+                roomModeLabel.text = modeName;
+            }
+            
+            var roomMapLabel = roomRow.Q<Label>(UI_Room_Row_Template.room_map);
+            if (roomMapLabel != null)
+            {
+                roomMapLabel.text = mapName;
             }
 
             var enterBtn = roomRow.Q<Button>(UI_Room_Row_Template.enter_button);                                               //enter-button
@@ -258,7 +284,7 @@ public class UIManager : MonoBehaviour
                     
                     enterBtn.SetEnabled(false);
                     _ = NetworkManager.Instance.JoinRoom(room.Name);
-                    ShowRoomView(dn);
+                    ShowRoomView(displayName, modeName, mapName);
                 };
             }
             
@@ -282,7 +308,11 @@ public class UIManager : MonoBehaviour
 
         var roomNameField = root.Q<TextField>(UI_Room_Creation_View.room_name);                                                 //room-name
         var maxPlayersField = root.Q<SliderInt>(UI_Room_Creation_View.max_players);                                             //max-players
-
+        //Assignment 3
+        var modesDropdown = root.Q<DropdownField>(UI_Room_Creation_View.modes_dropdown);
+        var mapsDropdown = root.Q<DropdownField>(UI_Room_Creation_View.maps_dropdown);
+        var publicToggle = root.Q<Toggle>(UI_Room_Creation_View.public_toggle);
+        
         var createBtn = root.Q<Button>(UI_Room_Creation_View.create_button);                                                    //create-button
         if (createBtn != null)
         {
@@ -295,7 +325,13 @@ public class UIManager : MonoBehaviour
                 createBtn.SetEnabled(false);
                 var roomName = roomNameField.value;
                 var maxPlayers = maxPlayersField.value;
-                _ = NetworkManager.Instance.CreateRoomInCurrentLobby(roomName, maxPlayers, _currentLobbyId);
+                //Assignment 3
+                var chosenMode = modesDropdown.value;
+                var chosenMap = mapsDropdown.value;
+                var isPublic = publicToggle.value;
+                Debug.Log("Creating room with name: " + roomName + " and max players: " + maxPlayers + " and mode: " + chosenMode + " and map: " + chosenMap + " and isPublic: " + isPublic);
+                
+                _ = NetworkManager.Instance.CreateRoomInCurrentLobby(roomName, maxPlayers, _currentLobbyId, chosenMode, chosenMap, isPublic);
 
                 roomCreationViewPrefab.gameObject.SetActive(false);
             };
@@ -313,15 +349,15 @@ public class UIManager : MonoBehaviour
     
     private void ShowRoomView(RoomCreatedEvent e)
     {
-        SetRoom(e.RoomName);
+        SetRoom(e.RoomName, e.ModeName, e.MapName);
     }    
     
-    private void ShowRoomView(string roomName)
+    private void ShowRoomView(string roomName, string modeName, string mapName)
     {
-        SetRoom(roomName);
+        SetRoom(roomName, modeName, mapName);
     }
 
-    private void SetRoom(string roomName)
+    private void SetRoom(string roomName, string modeName, string mapName)
     {
         _uiDocument.visualTreeAsset = roomView;
         _root = _uiDocument.rootVisualElement;
@@ -329,7 +365,7 @@ public class UIManager : MonoBehaviour
         var headerLabel = _root.Q<Label>(UI_Room_View.header);                                                        //header
         if (headerLabel != null)
         {
-            headerLabel.text = roomName;
+            headerLabel.text = roomName + " / " + modeName + " / " + mapName;
         }
         
         _playerListScrollView = _root.Q<ScrollView>(UI_Room_View.players_scroll_view);                                        //rooms-scroll-view
@@ -367,7 +403,7 @@ public class UIManager : MonoBehaviour
             startBtn.clicked += () =>
             {
                 if (NetworkManager.Instance?.ReadyManagerInstance is { } rm)
-                    rm.StartMatch();
+                    rm.StartMatch(modeName, mapName);
             };
         }
         RefreshStartButton();

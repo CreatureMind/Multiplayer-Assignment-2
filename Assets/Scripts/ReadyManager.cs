@@ -24,13 +24,14 @@ public class ReadyManager : NetworkBehaviour
         }
     }
 
-    public void StartMatch()
+    public void StartMatch(string modeName, string mapName)
     {
         if (!HasStateAuthority) return;
         MatchStarted = true;
         
         Runner.SessionInfo.IsOpen    = false;
-        Runner.SessionInfo.IsVisible = false;
+        // commented for assignment 3
+        //Runner.SessionInfo.IsVisible = false;
         Runner.LoadScene("Game_Scene");
     }
 
