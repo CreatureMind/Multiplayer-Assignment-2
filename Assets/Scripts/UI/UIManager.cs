@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Events;
+using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -36,10 +37,16 @@ public class UIManager : MonoBehaviour
     private VisualElement _roomsScrollView;
     private VisualElement _playerListScrollView;
     private ChatUIController _chatViewInstance;
-    
+
     private bool _canSpin = true;
-    
+
     private string _currentLobbyId;
+
+    // Caching for client-side filtering
+    private SessionDataRefreshedEvent? _cachedSessionData;
+    private DropdownField _roomsDropdown;
+    private DropdownField _modesDropdown;
+    private DropdownField _mapsDropdown;
     
     private void Awake()
     {
@@ -194,7 +201,18 @@ public class UIManager : MonoBehaviour
         
         var headerLabel = _root.Q<Label>(UI_Rooms_List_View_v3.header);                                                          //header
         headerLabel.text = _currentLobbyId + " / Rooms";
+
+        // Assignment 3
+        _roomsDropdown = _root.Q<DropdownField>(UI_Rooms_List_View_v3.rooms_dropdown);
+        _modesDropdown = _root.Q<DropdownField>(UI_Rooms_List_View_v3.modes_dropdown);
+        _mapsDropdown = _root.Q<DropdownField>(UI_Rooms_List_View_v3.maps_dropdown);
         
+        _roomsDropdown?.RegisterValueChangedCallback(evt => ApplyRoomFilters());
+
+        _modesDropdown?.RegisterValueChangedCallback(evt => ApplyRoomFilters());
+
+        _mapsDropdown?.RegisterValueChangedCallback(evt => ApplyRoomFilters());
+
         SetRoomsListButtons(_root);
         
         _roomsScrollView = _root.Q<ScrollView>(UI_Rooms_List_View_v3.rooms_scroll_view);                                        //rooms-scroll-view
@@ -232,22 +250,28 @@ public class UIManager : MonoBehaviour
     
     private void UpdateRoomsList(SessionDataRefreshedEvent e)
     {
+        // Cache the session data for client-side filtering
+        _cachedSessionData = e;
+
+        // Apply filters and render
+        ApplyRoomFilters();
+    }
+
+    private void RenderRoomsList(List<SessionInfo> rooms, int totalPlayers)
+    {
         _roomsScrollView.Clear();
-        
-        UpdatePlayerCountInLobby(e.TotalPlayers);
-        
-        if (e.Sessions.Count == 0) return;
-        
-        foreach (var room in e.Sessions)
+
+        UpdatePlayerCountInLobby(totalPlayers);
+
+        if (rooms.Count == 0) return;
+
+        foreach (var room in rooms)
         {
             var roomRow = roomRowTemplate.CloneTree();
             
             room.Properties.TryGetValue(DisplayName, out var displayName);
             room.Properties.TryGetValue(ModeName, out var modeName);
             room.Properties.TryGetValue(MapName, out var mapName);
-            
-            if(!room.IsVisible)
-                continue;
             
             roomRow.tooltip = room.IsOpen ? "Waiting for players" : "Match is in progress";
             
@@ -277,6 +301,7 @@ public class UIManager : MonoBehaviour
             {
                 var isFull = room.PlayerCount >= room.MaxPlayers;
                 enterBtn.SetEnabled(!isFull);
+                enterBtn.SetEnabled(room.IsOpen);
                 
                 enterBtn.clicked += () =>
                 {
@@ -299,6 +324,43 @@ public class UIManager : MonoBehaviour
     {
         var playerCountLabel = _root.Q<Label>(UI_Rooms_List_View.online_label);                                              //online-label
         if (playerCountLabel != null) playerCountLabel.text = $"Online Players: {totalPlayers}";
+    }
+
+    // Assignment 3
+    private void ApplyRoomFilters()
+    {
+        if (!_cachedSessionData.HasValue) return;
+
+        var allRooms = _cachedSessionData.Value.Sessions;
+        var filteredRooms = new List<SessionInfo>();
+
+        // Get current dropdown values
+        var selectedRoomFilter = _roomsDropdown?.value ?? "All";
+        var selectedModeFilter = _modesDropdown?.value ?? "All";
+        var selectedMapFilter = _mapsDropdown?.value ?? "All";
+
+        foreach (var room in allRooms)
+        {
+            // Get room properties
+            room.Properties.TryGetValue(ModeName, out var modeName);
+            room.Properties.TryGetValue(MapName, out var mapName);
+
+            // Apply filters
+            var matchesRoomFilter = selectedRoomFilter == "All" ||
+                                    (selectedRoomFilter == "Open" && room.IsOpen) ||
+                                    (selectedRoomFilter == "Closed" && !room.IsOpen);
+
+            var matchesModeFilter = selectedModeFilter == "All" || modeName == selectedModeFilter;
+            var matchesMapFilter = selectedMapFilter == "All" || mapName == selectedMapFilter;
+
+            if (matchesRoomFilter && matchesModeFilter && matchesMapFilter)
+            {
+                filteredRooms.Add(room);
+            }
+        }
+
+        // Update the UI with filtered rooms
+        RenderRoomsList(filteredRooms, _cachedSessionData.Value.TotalPlayers);
     }
 
     private void ShowRoomCreationView()
