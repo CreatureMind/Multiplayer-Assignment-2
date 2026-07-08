@@ -1,13 +1,22 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Events;
 using Fusion;
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class ReadyManager : NetworkBehaviour
 {
     [Networked, OnChangedRender(nameof(OnMatchStartedChanged))]
     private NetworkBool MatchStarted { get; set; }
+
+    private readonly Dictionary<string, string> _gameScenes = new()
+    {
+        { "Basic", "Game_Scene_1" },
+        { "Plus", "Game_Scene_2"},
+        { "Chokepoint", "Game_Scene_3"},
+    };
 
     public override void Spawned()
     {
@@ -39,7 +48,11 @@ public class ReadyManager : NetworkBehaviour
         Runner.SessionInfo.IsOpen    = false;
         // commented for assignment 3
         //Runner.SessionInfo.IsVisible = false;
-        Runner.LoadScene("Game_Scene");
+
+        if (_gameScenes.TryGetValue(mapName, out var sceneName))
+            Runner.LoadScene(sceneName);
+        else
+            Debug.LogError($"Map {mapName} not found!");
     }
 
     private void OnMatchStartedChanged()
