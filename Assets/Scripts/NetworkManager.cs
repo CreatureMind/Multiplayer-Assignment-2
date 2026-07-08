@@ -389,7 +389,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             
             totalPlayersInThisLobby += session.PlayerCount;
 
-            if (session.IsVisible && session.IsOpen)
+            // commented for assignment 3
+            if (session.IsVisible /*&& session.IsOpe*/)
             {
                 validRooms.Add(session);
             }

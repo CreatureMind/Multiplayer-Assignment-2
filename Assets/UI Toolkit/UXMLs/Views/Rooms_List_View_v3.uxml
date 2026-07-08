@@ -9,7 +9,7 @@
             <ui:DropdownField label="Show" index="0" choices="All,Free for All,2 vs 2" name="modes-dropdown" class="top-dropdown" style="align-self: center;">
                 <ui:Label text="Modes"/>
             </ui:DropdownField>
-            <ui:DropdownField label="Show" choices="All" index="0" name="maps-dropdown" class="top-dropdown" style="align-self: center;">
+            <ui:DropdownField label="Show" choices="All,Basic,Plus,Chokepoint" index="0" name="maps-dropdown" class="top-dropdown" style="align-self: center;">
                 <ui:Label text="Maps"/>
             </ui:DropdownField>
         </ui:VisualElement>
