@@ -44,8 +44,12 @@ namespace Events
 
 
     public struct SceneLoadStartedEvent { }
-    
-    public struct SceneLoadDoneEvent { }
+
+    public struct SceneLoadDoneEvent
+    {
+        // potentially add game mode do that the server game manager that
+        // listens to this to start the game knows what other game mode to instantiate as
+    }
     
     public struct ChatCreatedEvent { }
 
