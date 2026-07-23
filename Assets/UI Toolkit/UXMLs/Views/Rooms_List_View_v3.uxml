@@ -15,12 +15,13 @@
         </ui:VisualElement>
         <ui:ScrollView name="rooms-scroll-view" style="margin-right: 200px; margin-bottom: 200px; margin-left: 200px; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px; background-color: rgba(0, 0, 0, 0.5); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; height: 100%;"/>
         <ui:VisualElement name="bottom-container" style="flex-grow: 1; position: absolute; top: auto; left: 200px; right: 200px; bottom: 0; flex-direction: column; height: 200px; justify-content: flex-start; align-items: flex-start; padding-top: 5px;">
-            <ui:VisualElement name="VisualElement" style="flex-grow: 0; align-items: center; justify-content: space-between; align-self: stretch; flex-direction: row;">
-                <ui:VisualElement style="max-width: 171px;">
-                    <ui:Label text="Players: 0" name="online-label" class="Lable" style="color: rgb(255, 255, 255); flex-shrink: 1;"/>
-                </ui:VisualElement>
+            <ui:VisualElement name="" style="flex-grow: 0; align-items: center; justify-content: space-between; align-self: stretch; flex-direction: row;">
+                <ui:Button text="Leave" enabled="true" name="leave-button" style="align-items: auto; align-self: auto; font-size: 32px;"/>
                 <ui:Button text="Create a Room" enabled="true" name="create-button" style="align-items: auto; align-self: auto; font-size: 32px;"/>
                 <ui:Button text="Refresh" enabled="true" name="refresh-button" style="align-items: auto; align-self: auto; font-size: 32px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="" style="max-width: 171px;">
+                <ui:Label text="Players: 0" name="online-label" class="Lable" style="color: rgb(255, 255, 255); flex-shrink: 1;"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

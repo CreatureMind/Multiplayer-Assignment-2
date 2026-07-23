@@ -120,8 +120,6 @@ Button {
     background-color: rgb(255, 117, 0);
 }
 
-
-
 .play-indicator.green .unity-radio-button__checkmark {
     background-color: rgb(40, 154, 0);
 }

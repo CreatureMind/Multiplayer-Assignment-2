@@ -12,6 +12,9 @@ public class UIManager : MonoBehaviour
     private const string ModeName = "ModeName";
     private const string MapName = "MapName";
 
+    [Header("Main Menu")]
+    [SerializeField] private VisualTreeAsset mainMenuView;
+    
     [Header("Menus")]
     // commented out for assignment 3
     //[SerializeField] private VisualTreeAsset lobbiesListView;
@@ -41,6 +44,8 @@ public class UIManager : MonoBehaviour
     private bool _canSpin = true;
 
     private string _currentLobbyId;
+    
+    private bool _isReturningToLobby = false;
 
     // Caching for client-side filtering
     private SessionDataRefreshedEvent? _cachedSessionData;
@@ -116,7 +121,7 @@ public class UIManager : MonoBehaviour
     {
         // commented out for assignment 3
         //ShowSessionsListView();
-        EnterGlobalLobby();
+        ShowMainMenu();
     }
 
     private void StartMatch(MatchStartedEvent e)
@@ -180,14 +185,60 @@ public class UIManager : MonoBehaviour
         }
     }*/
 
+    private void ShowMainMenu()
+    {
+        _uiDocument.visualTreeAsset = mainMenuView;
+        _root = _uiDocument.rootVisualElement;
+
+        var playGameBtn = _root.Q<Button>(UI_Main_Menu_View.play_game_btn);
+        if (playGameBtn != null)
+        {
+            playGameBtn.clicked += EnterGlobalLobby;
+        }
+        else
+        {
+            Debug.LogError("Could not find Button named 'play-game-btn' in mainMenuView.");
+        }
+
+        var optionBtn = _root.Q<Button>(UI_Main_Menu_View.options_btn);
+        if (optionBtn != null)
+        {
+            optionBtn.clicked += () => Debug.Log("Options button clicked");
+        }
+        else
+        {
+            Debug.LogError("Could not find Button named 'options-btn' in mainMenuView.");
+        }
+        
+        var creditsBtn = _root.Q<Button>(UI_Main_Menu_View.credits_btn);
+        if (creditsBtn != null)
+        {
+            creditsBtn.clicked += () => Debug.Log("Credits button clicked");
+        }
+        else
+        {
+            Debug.LogError("Could not find Button named 'credits-btn' in mainMenuView.");
+        }
+    }
+
     private void EnterGlobalLobby()
     {
-        var session = sessionsListData.sessionsList[0];
+        if (!sessionsListData) return;
+        if (sessionsListData.sessionsList.Count == 0) return;
         
-        if (!NetworkManager.Instance) return;
+        if (!_isReturningToLobby)
+        {
+            var session = sessionsListData.sessionsList[0];
         
-        _ = NetworkManager.Instance.ConnectToCustomLobby(session.sessionName);
-        _currentLobbyId = session.sessionName;
+            if (!NetworkManager.Instance) return;
+        
+            _ = NetworkManager.Instance.ConnectToCustomLobby(session.sessionName);
+            _currentLobbyId = session.sessionName;
+        }
+        else
+        {
+            ShowRoomsListView(new JoinedLobbyEvent());
+        }
     }
 
     private void ShowRoomsListView(JoinedLobbyEvent e)
@@ -200,7 +251,7 @@ public class UIManager : MonoBehaviour
         _root = _uiDocument.rootVisualElement;
         
         var headerLabel = _root.Q<Label>(UI_Rooms_List_View_v3.header);                                                          //header
-        headerLabel.text = _currentLobbyId + " / Rooms";
+        headerLabel.text = "Tiny Soldiers / " + _currentLobbyId + " / Rooms";
 
         // Assignment 3
         _roomsDropdown = _root.Q<DropdownField>(UI_Rooms_List_View_v3.rooms_dropdown);
@@ -222,12 +273,15 @@ public class UIManager : MonoBehaviour
 
     private void SetRoomsListButtons(VisualElement root)
     {
-        // commented out for assignment 3
-        /*var leaveBtn = root.Q<Button>(UI_Rooms_List_View.leave_button);                                                      //leave-button
+        var leaveBtn = root.Q<Button>(UI_Rooms_List_View.leave_button);                                                      //leave-button
         if (leaveBtn != null)
         {
-            leaveBtn.clicked+= ShowSessionsListView;
-        }*/
+            leaveBtn.clicked+= () =>
+            {
+                ShowMainMenu();
+                _isReturningToLobby = true;
+            };
+        }
         
         var createRoomBtn = root.Q<Button>(UI_Rooms_List_View.create_button);                                                //create-button
         if (createRoomBtn != null)
