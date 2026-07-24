@@ -1,4 +1,5 @@
 using System;
+using Fusion;
 
 // Authoritative tile type, matching the GDD vocabulary.
 // NOTE: values are explicit and MUST NOT be reordered or have entries inserted mid-list.
@@ -39,7 +40,7 @@ public enum TileTypeMask : ushort
 // Frozen is deliberately absent. It is derived every time the board mutates and lives only in TileView.
 // There is nowhere to accidentally persist it.
 [Serializable]
-public readonly struct TileState : IEquatable<TileState>
+public readonly struct TileState : INetworkStruct, IEquatable<TileState>
 {
     public const byte NoOwner = 0; // player ids are 1-based
     public const short NoTerritory = 0;

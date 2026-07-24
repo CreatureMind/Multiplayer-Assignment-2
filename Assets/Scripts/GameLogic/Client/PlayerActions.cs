@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,7 +36,7 @@ public sealed class SoldierMoveMode : IPlayerActionMode
     
     public bool TryCreateRequest(Vector2Int cell, out MoveRequest request)
     {
-        if (!_legal.MoveTargets.Contains(cell))
+        if (!_legal.IsMoveTarget(cell))
         {
             request = default;
             return false;
@@ -65,7 +64,7 @@ public sealed class BombPlacementMode : IPlayerActionMode
 
     public bool TryCreateRequest(Vector2Int cell, out MoveRequest request)
     {
-        if (!_legal.BombTargets.Contains(cell))
+        if (!_legal.IsBombTarget(cell))
         {
             request = default;
             return false;

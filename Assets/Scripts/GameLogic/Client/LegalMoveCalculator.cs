@@ -35,6 +35,11 @@ public sealed class LegalMoveCalculator
         _localPlayerId = localPlayerId;
     }
     
+    // O(1) membership tests.
+    // Exposed as methods so callers get HashSet lookup directly instead of going through Enumerable.Contains and its runtime ICollection check
+    public bool IsMoveTarget(Vector2Int cell) => _moveTargets.Contains(cell);
+    public bool IsBombTarget(Vector2Int cell) => _bombTargets.Contains(cell);
+    
     public void Recompute()
     {
         _moveTargets.Clear();
@@ -55,30 +60,28 @@ public sealed class LegalMoveCalculator
                 
                 if (view.Frozen)
                     continue;
-                if (!CanExtendFrom(view.VisualType))
+                
+                if (!view.ConductsConnectivity)
                     continue;
 
-                foreach (var t in Orthogonal4)
+                foreach (var offset in Orthogonal4)
                 {
-                    var n = cell + t;
-                    if (!_board.Contains(n))
+                    var neighbour = cell + offset;
+                    if (!_board.Contains(neighbour))
                         continue;
-                    if (IsMoveTarget(_board[n]))
-                        _moveTargets.Add(n);
+                    if (CanMoveInto(_board[neighbour]))
+                        _moveTargets.Add(neighbour);
                 }
             }
     }
 
-    // Cells that conduct my connectivity outward
-    private static bool CanExtendFrom(TileType type)
-        => type is TileType.Soldier or TileType.Bomb or TileType.Base or TileType.Motherload;
-    
-    // An empty cell, or an enemy soldier.
-    // Enemy bombs project as soldiers, so they are included here on purpose - that is the whole mechanic
-    private bool IsMoveTarget(in TileView view)
+    // An empty cell, or an enemy Soldier.
+    // Enemy Bombs project as Soldiers and are therefor included on purpose.
+    private bool CanMoveInto(in TileView view)
     {
         if (view.VisualType == TileType.Empty)
             return true;
+
         return view.VisualType == TileType.Soldier && view.OwnerId != _localPlayerId;
     }
 }
