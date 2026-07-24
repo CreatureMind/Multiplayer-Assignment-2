@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour
 
     [Header("Main Menu")]
     [SerializeField] private VisualTreeAsset mainMenuView;
+    [SerializeField] private VisualTreeAsset optionsView;
     
     [Header("Menus")]
     // commented out for assignment 3
@@ -203,7 +204,7 @@ public class UIManager : MonoBehaviour
         var optionBtn = _root.Q<Button>(UI_Main_Menu_View.options_btn);
         if (optionBtn != null)
         {
-            optionBtn.clicked += () => Debug.Log("Options button clicked");
+            optionBtn.clicked += ShowOptions;
         }
         else
         {
@@ -218,6 +219,22 @@ public class UIManager : MonoBehaviour
         else
         {
             Debug.LogError("Could not find Button named 'credits-btn' in mainMenuView.");
+        }
+    }
+
+    private void ShowOptions()
+    {
+        _uiDocument.visualTreeAsset = optionsView;
+        _root = _uiDocument.rootVisualElement;
+        
+        var backBtn = _root.Q<Button>(UI_Options_View.back_button);
+        if (backBtn != null)
+        {
+            backBtn.clicked += ShowMainMenu;
+        }
+        else
+        {
+            Debug.LogError("Could not find Button named 'back-button' in optionsView.");
         }
     }
 

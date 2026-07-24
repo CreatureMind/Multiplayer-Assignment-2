@@ -1,14 +1,11 @@
-<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:ui="UnityEngine.UIElements"
-         noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd"
-         editor-extension-mode="False">
-    <Style src="project://database/Assets/UI%20Toolkit/Styles/LobbyStyle.uss"/>
-    <ui:VisualElement name="tint" style="flex-grow: 1; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center;">
-        <ui:VisualElement name="panel" style="background-color: rgb(60,60,60); padding-top:40px; padding-bottom:40px; padding-left:60px; padding-right:60px; border-top-left-radius:16px; border-top-right-radius:16px; border-bottom-right-radius:16px; border-bottom-left-radius:16px; min-width:600px; align-items:stretch;">
-            <ui:Label text="Enter Your Name" name="title" class="header" style="font-size:48px; margin-bottom:20px;"/>
-            <ui:TextField placeholder-text="Your name..." name="player-name-field" class="Lable" style="font-size:32px; margin-bottom:12px;"/>
-            <ui:Label text="" name="error-label" class="Lable" style="color: rgb(255,80,80); font-size:24px; margin-bottom:12px;"/>
-            <ui:Button text="Confirm" name="confirm-button" style="font-size:32px; align-self:center;"/>
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Styles/LobbyStyle.uss?fileID=7433441132597879392&amp;guid=c1ae93633323eed4e9baa1825210ea51&amp;type=3#LobbyStyle"/>
+    <ui:VisualElement name="" style="flex-grow: 1; justify-content: center; align-items: center;">
+        <ui:VisualElement name="panel" style="background-color: rgb(60, 60, 60); padding-top: 60px; padding-bottom: 40px; padding-left: 60px; padding-right: 60px; min-width: 600px; align-items: stretch; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(128, 128, 128); border-right-color: rgb(128, 128, 128); border-top-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128);">
+            <ui:Label text="Enter Your Name" name="title" class="header" style="font-size: 48px; margin-bottom: 0; position: absolute; padding-top: 10px; top: -68px;"/>
+            <ui:TextField placeholder-text="Your name..." name="player-name-field" class="Lable name-entry unity-base-field__input text-field" style="font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+            <ui:Label text="" name="error-label" class="Lable" style="color: rgb(255, 80, 80); font-size: 24px; margin-top: 20px; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; height: 0;"/>
         </ui:VisualElement>
+        <ui:Button text="Confirm" name="confirm-button" style="font-size: 32px; align-self: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
     </ui:VisualElement>
 </ui:UXML>

@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Room_Creation_View.uxml
-// Updated: 2026-07-23 20:27 UTC
+// Updated: 2026-07-24 21:40 UTC
 
 using System.Collections.Generic;
 
@@ -8,17 +8,13 @@ public enum UI_Room_Creation_View
 {
     tint,
     container,
-    header,
     container_2,
     VisualElement,
+    header,
     room_name,
-    spacer,
     max_players,
-    spacer_2,
     modes_dropdown,
-    spacer_3,
     maps_dropdown,
-    spacer_4,
     public_toggle,
     bottom_container,
     back_button,
@@ -32,17 +28,13 @@ internal static class UI_Room_Creation_View_Map
         {
             { UI_Room_Creation_View.tint, "tint" },
             { UI_Room_Creation_View.container, "container" },
-            { UI_Room_Creation_View.header, "header" },
             { UI_Room_Creation_View.container_2, "container" },
             { UI_Room_Creation_View.VisualElement, "VisualElement" },
+            { UI_Room_Creation_View.header, "header" },
             { UI_Room_Creation_View.room_name, "room-name" },
-            { UI_Room_Creation_View.spacer, "spacer" },
             { UI_Room_Creation_View.max_players, "max-players" },
-            { UI_Room_Creation_View.spacer_2, "spacer" },
             { UI_Room_Creation_View.modes_dropdown, "modes-dropdown" },
-            { UI_Room_Creation_View.spacer_3, "spacer" },
             { UI_Room_Creation_View.maps_dropdown, "maps-dropdown" },
-            { UI_Room_Creation_View.spacer_4, "spacer" },
             { UI_Room_Creation_View.public_toggle, "public-toggle" },
             { UI_Room_Creation_View.bottom_container, "bottom-container" },
             { UI_Room_Creation_View.back_button, "back-button" },

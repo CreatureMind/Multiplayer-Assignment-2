@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Templates/Session_Row_Template.uxml
-// Updated: 2026-07-23 20:27 UTC
+// Updated: 2026-07-24 21:40 UTC
 
 using System.Collections.Generic;
 

@@ -89,8 +89,8 @@ public class NameEntryUIController : MonoBehaviour
         }
 
         nameField.value = string.Empty;
-        if (errorLabel != null)
-            errorLabel.style.display = DisplayStyle.None;
+        //if (errorLabel != null)
+            //errorLabel.style.display = DisplayStyle.None;
 
         confirmBtn.clicked += () => OnConfirmClicked(nameField, errorLabel);
     }
@@ -148,6 +148,6 @@ public class NameEntryUIController : MonoBehaviour
         if (errorLabel == null)
             return;
         errorLabel.text = message;
-        errorLabel.style.display = DisplayStyle.Flex;
+        //errorLabel.style.display = DisplayStyle.Flex;
     }
 }
