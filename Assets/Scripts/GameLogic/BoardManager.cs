@@ -6,7 +6,7 @@ using UnityEngine;
 public class BoardManager : NetworkBehaviour
 {
     public static BoardManager Instance { get; private set; }
-    
+
     public const int MaxBoardTiles = 1024;
 
     [SerializeField, Min(1)] private int boardWidth = 8;
@@ -15,8 +15,6 @@ public class BoardManager : NetworkBehaviour
     [Networked] public int Width { get; private set; }
     [Networked] public int Height { get; private set; }
     [Networked, Capacity(MaxBoardTiles)] private NetworkArray<TileState> Tiles => default;
-    
-    public ServerBoardMutator ServerMutator { get; private set; }
 
     private ChangeDetector _changeDetector;
     private readonly BoardChangeCheck _changeCheck = new();
@@ -24,57 +22,7 @@ public class BoardManager : NetworkBehaviour
     public int TileCount => Width * Height;
     public int ChangeVersion => _changeCheck.Version;
 
-    public override void Spawned()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Runner.Despawn(Object);
-            return;
-        }
-
-        Instance = this;
-        
-        
-        ServerMutator = new ServerBoardMutator(this);
-        _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
-
-        if (HasStateAuthority)
-        {
-            ValidateBoardDimensions(boardWidth, boardHeight);
-            Width = boardWidth;
-            Height = boardHeight;
-            InitializeBoard(new TileState(TileType.Empty));
-        }
-
-        NotifyVisualsChanged();
-    }
-
-    public override void Despawned(NetworkRunner runner, bool hasState)
-    {
-        _changeCheck.Clear();
-        ServerMutator = null;
-
-        if (Instance == this)
-            Instance = null;
-    }
-
-    public override void Render()
-    {
-        foreach (var change in _changeDetector.DetectChanges(this))
-        {
-            if (change == nameof(Tiles) || change == nameof(Width) || change == nameof(Height))
-            {
-                NotifyVisualsChanged();
-                break;
-            }
-        }
-    }
-
-    public void RegisterVisualRenderer(Action<int> onBoardChanged, bool replayLatest = true)
-        => _changeCheck.Subscribe(onBoardChanged, replayLatest);
-
-    public void UnregisterVisualRenderer(Action<int> onBoardChanged)
-        => _changeCheck.Unsubscribe(onBoardChanged);
+    #region Helper Methods
 
     public bool TryGetTile(int x, int y, out TileState tile)
     {
@@ -100,11 +48,14 @@ public class BoardManager : NetworkBehaviour
         return true;
     }
 
-    private void InitializeBoard(in TileState initialState)
+    public int ToIndex(Vector2Int gridPosition)
     {
-        var count = TileCount;
-        for (var index = 0; index < count; index++)
-            Tiles.Set(index, initialState);
+        return gridPosition.y * Width + gridPosition.x;
+    }
+
+    public int ToIndex(int x, int y)
+    {
+        return y * Width + x;
     }
 
     private bool TryGetIndex(int x, int y, out int index)
@@ -119,6 +70,83 @@ public class BoardManager : NetworkBehaviour
         return true;
     }
 
+    private bool IsValidIndex(int x, int y)
+    {
+        return x >= 0 && y >= 0 && x < Width && y < Height;
+    }
+
+    public bool IsValidIndex(Vector2Int gridPosition)
+    {
+        return IsValidIndex(gridPosition.x, gridPosition.y) && Tiles[ToIndex(gridPosition)].Type != TileType.Blocked && Tiles[ToIndex(gridPosition)].Type != TileType.None;
+    }
+
+    #endregion
+
+    #region Life Time Methods
+
+    public override void Spawned()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Runner.Despawn(Object);
+            return;
+        }
+
+        Instance = this;
+
+
+        _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+
+        BoardUtilities.InstantiateBoardData(this, Tiles);
+
+        if (HasStateAuthority)
+        {
+            ValidateBoardDimensions(boardWidth, boardHeight);
+            Width = boardWidth;
+            Height = boardHeight;
+            InitializeBoard(new TileState(TileType.Empty));
+        }
+
+        NotifyVisualsChanged();
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        _changeCheck.Clear();
+
+        if (Instance == this)
+            Instance = null;
+    }
+
+    public override void Render()
+    {
+        foreach (var change in _changeDetector.DetectChanges(this))
+        {
+            if (change == nameof(Tiles) || change == nameof(Width) || change == nameof(Height))
+            {
+                NotifyVisualsChanged();
+                break;
+            }
+        }
+    }
+
+    #endregion
+
+    public void RegisterVisualRenderer(Action<int> onBoardChanged, bool replayLatest = true)
+        => _changeCheck.Subscribe(onBoardChanged, replayLatest);
+
+    public void UnregisterVisualRenderer(Action<int> onBoardChanged)
+        => _changeCheck.Unsubscribe(onBoardChanged);
+
+
+    private void InitializeBoard(in TileState initialState)
+    {
+        var count = TileCount;
+        for (var index = 0; index < count; index++)
+            Tiles.Set(index, initialState);
+    }
+
+
     private void NotifyVisualsChanged()
         => _changeCheck.NotifyVisualsChanged();
 
@@ -131,25 +159,44 @@ public class BoardManager : NetworkBehaviour
             throw new InvalidOperationException($"Board dimensions exceed max tile capacity ({MaxBoardTiles}).");
     }
 
-    public sealed class ServerBoardMutator
+    public bool ValidateBoardChange(Vector2Int gridPosition, TileType targetType)
     {
-        private readonly BoardManager _board;
-
-        internal ServerBoardMutator(BoardManager board)
+        switch (targetType)
         {
-            _board = board;
+            case TileType.None:
+                return false;
+
+            case TileType.Empty:
+                return false;
+
+            case TileType.Bomb:
+                return BombCheck(gridPosition);
+
+            case TileType.Pawn:
+                return PawnCheck(gridPosition);
+
+            case TileType.Base:
+                return BaseCheck(gridPosition);
+
+            case TileType.Core:
+                return false;
+
+            default:
+                return false;
         }
-
-        public bool TrySetTile(int x, int y, in TileState state)
-            => _board.TrySetTileServerOnly(x, y, state);
-
-        public bool TryClearTile(int x, int y)
-            => _board.TrySetTileServerOnly(x, y, new TileState(TileType.Empty));
     }
 
-    
+    private bool BaseCheck(Vector2Int gridPosition)
+    {
+        return false;
+    }
 
-    public bool ValidateBoardChange(Vector2Int gridPosition, TileType targetType)
+    private bool PawnCheck(Vector2Int gridPosition)
+    {
+        return false;
+    }
+
+    private bool BombCheck(Vector2Int gridPosition)
     {
         return false;
     }
