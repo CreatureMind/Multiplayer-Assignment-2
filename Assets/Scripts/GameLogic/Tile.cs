@@ -19,10 +19,10 @@ public readonly struct TileState : INetworkStruct, IEquatable<TileState>
     public const short NoTerritory = 0;
 
     public readonly TileType Type;
-    public readonly byte OwnerId;
+    public readonly int OwnerId;
     public readonly short TerritoryId;
 
-    public TileState(TileType type, byte ownerId = NoOwner, short territoryId = NoTerritory)
+    public TileState(TileType type, int ownerId = NoOwner, short territoryId = NoTerritory)
     {
         Type = type;
         OwnerId = ownerId;
@@ -64,10 +64,10 @@ public readonly struct TileState : INetworkStruct, IEquatable<TileState>
 public readonly struct TileView
 {
     public readonly TileType VisualType; // Bomb reads as Pawn to non-owners
-    public readonly byte OwnerId;
+    public readonly int OwnerId;
     public readonly bool Frozen; // render hint only - derived, never stored
 
-    public TileView(TileType visualType, byte ownerId, bool frozen)
+    public TileView(TileType visualType, int ownerId, bool frozen)
     {
         VisualType = visualType;
         OwnerId = ownerId;
@@ -77,7 +77,7 @@ public readonly struct TileView
 
 public static class TileProjector
 {
-    public static TileView Project(in TileState state, byte viewerId, bool frozen)
+    public static TileView Project(in TileState state, int viewerId, bool frozen)
     {
         var hidden = state.Type == TileType.Bomb && state.OwnerId != viewerId;
         return new TileView(hidden ? TileType.Pawn : state.Type, state.OwnerId, frozen);
