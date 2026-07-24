@@ -1001,7 +1001,7 @@
         </member>
         <member name="M:ExitGames.Client.Photon.PeerBase.NetworkSimRun">
             <summary>
-            Core of the Network Simulation, which is available in Debug builds.
+            Motherload of the Network Simulation, which is available in Debug builds.
             Called by a timer in intervals.
             </summary>
         </member>

@@ -48,14 +48,15 @@ public sealed class LegalMoveCalculator
                 
                 if (view.OwnerId != _localPlayerId)
                     continue;
+                
+                // A bomb replaces a soldier, so bombs and bases are not valid hosts
+                if (view.VisualType == TileType.Soldier)
+                    _bombTargets.Add(cell);
+                
                 if (view.Frozen)
                     continue;
                 if (!CanExtendFrom(view.VisualType))
                     continue;
-
-                // A bomb replaces a soldier, so bombs and bases are not valid hosts
-                if (view.VisualType == TileType.Pawn)
-                    _bombTargets.Add(cell);
 
                 foreach (var t in Orthogonal4)
                 {
@@ -70,7 +71,7 @@ public sealed class LegalMoveCalculator
 
     // Cells that conduct my connectivity outward
     private static bool CanExtendFrom(TileType type)
-        => type is TileType.Pawn or TileType.Bomb or TileType.Base or TileType.Core;
+        => type is TileType.Soldier or TileType.Bomb or TileType.Base or TileType.Motherload;
     
     // An empty cell, or an enemy soldier.
     // Enemy bombs project as soldiers, so they are included here on purpose - that is the whole mechanic
@@ -78,6 +79,6 @@ public sealed class LegalMoveCalculator
     {
         if (view.VisualType == TileType.Empty)
             return true;
-        return view.VisualType == TileType.Pawn && view.OwnerId != _localPlayerId;
+        return view.VisualType == TileType.Soldier && view.OwnerId != _localPlayerId;
     }
 }

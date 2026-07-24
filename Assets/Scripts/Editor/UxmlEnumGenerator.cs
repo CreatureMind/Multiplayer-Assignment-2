@@ -98,7 +98,7 @@ namespace Editor
                 $"  OutputFolder  : {OutputFolder}");
         }
 
-        // ── Core logic ────────────────────────────────────────────
+        // ── Motherload logic ────────────────────────────────────────────
         static void GenerateForUxml(string uxmlPath)
         {
             try

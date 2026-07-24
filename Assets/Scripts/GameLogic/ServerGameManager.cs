@@ -45,7 +45,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         foreach (var player in players)
         {
             var clientManager = Runner.Spawn(data.ClientManagerPrefab, Vector3.zero, Quaternion.identity, player);
-            clientManager.InstantiateClientManager(this);
+            clientManager.InstantiateClientManager(this, (byte)player.PlayerId);
             _clientManagers.Add(clientManager);
         }
     }
