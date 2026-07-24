@@ -476,6 +476,135 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
+--- !u!1 &797237189
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 797237191}
+  - component: {fileID: 797237190}
+  m_Layer: 0
+  m_Name: MatrixRain
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &797237190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797237189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9f43e12a5ee2d247a3c795e1abeb336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MatrixPawnRain
+  pawnSprite: {fileID: 21300000, guid: 8d8a40460e788984194e88419315e75b, type: 3}
+  spriteMaterial: {fileID: 0}
+  targetCamera: {fileID: 330585545}
+  palette:
+  - {r: 0.21176471, g: 0.5019608, b: 0.62352943, a: 1}
+  - {r: 0.12941177, g: 0.5568628, b: 0.36078432, a: 1}
+  - {r: 0.827451, g: 0.2784314, b: 0.5294118, a: 1}
+  - {r: 0.8901961, g: 0.8, b: 0.16078432, a: 1}
+  colorMode: 0
+  headHighlightColor: {r: 1, g: 1, b: 1, a: 0}
+  autoComputeCellSizeFromSprite: 1
+  cellSize: 0.2
+  boundsPadding: 1
+  minStepInterval: 0.06
+  maxStepInterval: 0.5
+  snapToGrid: 1
+  stepEaseCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  useUnscaledTime: 1
+  minStripeLength: 4
+  maxStripeLength: 14
+  minSpawnDelay: 50
+  maxSpawnDelay: 100
+  maxActiveStripesPerColumn: 2
+  fadeTail: 1
+  tailFadeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -2.301188
+      outSlope: -2.301188
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.25937957
+      value: 0.40311888
+      inSlope: -1.4227434
+      outSlope: -1.4227434
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  recolorChance: 1
+  poolSize: 400
+  growPoolIfNeeded: 1
+  sortingLayerName: Default
+  orderInLayer: -100
+--- !u!4 &797237191
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797237189}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &824371407
 GameObject:
   m_ObjectHideFlags: 0
@@ -856,3 +985,4 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 1668919663}
   - {fileID: 1828490692}
+  - {fileID: 797237191}
