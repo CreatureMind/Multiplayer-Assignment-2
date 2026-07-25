@@ -43,17 +43,6 @@ public class ClientManager : NetworkBehaviour
     // Chunk buffer.
     // Diffs accumulate here until the server flags the final chunk, so a 200-cell blast produces ONE cache update and on legal-move recompute rather than four.
     private readonly List<CellDiff> _pendingDiffs = new List<CellDiff>(MaxDiffsPerRpc);
-
-    public void InitialiseServer(ServerGameManager server, byte playerId)
-    {
-        if (!HasStateAuthority)
-            return;
-
-        _server = server ?? throw new ArgumentNullException(nameof(server));
-        Player = Object.InputAuthority;
-        PlayerId = playerId;
-        name = $"ClientManager_P{playerId}";
-    }
     
     // Server-side setup. Called by ServerGameManager immediately after spawn.
     public void InstantiateClientManager(ServerGameManager server, byte playerId)
@@ -199,12 +188,6 @@ public class ClientManager : NetworkBehaviour
         // The client already filtered illegal clicks, but that is a UX affordance and nothing more.
         // This is the authoritative path.
         // TODO: implement in ServerGameManager this: _server.HandleMoveRequest(PlayerId, cell, intent);
-        // TODO: BoardManager.cs can't stay as written, "[Networked, Capacity(1024)] NetworkArray<TileState> Tiles" must be deleted.
-        // TODO: Fusion replicates networked state to all clients, so every client would receive the true TileType of every bomb, making them not truly hidden.
-        // TODO: The mechanic is dead the moment that array syncs. BoardData becomes a plain server-side TileState[,], and client get projected diff only.
-        // TODO: MaxBoardTiles = 1024 is below specs, as board can be 50x50, which requires 2500 cells, so ValidateBoardDimensions throws on a legal map.
-        // TODO: If you make the board as plain C#, the cap can go.
-        
     }
     #endregion
 
