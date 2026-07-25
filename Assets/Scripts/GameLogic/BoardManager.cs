@@ -172,13 +172,13 @@ public class BoardManager : NetworkBehaviour
             case TileType.Bomb:
                 return BombCheck(gridPosition);
 
-            case TileType.Pawn:
+            case TileType.Soldier:
                 return PawnCheck(gridPosition);
 
             case TileType.Base:
                 return BaseCheck(gridPosition);
 
-            case TileType.Core:
+            case TileType.Motherload:
                 return false;
 
             default:

@@ -24,15 +24,6 @@ public class ClientManager : NetworkBehaviour
     // VERIFY against the RPC payload limit before shipping.
     public const int MaxDiffsPerRpc = 64;
     
-    [Header("Scene References (local client only)")]
-    [SerializeField] private Grid grid;
-    [SerializeField] private Camera boardCamera;
-    [SerializeField] private InputHandler inputHandler;
-    [SerializeField] private MonoBehaviour boardRendererBehaviour;
-    
-    [Header("Board Placement")]
-    [SerializeField] private Vector3Int boardOriginCell = Vector3Int.zero;
-    
     [Networked] public PlayerRef Player { get; private set; }
     // 1-based, matches TileState.OwnerId. 0 is reserved for "no owner"
     [Networked] public byte PlayerId { get; private set; }
@@ -46,11 +37,23 @@ public class ClientManager : NetworkBehaviour
     private BoardCoordinateMapper _mapper;
     private PlayerActionController _actions;
     private IBoardRenderer _renderer;
+    private InputHandler _inputHandler;
     private bool _clientReady;
     
     // Chunk buffer.
     // Diffs accumulate here until the server flags the final chunk, so a 200-cell blast produces ONE cache update and on legal-move recompute rather than four.
     private readonly List<CellDiff> _pendingDiffs = new List<CellDiff>(MaxDiffsPerRpc);
+
+    public void InitialiseServer(ServerGameManager server, byte playerId)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        _server = server ?? throw new ArgumentNullException(nameof(server));
+        Player = Object.InputAuthority;
+        PlayerId = playerId;
+        name = $"ClientManager_P{playerId}";
+    }
     
     // Server-side setup. Called by ServerGameManager immediately after spawn.
     public void InstantiateClientManager(ServerGameManager server, byte playerId)
@@ -69,20 +72,26 @@ public class ClientManager : NetworkBehaviour
         if (!Object.HasInputAuthority)
             return; // someone else's ClientManager
 
-        _renderer = boardRendererBehaviour as IBoardRenderer;
-        if (boardRendererBehaviour && _renderer == null)
-            Debug.LogError($"[ClientManager] {boardRendererBehaviour.GetType().Name} does not implement IBoardRenderer.");
+        var context = ClientSceneContext.Instance;
+        if (!context)
+        {
+            Debug.LogError("[ClientManager] No ClientSceneContext in the scene; cannot initialise local client.");
+            return;
+        }
 
-        // Nothing else is built yet: board dimensions arrive in RPC_InitialiseClient.
-        // Waiting for that removes any dependency on BoardManager's spawn order.
+        _renderer = context.Renderer;
+        _inputHandler = context.InputHandler;
+
+        // Board dimensions arrive in RPC_InitialiseClient, so the rest of the stack is built there.
+        // We only cache the rig references here.
     }
     
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
-        if (inputHandler)
+        if (_inputHandler)
         {
-            inputHandler.RequestSubmitted -= OnRequestSubmitted;
-            inputHandler.HoverChanged -= OnHoverChanged;
+            _inputHandler.RequestSubmitted -= OnRequestSubmitted;
+            _inputHandler.HoverChanged -= OnHoverChanged;
         }
 
         if (_actions != null)
@@ -106,16 +115,17 @@ public class ClientManager : NetworkBehaviour
             Debug.LogWarning("[ClientManager] Duplicate RPC_InitialiseClient ignored.");
             return;
         }
-
-        if (!grid || !boardCamera || !inputHandler)
+        
+        var context = ClientSceneContext.Instance;
+        if (!context || !_inputHandler)
         {
-            Debug.LogError("[ClientManager] Missing scene references; cannot initialise client.");
+            Debug.LogError("[ClientManager] Scene context missing at init time.");
             return;
         }
-
-        _mapper = new BoardCoordinateMapper(grid, boardCamera, boardOriginCell, width, height);
+        
+        _mapper = new BoardCoordinateMapper(context.Grid, context.BoardCamera, context.BoardOriginCell, width, height);
         _board = new ClientBoardCache(width, height);
-
+        
         var legal = new LegalMoveCalculator(_board, playerId);
         var scanner = new BaseFormationScanner(_board, playerId);
 
@@ -127,9 +137,9 @@ public class ClientManager : NetworkBehaviour
         _board.Changed += OnBoardChanged;
         _actions.HighlightsInvalidated += OnHighlightsInvalidated;
 
-        inputHandler.Initialize(_mapper, _actions);
-        inputHandler.RequestSubmitted += OnRequestSubmitted;
-        inputHandler.HoverChanged += OnHoverChanged;
+        _inputHandler.Initialize(_mapper, _actions);
+        _inputHandler.RequestSubmitted += OnRequestSubmitted;
+        _inputHandler.HoverChanged += OnHoverChanged;
 
         _renderer?.Initialise(_board, _mapper, playerId);
 

@@ -171,10 +171,14 @@ public static class TileTransitions
     private static TileTypeMask MaskOf(TileType t) => (TileTypeMask)(1 << (int)t);
 
     // Pipeline gate 3a. One array read.
+    // Checks if the transition is legal at all, no matter what triggers it, used for both server and player initiated transitions.
+    // Bomb -> Empty is a legal transition here. 
     public static bool CanBecome(TileType from, TileType to)
         => (Allowed[(int)from] & MaskOf(to)) != 0;
 
     // Pipeline gate 3b. Rejects well-formed but illegitimate intents.
+    // Only player-initiated requests, check if a client's RPC ask for this
+    // Bomb -> Empty is NOT a legal transition here. 
     public static bool CanRequest(TileType from, TileType to)
         => (Requestable[(int)from] & MaskOf(to)) != 0;
 }

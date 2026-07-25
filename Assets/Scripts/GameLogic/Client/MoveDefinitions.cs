@@ -43,7 +43,7 @@ public struct CellDiff : INetworkStruct
     
     public Vector2Int Cell => new Vector2Int(X, Y);
     
-    public TileView ToView()
+    public readonly TileView ToView()
         => new TileView((TileType)VisualType, OwnerId, Frozen != 0);
 
     public static CellDiff From(Vector2Int cell, TileType visual, byte owner, bool frozen, byte generation = 0)

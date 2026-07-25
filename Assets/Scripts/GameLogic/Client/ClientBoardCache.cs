@@ -14,7 +14,7 @@ public sealed class ClientBoardCache
     private readonly TileView[] _tiles; // flat; index = y * Width + x
     
     // Fires once per applied batch with the cells that changed, so subscribers can update only those cells
-    public event Action<IReadOnlyCollection<CellDiff>> Changed;
+    public event Action<IReadOnlyList<CellDiff>> Changed;
 
     public ClientBoardCache(int width, int height)
     {

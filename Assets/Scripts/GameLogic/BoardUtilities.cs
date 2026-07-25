@@ -26,7 +26,7 @@ public static class BoardUtilities
         var currentOwnerId = owner.PlayerId;
 
         //check if the requested tile can become pawn
-        if(!Manager.IsValidIndex(tileIndex) || !TileTransitions.CanRequest(tileState.Type, TileType.Pawn))
+        if(!Manager.IsValidIndex(tileIndex) || !TileTransitions.CanRequest(tileState.Type, TileType.Soldier))
         {
             return false;
         }
@@ -72,7 +72,7 @@ public static class BoardUtilities
             var nextState = Tiles[nextIndex];
 
             // We can walk through friendly pawns, bombs, and stop at a friendly base.
-            var isFriendlyPawn = nextState.Type == TileType.Pawn && nextState.OwnerId == currentOwnerId;
+            var isFriendlyPawn = nextState.Type == TileType.Soldier && nextState.OwnerId == currentOwnerId;
             var isFriendlyBase = nextState.Type == TileType.Base && nextState.OwnerId == currentOwnerId;
             var isFriendlyBomb = nextState.Type == TileType.Bomb && nextState.OwnerId == currentOwnerId;
 
@@ -119,7 +119,7 @@ public static class BoardUtilities
                         }
 
                         var tileState = Tiles[Manager.ToIndex(currentTile)];
-                        var isFriendlyPawn = tileState.Type == TileType.Pawn && tileState.OwnerId == ownerId;
+                        var isFriendlyPawn = tileState.Type == TileType.Soldier && tileState.OwnerId == ownerId;
                         var isFriendlyBomb = tileState.Type == TileType.Bomb && tileState.OwnerId == ownerId;
 
                         if (!isFriendlyPawn && !isFriendlyBomb)
