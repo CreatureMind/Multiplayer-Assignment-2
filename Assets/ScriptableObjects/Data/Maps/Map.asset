@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5925716b56d84848afd2d73a467602dc, type: 3}
   m_Name: Map
   m_EditorClassIdentifier: Assembly-CSharp::StartingPositionSO
-  width: 0
-  height: 0
+  width: 32
+  height: 32
   startingPosition: []

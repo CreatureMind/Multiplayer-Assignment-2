@@ -12,6 +12,9 @@ public class StartingPositionEditorWindow : EditorWindow
     private const float TileSpacing = 1f;
 
     private readonly Color _neutralColor = new Color(0.25f, 0.25f, 0.25f);
+    private readonly Color _blockedColor = new Color(0.45f, 0.45f, 0.45f);
+    private readonly Color _motherloadColor = new Color(0.58f, 0.28f, 0.82f);
+    private readonly Color _bombCenterColor = new Color(0.96f, 0.54f, 0.16f);
 
     private StartingPositionSO _targetAsset;
     private TileType _selectedType = TileType.Soldier;
@@ -160,7 +163,7 @@ public class StartingPositionEditorWindow : EditorWindow
             return;
         }
 
-        _tileStyle = new GUIStyle(GUI.skin.button)
+        _tileStyle = new GUIStyle(EditorStyles.boldLabel)
         {
             alignment = TextAnchor.MiddleCenter,
             fontSize = 10,
@@ -316,17 +319,16 @@ public class StartingPositionEditorWindow : EditorWindow
                 var rectY = startY + y * (tileSize + TileSpacing);
                 var tileRect = new Rect(rectX, rectY, tileSize, tileSize);
 
-                var previousColor = GUI.backgroundColor;
-                GUI.backgroundColor = ColorForOwner(tile.OwnerId);
+                DrawTileVisual(tile, tileRect);
                 var label = tileSize >= 14f ? LabelForTile(tile) : ShortLabelForTile(tile);
-                if (GUI.Button(tileRect, label, _tileStyle))
+                GUI.Label(tileRect, label, _tileStyle);
+                if (GUI.Button(tileRect, GUIContent.none, GUIStyle.none))
                 {
                     Undo.RecordObject(so, "Paint Tile");
                     tiles[index] = BuildConstrainedTile(_selectedType, _selectedOwner, tile.TerritoryId);
                     SetTiles(so, tiles);
                     EditorUtility.SetDirty(so);
                 }
-                GUI.backgroundColor = previousColor;
             }
         }
     }
@@ -371,5 +373,53 @@ public class StartingPositionEditorWindow : EditorWindow
         }
 
         return changed;
+    }
+
+    private void DrawTileVisual(TileState tile, Rect tileRect)
+    {
+        switch (tile.Type)
+        {
+            case TileType.Motherload:
+                EditorGUI.DrawRect(tileRect, _motherloadColor);
+                break;
+            case TileType.Blocked:
+                EditorGUI.DrawRect(tileRect, _blockedColor);
+                break;
+            case TileType.Base:
+            {
+                var owner = ColorForOwner(tile.OwnerId);
+                EditorGUI.DrawRect(tileRect, Darken(owner, 0.55f));
+                break;
+            }
+            case TileType.Bomb:
+            {
+                var owner = ColorForOwner(tile.OwnerId);
+                EditorGUI.DrawRect(tileRect, owner);
+                var inset = Mathf.Max(1f, tileRect.width * 0.25f);
+                var middleRect = new Rect(
+                    tileRect.x + inset,
+                    tileRect.y + inset,
+                    Mathf.Max(1f, tileRect.width - inset * 2f),
+                    Mathf.Max(1f, tileRect.height - inset * 2f));
+                EditorGUI.DrawRect(middleRect, _bombCenterColor);
+                break;
+            }
+            default:
+                EditorGUI.DrawRect(tileRect, ColorForOwner(tile.OwnerId));
+                break;
+        }
+
+        Handles.color = new Color(0f, 0f, 0f, 0.35f);
+        Handles.DrawAAPolyLine(1f,
+            new Vector3(tileRect.xMin, tileRect.yMin),
+            new Vector3(tileRect.xMax, tileRect.yMin),
+            new Vector3(tileRect.xMax, tileRect.yMax),
+            new Vector3(tileRect.xMin, tileRect.yMax),
+            new Vector3(tileRect.xMin, tileRect.yMin));
+    }
+
+    private static Color Darken(Color color, float factor)
+    {
+        return new Color(color.r * factor, color.g * factor, color.b * factor, color.a);
     }
 }
