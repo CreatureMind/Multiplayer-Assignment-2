@@ -10,8 +10,9 @@ public sealed class ServerGameManager : NetworkBehaviour
 
     [SerializeField] private GameDataSO data;
 
-    private List<ClientManager> _clientManagers = new List<ClientManager>();
-    private BoardManager _boardManager;
+    private BoardManager _boardManagerInstance;
+    private TurnManager _turnManagerInstance;
+    private List<ClientManager> _clientManagers = new();
 
     private bool _boardManagerSpawned;
     private int _currentPlayerCount;
@@ -39,7 +40,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (!data.ValidatePlayerCount(_currentPlayerCount))
         {
             throw new InvalidOperationException(
-                $"Invalid player count: {_currentPlayerCount}. Expected counts: {string.Join(", ", data.NumberOfPlayers)}");
+                $"Invalid player count: {_currentPlayerCount}. Expected counts: {string.Join(", ", data.NumberOfPlayersToEnforce)}");
         }
 
         foreach (var player in players)
@@ -65,7 +66,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (!HasStateAuthority)
             return;
 
-        _boardManager = Runner.Spawn(data.BoardManagerPrefab, Vector3.zero, Quaternion.identity)
+        _boardManagerInstance = Runner.Spawn(data.BoardManagerPrefab, Vector3.zero, Quaternion.identity)
             .GetComponent<BoardManager>();
         _boardManagerSpawned = true;
     }
@@ -74,11 +75,11 @@ public sealed class ServerGameManager : NetworkBehaviour
     {
         if (!HasStateAuthority) return;
 
-        if (!_boardManager) return;
+        if (!_boardManagerInstance) return;
         
         if (!ValidatePlayerTurn(player)) return;
 
-        if (!_boardManager.ValidateBoardChange(gridPosition, targetType)) return;
+        if (!_boardManagerInstance.ValidateBoardChange(gridPosition, targetType)) return;
         
         //implement board change 
     }

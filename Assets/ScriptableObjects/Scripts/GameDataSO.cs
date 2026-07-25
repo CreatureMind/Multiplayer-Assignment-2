@@ -1,6 +1,7 @@
 ﻿
     using System.Collections.Generic;
     using UnityEngine;
+    using UnityEngine.Serialization;
 
     [CreateAssetMenu(fileName = "GameDataSO", menuName = "ScriptableObjects/GameDataSO", order = 1)]
     public class GameDataSO : ScriptableObject 
@@ -9,15 +10,17 @@
     {
         [SerializeField] private ClientManager  clientManagerPrefab;
         [SerializeField] private BoardManager boardManagerPrefab;
-        [SerializeField] private List<int> numberOfPlayers;
-        
+        [SerializeField] private TurnManager turnManagerPrefab;
+        [SerializeField] private List<int> numberOfPlayersToEnforce;
+        [SerializeField] private StartingPositionSO startingPosition;
         public bool ValidatePlayerCount(int playerCount)
         {
-            return numberOfPlayers.Contains(playerCount);
+            return numberOfPlayersToEnforce.Contains(playerCount);
         }
         
         public ClientManager ClientManagerPrefab => clientManagerPrefab;
         public BoardManager BoardManagerPrefab => boardManagerPrefab;
-        
-        public List<int> NumberOfPlayers => numberOfPlayers;
+        public TurnManager TurnManagerPrefab => turnManagerPrefab;
+        public List<int> NumberOfPlayersToEnforce => numberOfPlayersToEnforce;
+        public StartingPositionSO StartingPosition => startingPosition;
     }
