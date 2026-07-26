@@ -13,6 +13,7 @@
         [SerializeField] private TurnManager turnManagerPrefab;
         [SerializeField] private List<int> numberOfPlayersToEnforce;
         [SerializeField] private StartingPositionSO startingPosition;
+        [SerializeField] private TurnStatsSO turnStats;
         public bool ValidatePlayerCount(int playerCount)
         {
             return numberOfPlayersToEnforce.Contains(playerCount);
@@ -23,4 +24,5 @@
         public TurnManager TurnManagerPrefab => turnManagerPrefab;
         public List<int> NumberOfPlayersToEnforce => numberOfPlayersToEnforce;
         public StartingPositionSO StartingPosition => startingPosition;
+        public TurnStatsSO TurnStats => turnStats;
     }

@@ -189,6 +189,19 @@ public class ClientManager : NetworkBehaviour
         // This is the authoritative path.
         // TODO: implement in ServerGameManager this: _server.HandleMoveRequest(PlayerId, cell, intent);
     }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+    public void RPC_RequestTurnEndEarly()
+    {
+        if (!_server)
+        {
+            Debug.LogError("[ClientManager] RPC_RequestTurnEndEarly reached a peer with no ServerGameManager.");
+            return;
+        }
+        
+        // TODO: implement in ServerGameManager this: _server.HandleTurnEndRequest(PlayerId);
+    }
+
     #endregion
 
     private void OnRequestSubmitted(MoveRequest request)
