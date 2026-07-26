@@ -4,13 +4,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 // Renders the board. Purely reactive: it subscribes to ClientBoardCache.Changed and paints the diffs it is handed.
-// Holds NO game logic - it never decides what is legal, only what is drawn.
-// It renders CellDiff.VisualType verbatim and hides nothing itself.
-// Whether an enemy bomb arrives as Bomb or Soldier is decided server-side before the diff exists, so this class is correct regardless of how projection is (or isn't) wired.
-// Three tilemaps, sharing the same Grid the mapper was built with:
-//   base - board contents
-//   highlight - legal-move overlay (sorting order above base)
-//   hover - single cursor cell (sorting order above highlight)
 public class BoardView : MonoBehaviour, IBoardRenderer
 {
     [Header("Tilemaps (all under the mapper's Grid)")]
@@ -33,7 +26,7 @@ public class BoardView : MonoBehaviour, IBoardRenderer
     private byte _localPlayerId;
     
     // Track what we set on the overlays so we clear only those cells, not the whole tilemap.
-    private readonly List<Vector2Int> _activeHighlights = new List<Vector2Int>();
+    private readonly List<Vector2Int> _activeHighlights = new();
     private Vector2Int? _activeHover;
 
     private Coroutine _blastRoutine;

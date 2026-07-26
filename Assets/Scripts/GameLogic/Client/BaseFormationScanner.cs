@@ -3,7 +3,6 @@ using UnityEngine;
 
 // Finds every 4x4 window the local player could turn into a base.
 // Rules: all 16 cells are mine and unfrozen; the middle 2x2 must be plain soldiers; the outer 12 may be soldiers OR bombs.
-// Cost is 0(cells * 16) - about 40k reads on a 50x50 board. Fine on turn start or on entering build mode. Do not call it per frame.
 public sealed class BaseFormationScanner
 {
     private const int WindowSize = 4;
@@ -17,8 +16,7 @@ public sealed class BaseFormationScanner
     
     // Maps each cell of a candidate's middle 2x2 back to that candidate's origin,
     // so a click on the visible highlight resolves to a window.
-    // First writer wins where windows overlap - see note below.
-    private readonly Dictionary<Vector2Int, Vector2Int> _coreToOrigin = new Dictionary<Vector2Int, Vector2Int>();
+    private readonly Dictionary<Vector2Int, Vector2Int> _coreToOrigin = new();
     
     public IReadOnlyList<Vector2Int> Origins => _origins;
     public IReadOnlyCollection<Vector2Int> HighlightCells => _coreToOrigin.Keys;
@@ -87,6 +85,7 @@ public sealed class BaseFormationScanner
                         return false;
                 }
             }
+        
         return true;
     }
 }

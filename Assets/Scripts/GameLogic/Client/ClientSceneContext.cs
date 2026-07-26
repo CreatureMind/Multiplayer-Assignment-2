@@ -2,7 +2,6 @@ using UnityEngine;
 
 // Scene-side rendering rig. Exactly one per client scene.
 // A spawned ClientManager cannot hold references to scene objects, so the local-authority instance pulls its rig from here instead.
-// Not networked - purely local. Every peer has its own, wired in its own scene.
 public sealed class ClientSceneContext : MonoBehaviour
 {
     public static ClientSceneContext Instance { get; private set; }

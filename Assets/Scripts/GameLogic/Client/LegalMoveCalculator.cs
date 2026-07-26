@@ -2,10 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Works out which cells the local player may act on right now.
-// This is NOT prediction and needs no round trip: the player sees all of their own cells truthfully,
-// and legality never depends on an enemy cell's hidden type.
 // Only the OUTCOME of a capture is unknowable. The server still revalidates every request.
-// The server already sends Frozen per cell, so no BFS is needed here.
 public sealed class LegalMoveCalculator
 {
     private static readonly Vector2Int[] Orthogonal4 =

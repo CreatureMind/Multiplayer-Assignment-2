@@ -1,10 +1,8 @@
 using System;
 using UnityEngine;
 
-// THE single screen <-> board-cell conversion point on the client.
 // Grid.WorldToCell returns a Vector3Int that can be negative, while the board is indexed from (0,0).
 // The origin offset is applied here and nowhere else.
-// Assumes an orthographic camera looking down +Z at the grid plane.
 public sealed class BoardCoordinateMapper
 {
     private readonly Grid _grid;

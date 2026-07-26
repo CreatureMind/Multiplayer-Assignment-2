@@ -4,7 +4,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 // Converts pointer input into a MoveRequest and raises it.
-// Holds ZERO gameplay rules: it asks the controller whether a click means anything and forwards the result.
 // It never validates and never mutates.
 public sealed class InputHandler : MonoBehaviour
 {

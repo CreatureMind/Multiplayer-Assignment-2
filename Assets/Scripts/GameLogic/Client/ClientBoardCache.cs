@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // The client's local mirror of the board, built entirely from server diffs.
-// NOT authoritative and NOT a secret: the server has already projected enemy bombs down to soldiers before sending,
-// so this array genuinely does not contain hidden information even in memory.
-// Observer: renderers and the legal-move calculator subscribe to Changed rather than polling
 public sealed class ClientBoardCache
 {
     public int Width { get; }

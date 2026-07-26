@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Owns the current action mode and the client's mirror of turn state.
-// Budget is MIRRORED, never computed: conquering a base mid-turn grants +3 immediately,
-// so only the server knows the real number. The client displays wht it is told.
+// Budget is MIRRORED, never computed.
 public sealed class PlayerActionController
 {
     private readonly Dictionary<MoveIntent, IPlayerActionMode> _modes = new Dictionary<MoveIntent, IPlayerActionMode>();

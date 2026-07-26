@@ -30,7 +30,6 @@ public readonly struct MoveRequest
 }
 
 // One changed cell, already projected by the server for THIS viewer.
-// Deliberately flat primitives: this goes over an RPC, so every field must be Fusion-serializable.
 // Frozen is a byte flag rather than a bool for the same reason. 8 bytes per cell.
 public struct CellDiff : INetworkStruct
 {
