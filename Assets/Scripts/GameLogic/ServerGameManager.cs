@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Events;
 using Fusion;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public sealed class ServerGameManager : NetworkBehaviour
 {

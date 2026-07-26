@@ -77,11 +77,15 @@ public sealed class BaseFormationScanner
                              && dy is >= CoreOffset and < CoreOffset + CoreSize;
                 
                 if (isCore)
+                {
                     if (view.VisualType != TileType.Soldier)
                         return false;
+                }
                 else
+                {
                     if (view.VisualType != TileType.Soldier && view.VisualType != TileType.Bomb)
                         return false;
+                }
             }
         return true;
     }
