@@ -13,6 +13,7 @@ public class TileVisualCatalogSO : ScriptableObject
         public TileType type;
         public TileBase tile; // null renders as an empty cell
         public bool tintByOwner; // soldiers/bases follow the owner palette; blocked/empty do not
+        public Color color;
     }
 
     [SerializeField] private TypeVisual[] typeVisuals;
@@ -25,12 +26,17 @@ public class TileVisualCatalogSO : ScriptableObject
 
     private TileBase[] _tileByType;
     private bool[] _tintByType;
+    private Color[] _colorByType;
 
     private void OnEnable()
     {
         var count = Enum.GetValues(typeof(TileType)).Length;
         _tileByType = new TileBase[count];
         _tintByType = new bool[count];
+        _colorByType = new Color[count];
+        
+        for (var i = 0; i < count; i++)
+            _colorByType[i] = Color.white; // default so a type you didn't list isn't invisible
 
         if (typeVisuals == null)
             return;
@@ -42,6 +48,7 @@ public class TileVisualCatalogSO : ScriptableObject
                 continue;
             _tileByType[i] = visual.tile;
             _tintByType[i] = visual.tintByOwner;
+            _colorByType[i] = visual.color;
         }
     }
 
@@ -53,18 +60,22 @@ public class TileVisualCatalogSO : ScriptableObject
 
     public Color GetColor(in TileView view)
     {
-        var color = Color.white;
-
         var i = (int)view.VisualType;
-        if (_tintByType != null && i >= 0 && i < _tintByType.Length && _tintByType[i])
-            color = OwnerColor(view.OwnerId);
-        
+
+        // Owner-tinted types use the palette; everything else uses its authored per-type color.
+        var color = (_tintByType != null && i >= 0 && i < _tintByType.Length && _tintByType[i])
+            ? OwnerColor(view.OwnerId)
+            : PerTypeColor(i);
+
         // Frozen is a render hint from the server; it never lives in TileState.
         if (view.Frozen)
             color = new Color(color.r * frozenDim, color.g * frozenDim, color.b * frozenDim, color.a);
 
         return color;
     }
+    
+    private Color PerTypeColor(int i)
+        => _colorByType != null && i >= 0 && i < _colorByType.Length ? _colorByType[i] : Color.white;
     
     private Color OwnerColor(byte ownerId)
         => ownerColors != null && ownerId < ownerColors.Length ? ownerColors[ownerId] : Color.white;

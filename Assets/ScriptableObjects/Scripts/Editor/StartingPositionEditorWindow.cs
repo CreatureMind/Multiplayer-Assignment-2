@@ -182,12 +182,12 @@ public class StartingPositionEditorWindow : EditorWindow
         return _heightField != null ? (int)_heightField.GetValue(so) : MinGridSize;
     }
 
-    private TileState[] GetTiles(StartingPositionSO so)
+    private AuthoredTile[] GetTiles(StartingPositionSO so)
     {
-        return _startingPositionField != null ? (TileState[])_startingPositionField.GetValue(so) : null;
+        return _startingPositionField != null ? (AuthoredTile[])_startingPositionField.GetValue(so) : null;
     }
 
-    private void SetTiles(StartingPositionSO so, TileState[] tiles)
+    private void SetTiles(StartingPositionSO so, AuthoredTile[] tiles)
     {
         _startingPositionField.SetValue(so, tiles);
     }
@@ -201,7 +201,7 @@ public class StartingPositionEditorWindow : EditorWindow
         var oldHeight = Mathf.Clamp(GetHeight(so), MinGridSize, MaxGridSize);
         var oldTiles = GetTiles(so);
 
-        var newTiles = new TileState[clampedWidth * clampedHeight];
+        var newTiles = new AuthoredTile[clampedWidth * clampedHeight];
         for (var i = 0; i < newTiles.Length; i++)
         {
             newTiles[i] = BuildConstrainedTile(TileType.Empty, TileState.NoOwner, TileState.NoTerritory);
@@ -220,7 +220,7 @@ public class StartingPositionEditorWindow : EditorWindow
                     {
                         var newIndex = y * clampedWidth + x;
                         var oldTile = oldTiles[oldIndex];
-                        newTiles[newIndex] = BuildConstrainedTile(oldTile.Type, oldTile.OwnerId, oldTile.TerritoryId);
+                        newTiles[newIndex] = BuildConstrainedTile(oldTile.type, oldTile.ownerId, oldTile.territoryId);
                     }
                 }
             }
@@ -248,9 +248,9 @@ public class StartingPositionEditorWindow : EditorWindow
         }
     }
 
-    private string LabelForTile(TileState tile)
+    private string LabelForTile(AuthoredTile tile)
     {
-        switch (tile.Type)
+        switch (tile.type)
         {
             case TileType.None:
                 return "None";
@@ -267,13 +267,13 @@ public class StartingPositionEditorWindow : EditorWindow
             case TileType.Motherload:
                 return "Motherload";
             default:
-                return tile.Type.ToString();
+                return tile.type.ToString();
         }
     }
 
-    private static string ShortLabelForTile(TileState tile)
+    private static string ShortLabelForTile(AuthoredTile tile)
     {
-        switch (tile.Type)
+        switch (tile.type)
         {
             case TileType.None:
                 return "N";
@@ -294,7 +294,7 @@ public class StartingPositionEditorWindow : EditorWindow
         }
     }
 
-    private void DrawBoard(StartingPositionSO so, TileState[] tiles, int width, int height, Rect boardArea)
+    private void DrawBoard(StartingPositionSO so, AuthoredTile[] tiles, int width, int height, Rect boardArea)
     {
         if (width <= 0 || height <= 0)
         {
@@ -316,7 +316,7 @@ public class StartingPositionEditorWindow : EditorWindow
                 var index = y * width + x;
                 var tile = tiles[index];
                 var rectX = startX + x * (tileSize + TileSpacing);
-                var rectY = startY + y * (tileSize + TileSpacing);
+                var rectY = startY + (height - 1 - y) * (tileSize + TileSpacing);
                 var tileRect = new Rect(rectX, rectY, tileSize, tileSize);
 
                 DrawTileVisual(tile, tileRect);
@@ -325,7 +325,7 @@ public class StartingPositionEditorWindow : EditorWindow
                 if (GUI.Button(tileRect, GUIContent.none, GUIStyle.none))
                 {
                     Undo.RecordObject(so, "Paint Tile");
-                    tiles[index] = BuildConstrainedTile(_selectedType, _selectedOwner, tile.TerritoryId);
+                    tiles[index] = BuildConstrainedTile(_selectedType, _selectedOwner, tile.territoryId);
                     SetTiles(so, tiles);
                     EditorUtility.SetDirty(so);
                 }
@@ -346,26 +346,26 @@ public class StartingPositionEditorWindow : EditorWindow
         return type == TileType.Soldier || type == TileType.Bomb || type == TileType.Base;
     }
 
-    private static TileState BuildConstrainedTile(TileType type, byte ownerId, short previousTerritoryId)
+    private static AuthoredTile BuildConstrainedTile(TileType type, byte ownerId, short previousTerritoryId)
     {
         var constrainedOwner = RequiresOwner(type) ? (byte)Mathf.Clamp(ownerId, 1, 4) : TileState.NoOwner;
 
         if (type == TileType.Base || type == TileType.Motherload)
         {
-            return new TileState(type, constrainedOwner, previousTerritoryId);
+            return new AuthoredTile(type, constrainedOwner, previousTerritoryId);
         }
 
-        return new TileState(type, constrainedOwner, TileState.NoTerritory);
+        return new AuthoredTile(type, constrainedOwner, TileState.NoTerritory);
     }
 
-    private static bool SanitizeOwners(TileState[] tiles)
+    private static bool SanitizeOwners(AuthoredTile[] tiles)
     {
         var changed = false;
         for (var i = 0; i < tiles.Length; i++)
         {
             var tile = tiles[i];
-            var constrained = BuildConstrainedTile(tile.Type, tile.OwnerId, tile.TerritoryId);
-            if (tile != constrained)
+            var constrained = BuildConstrainedTile(tile.type, tile.ownerId, tile.territoryId);
+            if (tile.type != constrained.type || tile.ownerId != constrained.ownerId || tile.territoryId != constrained.territoryId)
             {
                 tiles[i] = constrained;
                 changed = true;
@@ -375,9 +375,9 @@ public class StartingPositionEditorWindow : EditorWindow
         return changed;
     }
 
-    private void DrawTileVisual(TileState tile, Rect tileRect)
+    private void DrawTileVisual(AuthoredTile tile, Rect tileRect)
     {
-        switch (tile.Type)
+        switch (tile.type)
         {
             case TileType.Motherload:
                 EditorGUI.DrawRect(tileRect, _motherloadColor);
@@ -387,13 +387,13 @@ public class StartingPositionEditorWindow : EditorWindow
                 break;
             case TileType.Base:
             {
-                var owner = ColorForOwner(tile.OwnerId);
+                var owner = ColorForOwner(tile.ownerId);
                 EditorGUI.DrawRect(tileRect, Darken(owner, 0.55f));
                 break;
             }
             case TileType.Bomb:
             {
-                var owner = ColorForOwner(tile.OwnerId);
+                var owner = ColorForOwner(tile.ownerId);
                 EditorGUI.DrawRect(tileRect, owner);
                 var inset = Mathf.Max(1f, tileRect.width * 0.25f);
                 var middleRect = new Rect(
@@ -405,7 +405,7 @@ public class StartingPositionEditorWindow : EditorWindow
                 break;
             }
             default:
-                EditorGUI.DrawRect(tileRect, ColorForOwner(tile.OwnerId));
+                EditorGUI.DrawRect(tileRect, ColorForOwner(tile.ownerId));
                 break;
         }
 

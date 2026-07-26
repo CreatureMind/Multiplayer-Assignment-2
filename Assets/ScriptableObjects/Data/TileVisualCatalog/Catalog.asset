@@ -13,28 +13,38 @@ MonoBehaviour:
   m_Name: Catalog
   m_EditorClassIdentifier: Assembly-CSharp::TileVisualCatalogSO
   typeVisuals:
+  - type: 0
+    tile: {fileID: 0}
+    tintByOwner: 0
+    color: {r: 0, g: 0, b: 0, a: 1}
   - type: 1
-    tile: {fileID: 0}
+    tile: {fileID: 11400000, guid: 285bae9cd87d940438576dbf0bd9acc4, type: 2}
     tintByOwner: 0
+    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   - type: 2
-    tile: {fileID: 0}
+    tile: {fileID: 11400000, guid: 285bae9cd87d940438576dbf0bd9acc4, type: 2}
     tintByOwner: 1
+    color: {r: 1, g: 1, b: 1, a: 0}
   - type: 3
-    tile: {fileID: 0}
+    tile: {fileID: 11400000, guid: c1f90dd6aa1be584698cc67a6b789fcf, type: 2}
     tintByOwner: 1
+    color: {r: 1, g: 1, b: 1, a: 0}
   - type: 4
-    tile: {fileID: 0}
+    tile: {fileID: 11400000, guid: a600e4875dca6464c82d261d590c242c, type: 2}
     tintByOwner: 1
+    color: {r: 1, g: 1, b: 1, a: 0}
   - type: 5
-    tile: {fileID: 0}
+    tile: {fileID: 11400000, guid: a600e4875dca6464c82d261d590c242c, type: 2}
     tintByOwner: 0
+    color: {r: 0.25, g: 0.25, b: 0.25, a: 0}
   - type: 6
-    tile: {fileID: 0}
+    tile: {fileID: 11400000, guid: a600e4875dca6464c82d261d590c242c, type: 2}
     tintByOwner: 0
+    color: {r: 0.58, g: 0.28, b: 0.82, a: 1}
   ownerColors:
   - {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  - {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  - {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  - {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  - {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - {r: 0.92, g: 0.3, b: 0.3, a: 1}
+  - {r: 0.3, g: 0.53, b: 0.92, a: 1}
+  - {r: 0.28, g: 0.77, b: 0.39, a: 1}
+  - {r: 0.88, g: 0.73, b: 0.22, a: 1}
   frozenDim: 0.45
