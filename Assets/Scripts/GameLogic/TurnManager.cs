@@ -11,8 +11,8 @@ public class TurnManager : NetworkBehaviour
     private TurnStatsSO _turnStats;
     private List<ClientManager> _clientManagers = new List<ClientManager>();
 
-    [Networked, Capacity(8)]
-    private NetworkArray<PlayerActionData> _playerActions { get; set; } = new NetworkArray<PlayerActionData>();
+    private const int maxPlayers = 8;
+    [Networked, Capacity(maxPlayers)] private NetworkArray<PlayerActionData> PlayerActions => default;
 
     private int _currentTurnIndex;
 
@@ -25,7 +25,7 @@ public class TurnManager : NetworkBehaviour
     private int CurrentTurnIndex
     {
         get => _currentTurnIndex;
-        set => _currentTurnIndex = value % _playerActions.Length;
+        set => _currentTurnIndex = value % PlayerActions.Length;
     }
 
     private void CurrentTurnIndexChanged()
@@ -56,7 +56,7 @@ public class TurnManager : NetworkBehaviour
         for (int i = 0; i < _clientManagers.Count; i++)
         {
             var playerActionData = new PlayerActionData(_turnStats.InitialActionAmount, _clientManagers[i].PlayerId);
-            _playerActions.Set(i, playerActionData);
+            PlayerActions.Set(i, playerActionData);
         }
 
         RandomizeTurnOrder();
@@ -82,11 +82,11 @@ public class TurnManager : NetworkBehaviour
 
     public bool CanPlayerBuildBase(int playerId)
     {
-        for (int i = 0; i < _playerActions.Length; i++)
+        for (int i = 0; i < PlayerActions.Length; i++)
         {
-            if (_playerActions[i].PlayerId == playerId)
+            if (PlayerActions[i].PlayerId == playerId)
             {
-                return _playerActions[i].HasEnoughToBuildBase();
+                return PlayerActions[i].HasEnoughToBuildBase();
             }
         }
 
@@ -95,11 +95,11 @@ public class TurnManager : NetworkBehaviour
 
     public bool CanPlayerPlacePawn(int playerId)
     {
-        for (int i = 0; i < _playerActions.Length; i++)
+        for (int i = 0; i < PlayerActions.Length; i++)
         {
-            if (_playerActions[i].PlayerId == playerId)
+            if (PlayerActions[i].PlayerId == playerId)
             {
-                return _playerActions[i].HasEnoughToPlacePawn(_turnStats.PawnActionPrice);
+                return PlayerActions[i].HasEnoughToPlacePawn(_turnStats.PawnActionPrice);
             }
         }
         return false;
@@ -107,11 +107,11 @@ public class TurnManager : NetworkBehaviour
 
     public bool CanPlayerPlaceBomb(int playerId)
     {
-        for (int i = 0; i < _playerActions.Length; i++)
+        for (int i = 0; i < PlayerActions.Length; i++)
         {
-            if (_playerActions[i].PlayerId == playerId)
+            if (PlayerActions[i].PlayerId == playerId)
             {
-                return _playerActions[i].HasEnoughToPlaceBomb(_turnStats.BombActionPrice);
+                return PlayerActions[i].HasEnoughToPlaceBomb(_turnStats.BombActionPrice);
             }
         }
         return false;
@@ -127,13 +127,13 @@ public class TurnManager : NetworkBehaviour
     {
         if (!HasStateAuthority) return ActionResult.NotStateAuthority;
 
-        for (var i = 0; i < _playerActions.Length; i++)
+        for (var i = 0; i < PlayerActions.Length; i++)
         {
-            if (_playerActions[i].PlayerId != playerId) continue;
+            if (PlayerActions[i].PlayerId != playerId) continue;
             
-            var pad = _playerActions[i];
+            var pad = PlayerActions[i];
             pad.UpdateCurrentActionAmount(_turnStats.PawnActionPrice);
-            _playerActions.Set(i, pad);
+            PlayerActions.Set(i, pad);
             
             if (pad.TurnEnded())
             {
@@ -143,7 +143,7 @@ public class TurnManager : NetworkBehaviour
             break;
         }
 
-        NotifyPlayersOfActionChangeRPC(playerId);
+        RPC_NotifyPlayersOfActionChange(playerId);  
         return ActionResult.Success;
     }
 
@@ -151,13 +151,13 @@ public class TurnManager : NetworkBehaviour
     {
         if (!HasStateAuthority) return ActionResult.NotStateAuthority;
 
-        for (var i = 0; i < _playerActions.Length; i++)
+        for (var i = 0; i < PlayerActions.Length; i++)
         {
-            if (_playerActions[i].PlayerId != playerId) continue;
+            if (PlayerActions[i].PlayerId != playerId) continue;
             
-            var pad = _playerActions[i];
+            var pad = PlayerActions[i];
             pad.UpdateMaxActionAmountPerTurn(_turnStats.ActionGainPerBase);
-            _playerActions.Set(i, pad);
+            PlayerActions.Set(i, pad);
             
             if (pad.TurnEnded())
             {
@@ -167,7 +167,7 @@ public class TurnManager : NetworkBehaviour
             break;
         }
         
-        NotifyPlayersOfActionChangeRPC(playerId);
+        RPC_NotifyPlayersOfActionChange(playerId);
         return ActionResult.Success;
     }
 
@@ -175,13 +175,13 @@ public class TurnManager : NetworkBehaviour
     {
         if (!HasStateAuthority) return ActionResult.NotStateAuthority;
 
-        for (int i = 0; i < _playerActions.Length; i++)
+        for (int i = 0; i < PlayerActions.Length; i++)
         {
-            if (_playerActions[i].PlayerId == playerId)
+            if (PlayerActions[i].PlayerId == playerId)
             {
-                var pad = _playerActions[i];
+                var pad = PlayerActions[i];
                 pad.UpdateCurrentActionAmount(_turnStats.BombActionPrice);
-                _playerActions.Set(i, pad);
+                PlayerActions.Set(i, pad);
                 
                 if (pad.TurnEnded())
                 {
@@ -192,7 +192,7 @@ public class TurnManager : NetworkBehaviour
             }
         }
         
-        NotifyPlayersOfActionChangeRPC(playerId);
+        RPC_NotifyPlayersOfActionChange(playerId);
         return ActionResult.Success;
     }
 
@@ -204,20 +204,20 @@ public class TurnManager : NetworkBehaviour
     {
         if (!HasStateAuthority) return;
 
-        for (int i = 0; i < _playerActions.Length; i++)
+        for (int i = 0; i < PlayerActions.Length; i++)
         {
-            if (_playerActions[i].PlayerId == playerId)
+            if (PlayerActions[i].PlayerId == playerId)
             {
-                var pad = _playerActions[i];
+                var pad = PlayerActions[i];
                 pad.ResetCurrentActionAmount();
-                _playerActions.Set(i, pad);
+                PlayerActions.Set(i, pad);
                 break;
             }
         }
 
         CurrentTurnIndex++;
         
-        NotifyPlayersOfTurnEnd(_clientManagers[CurrentTurnIndex].PlayerId);
+        RPC_NotifyPlayersOfTurnEnd(_clientManagers[CurrentTurnIndex].PlayerId);
         OnTurnChanged?.Invoke();
     }
     
@@ -226,9 +226,9 @@ public class TurnManager : NetworkBehaviour
     #region RPC Methods Server --> All
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
-    private void NotifyPlayersOfActionChangeRPC(int playerId)
+    private void RPC_NotifyPlayersOfActionChange(int playerId)
     {
-        foreach (var pad in _playerActions.Where(pad => pad.PlayerId == playerId))
+        foreach (var pad in PlayerActions.Where(pad => pad.PlayerId == playerId))
         {
             OnPlayerActionChanged?.Invoke(pad);
             break;
@@ -236,9 +236,9 @@ public class TurnManager : NetworkBehaviour
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
-    private void NotifyPlayersOfTurnEnd(int playerIdToPlay)
+    private void RPC_NotifyPlayersOfTurnEnd(int playerIdToPlay)
     {
-        
+        // TODO
     }
 
     #endregion
