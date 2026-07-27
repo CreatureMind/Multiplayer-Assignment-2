@@ -258,7 +258,10 @@ public class RoomManager : MonoBehaviour
                 room.BootstrapStarted = false;
                 yield break;
             }
-            requiredComponents = FindAnyObjectByType<ClientSceneContext>()?.gameObject; 
+            requiredComponents = FindAnyObjectByType<ClientSceneContext>()?.gameObject;
+            if (!requiredComponents)
+                break;
+
             loadedScene = room.Runner.SceneManager.GetSceneRef(requiredComponents);
             if (loadedScene.IsValid)
                 break;
