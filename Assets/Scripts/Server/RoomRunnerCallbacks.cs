@@ -150,6 +150,7 @@ public class RoomRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         Debug.Log($"[Server] Room '{_sessionName}' OnSceneLoadDone: {runner.SceneManager.MainRunnerScene.name}.");
+        _manager.TryBeginPostGameSceneBootstrap(_roomId, runner);
     }
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)

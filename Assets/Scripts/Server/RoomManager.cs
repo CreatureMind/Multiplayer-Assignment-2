@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Fusion;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Utils;
 
 /// <summary>
@@ -17,6 +19,7 @@ public class RoomManager : MonoBehaviour
     [SerializeField] private RoomController roomControllerPrefab;
     [SerializeField] private PlayerData playerDataPrefab;
     [SerializeField] private ChatRelay chatRelayPrefab;
+    [SerializeField] private ServerGameManager serverGameManagerPrefab;
 
     [SerializeField] private string hubLobbyName = "TinySoldiersLobby";
     [SerializeField] private int maxRooms = 16;
@@ -43,6 +46,8 @@ public class RoomManager : MonoBehaviour
     {
         public NetworkRunner Runner;
         public RoomRunnerCallbacks Callbacks;
+        public bool BootstrapStarted;
+        public bool BootstrapDone;
     }
 
     private void Awake()
@@ -223,4 +228,78 @@ public class RoomManager : MonoBehaviour
         var cleaned = raw.Trim().Replace(" ", "_");
         return cleaned.Length > 16 ? cleaned[..16] : cleaned;
     }
+    
+    public void TryBeginPostGameSceneBootstrap(int roomId, NetworkRunner runner)
+    {
+        if (!_rooms.TryGetValue(roomId, out var room)) return;
+        if (!runner || room.Runner != runner) return;
+        if (room.BootstrapStarted || room.BootstrapDone) return;
+
+        room.BootstrapStarted = true;
+        StartCoroutine(BootstrapAfterSceneLoadRoutine(room));
+    }
+
+    private IEnumerator BootstrapAfterSceneLoadRoutine(RoomRuntime room)
+    {
+        if (!room.Runner || room.Runner.IsShutdown)
+        {
+            room.BootstrapStarted = false;
+            yield break;
+        }
+        Debug.Log($"[Server] Room '{room.Runner.SessionInfo.Name}' bootstrap gate opened. Waiting for Clean_Game_Scene to settle...");
+
+        var timeoutAt = Time.realtimeSinceStartup + 15f;
+        while (Time.realtimeSinceStartup < timeoutAt)
+        {
+            if (!room.Runner || room.Runner.IsShutdown)
+            {
+                room.BootstrapStarted = false;
+                yield break;
+            }
+
+            var gameScene = SceneManager.GetSceneByName("Clean_Game_Scene");
+            if (gameScene.IsValid() && gameScene.isLoaded)
+                break;
+
+            yield return null;
+        }
+
+        var loadedScene = SceneManager.GetSceneByName("Clean_Game_Scene");
+        if (!loadedScene.IsValid() || !loadedScene.isLoaded)
+        {
+            room.BootstrapStarted = false;
+            Debug.LogWarning($"[Server] Room '{room.Runner.SessionInfo.Name}' bootstrap gate timed out waiting for Clean_Game_Scene. Will retry on next scene load callback.");
+            yield break;
+        }
+
+        // Defer one frame so post-load objects and runner bookkeeping settle before spawning authoritative game logic.
+        yield return null;
+
+        if (!room.Runner || room.Runner.IsShutdown)
+        {
+            room.BootstrapStarted = false;
+            yield break;
+        }
+
+        if (room.BootstrapDone)
+            yield break;
+
+        room.BootstrapDone = true;
+        Debug.Log($"[Server] Room '{room.Runner.SessionInfo.Name}' bootstrap gate passed. Spawning ServerGameManager...");
+        BootServerGameManager(room.Runner);
+    }
+public void BootServerGameManager(NetworkRunner runner)
+    {
+        if (!runner) return;
+
+        if (!serverGameManagerPrefab)
+        {
+            Debug.LogWarning($"[Server] Room '{runner.SessionInfo.Name}': serverGameManagerPrefab not assigned; game logic will be unavailable.");
+        }
+        else
+        {
+            runner.Spawn(serverGameManagerPrefab);
+        }
+    }
+    
 }
