@@ -15,7 +15,7 @@ public class InGameUIPresenter
 
     private void SubscribeToEvents()
     {
-        _view.OnEndGameButtonClicked += HandleEndGameButtonClicked;
+        //_view.OnEndGameButtonClicked += HandleEndGameButtonClicked;
         _view.OnLeaveButtonClicked += HandleLeaveButtonClicked;
         _view.OnReturnToLobbyClicked += HandleReturnToLobbyClicked;
 
@@ -25,7 +25,7 @@ public class InGameUIPresenter
 
     public void UnsubscribeFromEvents()
     {
-        _view.OnEndGameButtonClicked -= HandleEndGameButtonClicked;
+        //_view.OnEndGameButtonClicked -= HandleEndGameButtonClicked;
         _view.OnLeaveButtonClicked -= HandleLeaveButtonClicked;
         _view.OnReturnToLobbyClicked -= HandleReturnToLobbyClicked;
 
@@ -36,16 +36,6 @@ public class InGameUIPresenter
     public void Initialize()
     {
         UpdateButtonVisibility();
-    }
-
-    private void HandleEndGameButtonClicked()
-    {
-        if (!_model.IsMasterClient()) return;
-
-        if (GameSessionManager.Instance)
-        {
-            GameSessionManager.Instance.EndGameSession();
-        }
     }
 
     private void HandleLeaveButtonClicked()

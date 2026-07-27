@@ -20,8 +20,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private string hubSessionName = "LobbyHub";
     [SerializeField] private string hubLobbyName = "TinySoldiersLobby";
     [SerializeField] private int hubNetSceneBuildIndex = (int)SceneDefs.HUB_NET;
-
-    public ReadyManager ReadyManagerInstance { get; set; }
+    
     public ChatNetworkManager ChatNetworkManager { get; private set; }
 
     private const int MIN_PLAYERS_TO_START = 1;
@@ -31,7 +30,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private string _currentLobbyId;
     public string CurrentLobbyId => _currentLobbyId;
-    public CharacterRegistry CharacterRegistry => characterRegistry;
 
     public bool IsReturningFromMatch { get; private set; }
     public string LocalConfirmedName { get; set; }
@@ -387,8 +385,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         EventBus.Raise(new PlayerLeftEvent { Player = player });
         _playerDataMap.Remove(player);
-        if (CharacterSelectionManager.Instance)
-            CharacterSelectionManager.Instance.OnPlayerLeft(player);
+
         EventBus.Raise(new PlayerListChangedEvent());
     }
 
@@ -456,19 +453,48 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
-    private Scene _currentScene;
+    private bool _lobbyUnloadPending;
     private int playerCount = 0;
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         playerCount++;
         Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name} player_{playerCount}");
-        _currentScene = SceneManager.GetActiveScene();
         EventBus.Raise(new SceneLoadDoneEvent());
+        TryUnloadLobbyScene();
     }
 
     private void UnloadScene(MatchStartedEvent e)
     {
-        SceneManager.UnloadSceneAsync(_currentScene);
+        _lobbyUnloadPending = true;
+        TryUnloadLobbyScene();
+    }
+
+    // Runs from both MatchStartedEvent and OnSceneLoadDone so the unload happens regardless of which arrives first.
+    private void TryUnloadLobbyScene()
+    {
+        if (!_lobbyUnloadPending) return;
+
+        var lobby = SceneManager.GetSceneByBuildIndex((int)SceneDefs.MENU);
+        if (!lobby.IsValid() || !lobby.isLoaded) { _lobbyUnloadPending = false; return; }
+
+        var fallback = FindOtherLoadedScene(lobby);
+        if (!fallback.IsValid()) return; // defer until the game scene is loaded; retried from OnSceneLoadDone
+
+        if (SceneManager.GetActiveScene() == lobby)
+            SceneManager.SetActiveScene(fallback);
+
+        _lobbyUnloadPending = false;
+        SceneManager.UnloadSceneAsync(lobby);
+    }
+
+    private static Scene FindOtherLoadedScene(Scene exclude)
+    {
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            var scene = SceneManager.GetSceneAt(i);
+            if (scene.isLoaded && scene != exclude) return scene;
+        }
+        return default;
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
