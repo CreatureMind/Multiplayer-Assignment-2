@@ -149,28 +149,25 @@ public class RoomRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        /*Debug.Log($"[Server] Room '{_sessionName}' scene loaded.");
-        if (SceneManager.GetSceneByName("Lobby_Scene").isLoaded)
-        {
-            Debug.Log($"[Server] Room '{_sessionName}' unloading Lobby_Scene.");
-            SceneManager.UnloadSceneAsync("Lobby_Scene");
-        }*/
+        Debug.Log($"[Server] Room '{_sessionName}' OnSceneLoadDone: {runner.SceneManager.MainRunnerScene.name}.");
+    }
 
-        if (SceneManager.GetSceneByName("Clean_Game_Scene").isLoaded)
-        {
-            _manager.BootServerGameManager(runner);
-        }
+    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
+    {
+        Debug.Log($"[Server] Room '{_sessionName}' OnDisconnectedFromServer: {reason}.");
+    }
+
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
+    {
+        Debug.Log($"[Server] Room '{_sessionName}' OnConnectFailed: {reason}.");
     }
 
     #region Unused callbacks
-
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnConnectedToServer(NetworkRunner runner) { }
-    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { Debug.Log($"[Server] Room '{_sessionName}' OnDisconnectedFromServer: {reason}."); }
-    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { Debug.Log($"[Server] Room '{_sessionName}' OnConnectFailed: {reason}."); }
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }

@@ -131,6 +131,7 @@ public class UIManager : MonoBehaviour
     private void StartMatch(MatchStartedEvent e)
     {
         EventBus.Raise(new ShowLoadingScreenEvent());
+        _uiDocument = null;
     }
 
     // commented out for assignment 3
@@ -615,10 +616,10 @@ public class UIManager : MonoBehaviour
         var startBtn = _root.Q<Button>(UI_Room_View.start_button);
         if (startBtn == null) return;
 
-        var isMaster = NetworkManager.Instance.CanStartGame();
+        var isOwner = NetworkManager.Instance.CanStartGame();
         var allReady = NetworkManager.Instance.AreAllPlayersReady();
 
-        startBtn.style.display = isMaster ? DisplayStyle.Flex : DisplayStyle.None;
+        startBtn.style.display = isOwner ? DisplayStyle.Flex : DisplayStyle.None;
         startBtn.SetEnabled(allReady);
     }
 

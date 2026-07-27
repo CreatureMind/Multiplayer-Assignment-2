@@ -17,7 +17,6 @@ public class RoomManager : MonoBehaviour
     [SerializeField] private RoomController roomControllerPrefab;
     [SerializeField] private PlayerData playerDataPrefab;
     [SerializeField] private ChatRelay chatRelayPrefab;
-    [SerializeField] private ServerGameManager serverGameManagerPrefab;
 
     [SerializeField] private string hubLobbyName = "TinySoldiersLobby";
     [SerializeField] private int maxRooms = 16;
@@ -164,8 +163,6 @@ public class RoomManager : MonoBehaviour
             announcer.SetRelay(relay);
             callbacks.SetAnnouncer(announcer);
         }
-        
-        
 
         var info = new RoomInfo
         {
@@ -225,17 +222,5 @@ public class RoomManager : MonoBehaviour
         if (string.IsNullOrWhiteSpace(raw)) return "Room";
         var cleaned = raw.Trim().Replace(" ", "_");
         return cleaned.Length > 16 ? cleaned[..16] : cleaned;
-    }
-
-    public void BootServerGameManager(NetworkRunner runner)
-    {
-        if (!serverGameManagerPrefab)
-        {
-            Debug.LogWarning($"[Server] Room '{runner.SessionInfo.Name}': serverGameManagerPrefab not assigned; game logic will be unavailable.");
-        }
-        else
-        {
-            runner.Spawn(serverGameManagerPrefab);
-        }
     }
 }

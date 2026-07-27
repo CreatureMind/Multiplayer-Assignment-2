@@ -18,10 +18,17 @@ public class InGameUIModel
 
     public void ReturnToLobby(float flushDelay = 0f)
     {
+        Debug.Log("[InGameUI] Returning to lobby.");
         if (NetworkManager.Instance)
+        {
+            Debug.Log("[InGameUI] Returning to lobby.");
             _ = NetworkManager.Instance.ReturnToLobbyAsync(flushDelay);
+        }
         else
+        {
+            Debug.Log("[InGameUI] Returning to lobby (no network manager).");
             SceneManager.LoadScene(LOBBY_SCENE);
+        }
     }
 
     public void CheckMasterClientStatus()

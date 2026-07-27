@@ -24,7 +24,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public ReadyManager ReadyManagerInstance { get; set; }
     public ChatNetworkManager ChatNetworkManager { get; private set; }
 
-    private const int MIN_PLAYERS_TO_START = 2;
+    private const int MIN_PLAYERS_TO_START = 1;
 
     private NetworkRunner _networkRunnerInstance;
     private bool _handlingDisconnect;
@@ -68,8 +68,17 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         ChatNetworkManager = GetComponent<ChatNetworkManager>();
     }
 
-    private void OnEnable() => EventBus.Subscribe<RoomListChangedEvent>(CacheRoomList);
-    private void OnDisable() => EventBus.Unsubscribe<RoomListChangedEvent>(CacheRoomList);
+    private void OnEnable()
+    {
+        EventBus.Subscribe<RoomListChangedEvent>(CacheRoomList);
+        EventBus.Subscribe<MatchStartedEvent>(UnloadScene);
+    }
+
+    private void OnDisable()
+    {
+        EventBus.Unsubscribe<RoomListChangedEvent>(CacheRoomList);
+        EventBus.Unsubscribe<MatchStartedEvent>(UnloadScene);
+    }
 
     private void CacheRoomList(RoomListChangedEvent e) => _cachedRoomList = e;
 
@@ -140,7 +149,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void StartMatch(string modeName, string mapName)
     {
         if (!IsRoomOwner() || !RoomController.Instance) return;
-        RoomController.Instance.Rpc_RequestStartMatch(modeName, mapName, LocalPlayer);
+        RoomController.Instance.Rpc_RequestStartMatch(LocalPlayer);
     }
 
     public bool CanKick() => IsRoomOwner();
@@ -447,9 +456,19 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
+    private Scene _currentScene;
+    private int playerCount = 0;
     public void OnSceneLoadDone(NetworkRunner runner)
     {
+        playerCount++;
+        Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name} player_{playerCount}");
+        _currentScene = SceneManager.GetActiveScene();
         EventBus.Raise(new SceneLoadDoneEvent());
+    }
+
+    private void UnloadScene(MatchStartedEvent e)
+    {
+        SceneManager.UnloadSceneAsync(_currentScene);
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
