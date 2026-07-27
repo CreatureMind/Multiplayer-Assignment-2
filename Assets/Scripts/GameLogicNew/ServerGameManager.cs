@@ -21,19 +21,18 @@ public sealed class ServerGameManager : NetworkBehaviour
     private int _currentPlayerCount;
     private readonly HashSet<byte> _readyClientIds = new HashSet<byte>();
     private readonly HashSet<byte> _initialisedClientIds = new HashSet<byte>();
-    
 
-    public override void Spawned()
+
+    public void Awake()
     {
         if (!HasStateAuthority) return;
 
-        base.Spawned();
-        
-        InstantiateClientManagers();
-        SpawnBoardManager();
+        EventBus.Subscribe<MatchStartedEvent>(SpawnBoardManager);
+        EventBus.Subscribe<MatchStartedEvent>(InstantiateClientManagers); 
+        // **note** spawning TurnManager after ClientManagers are instantiated because of dependency so no event sub needed
     }
 
-    private void SpawnTurnManager()
+    private void SpawnTurnManager(MatchStartedEvent _)
     {
         if (!HasStateAuthority) return;
 
@@ -62,7 +61,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         
     }
 
-    private void InstantiateClientManagers()
+    private void InstantiateClientManagers(MatchStartedEvent _)
     {
         if (!HasStateAuthority) return;
 
@@ -94,11 +93,11 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (_clientManagers.Count != _currentPlayerCount) return;
         
         _ClientManagerSpawned = true;
-        SpawnTurnManager();
+        SpawnTurnManager(_);
     }
 
 
-    private void SpawnBoardManager()
+    private void SpawnBoardManager(MatchStartedEvent _)
     {
         if (!HasStateAuthority) return;
         
@@ -149,6 +148,13 @@ public sealed class ServerGameManager : NetworkBehaviour
         {
             Debug.Log("All players have successfully instantiated first bases.");
         }
+    }
+
+
+    private void OnDestroy()
+    {
+        EventBus.Unsubscribe<MatchStartedEvent>(SpawnBoardManager);
+        EventBus.Unsubscribe<MatchStartedEvent>(InstantiateClientManagers);
     }
 
     public void HandleMoveRequest(ClientManager clientManager, Vector2Int cell, MoveIntent intent)
