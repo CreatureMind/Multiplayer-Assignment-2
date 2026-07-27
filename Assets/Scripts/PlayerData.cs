@@ -24,29 +24,63 @@ public class PlayerData : NetworkBehaviour
     
     public override void Spawned()
     {
-        if (HasStateAuthority)
+        // The server owns PlayerData now; only it seeds initial values.
+        if (HasStateAuthority && string.IsNullOrEmpty(DisplayName.Value))
         {
-            var confirmedName = NetworkManager.Instance ? NetworkManager.Instance.LocalConfirmedName : null;
-            DisplayName = string.IsNullOrEmpty(confirmedName)
-                ? $"Player_{Object.InputAuthority.PlayerId}"
-                : confirmedName;
+            DisplayName = $"Player_{Object.InputAuthority.PlayerId}";
             CharacterId = -1;
             HasSelectedCharacter = false;
         }
 
-        NetworkManager.Instance.RegisterPlayer(Object.InputAuthority, this);
+        // NetworkManager only exists on client builds.
+        if (NetworkManager.Instance)
+            NetworkManager.Instance.RegisterPlayer(Object.InputAuthority, this);
     }
-    
+
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
-        NetworkManager.Instance.UnregisterPlayer(Object.InputAuthority);
+        if (NetworkManager.Instance)
+            NetworkManager.Instance.UnregisterPlayer(Object.InputAuthority);
     }
-    
+
+    // Server-side seeding of the display name from the connection token.
+    public void ServerInitialize(string displayName)
+    {
+        if (!HasStateAuthority) return;
+        DisplayName = string.IsNullOrEmpty(displayName)
+            ? $"Player_{Object.InputAuthority.PlayerId}"
+            : displayName;
+        CharacterId = -1;
+        HasSelectedCharacter = false;
+    }
+
     public void ApplyConfirmedName(string confirmedName)
     {
-        if (!HasStateAuthority)
-            return;
-        DisplayName = confirmedName;
+        if (HasStateAuthority) DisplayName = confirmedName;
+        else Rpc_SetName(confirmedName);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void Rpc_SetName(NetworkString<_32> confirmedName) => DisplayName = confirmedName;
+
+    // Ready toggle: client has input authority, so it asks the server (state authority).
+    public void RequestSetReady(bool ready)
+    {
+        if (HasStateAuthority) IsReady = ready;
+        else Rpc_SetReady(ready);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void Rpc_SetReady(NetworkBool ready)
+    {
+        IsReady = ready;
+
+        // Dedicated server builds don't run the client-side ChatNetworkManager; announce ready here.
+        if (HasStateAuthority)
+        {
+            var announcer = Runner ? Runner.GetComponent<RunnerChatAnnouncer>() : null;
+            announcer?.AnnounceReady(DisplayName.ToString(), ready);
+        }
     }
     
     public void ApplyCharacterSelection(int characterId, Color color)

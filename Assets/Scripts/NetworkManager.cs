@@ -7,59 +7,74 @@ using Fusion.Sockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using Utils;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     public static NetworkManager Instance;
-    
+
     [SerializeField] private NetworkRunner networkRunnerPrefab;
-    [SerializeField] private PlayerData playerDataPrefab;
     [SerializeField] private CharacterRegistry characterRegistry;
-    
+
+    [Header("Dedicated Server")]
+    [SerializeField] private string hubSessionName = "LobbyHub";
+    [SerializeField] private string hubLobbyName = "TinySoldiersLobby";
+    [SerializeField] private int hubNetSceneBuildIndex = (int)SceneDefs.HUB_NET;
+
     public ReadyManager ReadyManagerInstance { get; set; }
     public ChatNetworkManager ChatNetworkManager { get; private set; }
 
     private const int MIN_PLAYERS_TO_START = 2;
 
     private NetworkRunner _networkRunnerInstance;
-    // assignment 3
-    private MasterClientObjectSpawner _masterObjectSpawner;
+    private bool _handlingDisconnect;
 
     private string _currentLobbyId;
     public string CurrentLobbyId => _currentLobbyId;
     public CharacterRegistry CharacterRegistry => characterRegistry;
 
-    private const string LOBBY_SCENE = "Lobby_Scene";
-    private const string DisplayName = "DisplayName";
-    private const string ModeName = "ModeName";
-    private const string MapName = "MapName";
-
     public bool IsReturningFromMatch { get; private set; }
-    
     public string LocalConfirmedName { get; set; }
-    
-    private SessionDataRefreshedEvent? _cachedSessionData;
-    
+
+    // Owner token handed back by the server on room creation; presented as the
+    // connection token so the room can recognise the creator as its owner.
+    private string _pendingOwnerToken;
+
+    // Pending create request, so we can raise RoomCreatedEvent once the server approves.
+    private RoomCreatedEvent? _pendingCreatedRoom;
+
+    private RoomListChangedEvent? _cachedRoomList;
+
     private readonly Dictionary<PlayerRef, PlayerData> _playerDataMap = new();
-    
+
     private void Awake()
     {
+#if UNITY_SERVER
+        // Client-only manager: the dedicated server never runs it.
+        Destroy(gameObject);
+        return;
+#else
         if (!Instance)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else Destroy(gameObject);
+#endif
     }
 
     private void Start()
     {
         ChatNetworkManager = GetComponent<ChatNetworkManager>();
-        _masterObjectSpawner = GetComponent<MasterClientObjectSpawner>();
     }
 
+    private void OnEnable() => EventBus.Subscribe<RoomListChangedEvent>(CacheRoomList);
+    private void OnDisable() => EventBus.Unsubscribe<RoomListChangedEvent>(CacheRoomList);
+
+    private void CacheRoomList(RoomListChangedEvent e) => _cachedRoomList = e;
+
     #region Player Logic
-    
+
     public async void RegisterPlayer(PlayerRef player, PlayerData data)
     {
         try
@@ -71,7 +86,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             }
 
             await Task.Yield();
-        
+
             if (data == null || !_networkRunnerInstance || !_networkRunnerInstance.IsRunning) return;
 
             EventBus.Raise(new PlayerListChangedEvent());
@@ -86,177 +101,207 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (!Application.isPlaying) return;
         if (!_networkRunnerInstance || !_networkRunnerInstance.IsRunning) return;
-        
         if (_networkRunnerInstance.IsShutdown) return;
-        
+
         Debug.Log($"Unregistering player: {player.ToString()}");
         _playerDataMap.Remove(player);
 
-        var remainingPlayers = _playerDataMap.Count;
-        //Last player left. Skipping event broadcast.
-        if  (remainingPlayers <= 0) return;
-        
-        if (!Application.isPlaying) return;
-        
+        if (_playerDataMap.Count <= 0) return;
+
         EventBus.Raise(new PlayerListChangedEvent());
     }
 
     public IEnumerable<PlayerData> GetAllPlayers() => _playerDataMap.Values;
-    
+
     public PlayerData GetLocalPlayerData()
     {
         if (!_networkRunnerInstance)
             return null;
-        
-        var localPlayer = _networkRunnerInstance.LocalPlayer;
-        _playerDataMap.TryGetValue(localPlayer, out var data);
+
+        _playerDataMap.TryGetValue(_networkRunnerInstance.LocalPlayer, out var data);
         return data;
     }
 
-    public bool IsLocalPlayer(PlayerRef player) => _networkRunnerInstance.LocalPlayer == player;
+    public bool IsLocalPlayer(PlayerRef player) => _networkRunnerInstance && _networkRunnerInstance.LocalPlayer == player;
 
     public PlayerRef LocalPlayer => _networkRunnerInstance ? _networkRunnerInstance.LocalPlayer : default;
-    
+
+    // The server decides owner-only actions; the client only asks.
+    public bool IsRoomOwner() =>
+        RoomController.Instance && _networkRunnerInstance &&
+        RoomController.Instance.Owner == _networkRunnerInstance.LocalPlayer;
+
     public void KickPlayer(PlayerRef player)
     {
-        if (!_networkRunnerInstance.IsSharedModeMasterClient) return;
-        
-        ReadyManagerInstance.KickPlayerRpc(player);
+        if (!IsRoomOwner() || !RoomController.Instance) return;
+        RoomController.Instance.Rpc_RequestKick(player, LocalPlayer);
     }
 
-    public bool CanKick() => _networkRunnerInstance.IsSharedModeMasterClient;
-    public bool CanStartGame() => _networkRunnerInstance && _networkRunnerInstance.IsSharedModeMasterClient;
+    public void StartMatch(string modeName, string mapName)
+    {
+        if (!IsRoomOwner() || !RoomController.Instance) return;
+        RoomController.Instance.Rpc_RequestStartMatch(modeName, mapName, LocalPlayer);
+    }
+
+    public bool CanKick() => IsRoomOwner();
+    public bool CanStartGame() => IsRoomOwner();
 
     public bool AreAllPlayersReady() =>
         _playerDataMap.Count >= MIN_PLAYERS_TO_START && _playerDataMap.Values.All(p => p.IsReady);
-    
+
     public int GetReadyPlayerCount() => _playerDataMap.Values.Count(p => p.IsReady);
-    
+
     public void SetLocalPlayerReady(bool isReady)
     {
         var data = GetLocalPlayerData();
         if (!data) return;
-        data.IsReady = isReady;
+        data.RequestSetReady(isReady);
     }
-    
+
     public Dictionary<PlayerRef, PlayerData> GetPlayerDataMap() => _playerDataMap;
 
     #endregion
 
-    #region Lobby Logic
+    #region Lobby (Hub) Logic
 
-    public async Task ConnectToCustomLobby(string targetLobbyId)
+    // Play Game -> connect to the server-hosted Lobby Hub as a client.
+    public async Task ConnectToCustomLobby(string _ = null)
     {
+        // Already in the hub: just re-surface the cached room list.
+        if (_networkRunnerInstance && _networkRunnerInstance.IsRunning &&
+            _networkRunnerInstance.SessionInfo.Name == hubSessionName)
+        {
+            EventBus.Raise(new JoinedLobbyEvent());
+            if (_cachedRoomList.HasValue)
+                EventBus.Raise(_cachedRoomList.Value);
+            return;
+        }
+
         EventBus.Raise(new ShowLoadingScreenEvent());
-        
-        _currentLobbyId = targetLobbyId;
+
         await CreateFreshRunner();
-        
-        var result = await _networkRunnerInstance.JoinSessionLobby(SessionLobby.Custom, _currentLobbyId);
+        _currentLobbyId = hubSessionName;
+
+        var result = await _networkRunnerInstance.StartGame(new StartGameArgs
+        {
+            GameMode = GameMode.Client,
+            SessionName = hubSessionName,
+            CustomLobbyName = hubLobbyName,
+            EnableClientSessionCreation = false,
+            ConnectionToken = ConnectionTokenUtils.Encode(SafeName()),
+            SceneManager = _networkRunnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>(),
+            // must be set in Multiple Peer mode, otherwise the scene manager remains "busy" (no scene root), and spawns get stuck.
+            Scene = SceneRef.FromIndex(hubNetSceneBuildIndex),
+        });
 
         EventBus.Raise(new HideLoadingScreenEvent());
-        
+
         if (result.Ok)
         {
-            Debug.Log("Joined lobby successfully!");
+            Debug.Log("Joined Lobby Hub successfully!");
             EventBus.Raise(new JoinedLobbyEvent());
-            
-            if (_cachedSessionData.HasValue)
-                EventBus.Raise(_cachedSessionData.Value);
-        } 
+            if (_cachedRoomList.HasValue)
+                EventBus.Raise(_cachedRoomList.Value);
+        }
         else
         {
-            Debug.LogError($"Failed to join lobby: {result.ShutdownReason}");
+            Debug.LogError($"Failed to join Lobby Hub: {result.ShutdownReason}");
+            EventBus.Raise(new RoomJoinRejectedEvent { Reason = DescribeShutdown(result.ShutdownReason) });
         }
     }
-    
-    public async Task CreateRoomInCurrentLobby(string roomName, int maxPlayers, string lobbyId, string mode, string map, bool isPublic)
+
+    // Create a room: ask the server. Approval/rejection comes back via LobbyHubService RPC.
+    public Task CreateRoomInCurrentLobby(string roomName, int maxPlayers, string lobbyId, string mode, string map, bool isPublic)
     {
-        EventBus.Raise(new ShowLoadingScreenEvent());
-        
-        await CreateFreshRunner();
-        
-        var playerName = GetLocalPlayerData()?.DisplayName.Value ?? "Player";
-        var sessionName = $"{roomName}_{playerName}_{Guid.NewGuid().ToString("N")[..6]}";
-        
-        var result = await _networkRunnerInstance.StartGame(new StartGameArgs()
+        if (!LobbyHubService.Instance)
         {
-            GameMode = GameMode.Shared,
-            SessionName = sessionName,
-            PlayerCount = maxPlayers,
-            CustomLobbyName = lobbyId,
-            //Assignment 3
-            IsVisible = isPublic,
-            SessionProperties = new Dictionary<string, SessionProperty>
-            {
-                { DisplayName, roomName },
-                //Assignment 3
-                { ModeName, mode },
-                { MapName, map },
-            },
-        });
-        
-        Debug.Log("Creating room...");
-        
-        EventBus.Raise(new HideLoadingScreenEvent());
-        
-        if (result.Ok)
-        {
-            Debug.Log("Created room successfully!");
-            
-            EventBus.Raise(new RoomCreatedEvent
-            {
-                RoomName = roomName,
-                //Assignment 3
-                ModeName = mode,
-                MapName = map,
-            });
-        } 
-        else
-        {
-            Debug.LogError($"Failed to create room: {result.ShutdownReason}");
+            EventBus.Raise(new RoomJoinRejectedEvent { Reason = "Not connected to the lobby." });
+            return Task.CompletedTask;
         }
+
+        EventBus.Raise(new ShowLoadingScreenEvent());
+
+        _pendingCreatedRoom = new RoomCreatedEvent { RoomName = roomName, ModeName = mode, MapName = map };
+
+        LobbyHubService.Instance.Rpc_RequestCreateRoom(roomName, mode, map, maxPlayers, isPublic, LocalPlayer);
+        return Task.CompletedTask;
+    }
+
+    // Called on the requesting client by LobbyHubService when the server approves creation.
+    public void OnRoomCreationApproved(string sessionName, string ownerToken)
+    {
+        _pendingOwnerToken = ownerToken;
+
+        if (_pendingCreatedRoom.HasValue)
+            EventBus.Raise(_pendingCreatedRoom.Value);
+        _pendingCreatedRoom = null;
+
+        _ = JoinRoom(sessionName);
+    }
+
+    // Called on the requesting client by LobbyHubService when the server refuses creation.
+    public void OnRoomCreationRejected(string reason)
+    {
+        _pendingCreatedRoom = null;
+        EventBus.Raise(new HideLoadingScreenEvent());
+        EventBus.Raise(new RoomJoinRejectedEvent { Reason = reason });
     }
 
     #endregion
 
     #region Room Logic
-    
-    public async Task JoinRoom(string roomName)
+
+    public async Task JoinRoom(string sessionName)
     {
         EventBus.Raise(new ShowLoadingScreenEvent());
-        
+
+        var ownerToken = _pendingOwnerToken;
+        _pendingOwnerToken = null;
+
         await CreateFreshRunner();
-        
-        var result = await _networkRunnerInstance.StartGame(new StartGameArgs()
+
+        Debug.Log($"[Client] JoinRoom: connecting to session '{sessionName}' (lobby '{hubLobbyName}')...");
+
+        var result = await _networkRunnerInstance.StartGame(new StartGameArgs
         {
-            GameMode = GameMode.Shared,
-            SessionName = roomName,
+            GameMode = GameMode.Client,
+            SessionName = sessionName,
+            CustomLobbyName = hubLobbyName,
+            EnableClientSessionCreation = false,
+            ConnectionToken = ConnectionTokenUtils.Encode(SafeName(), ownerToken),
+            // Needed so server-driven scene loads (Runner.LoadScene in RoomController) work,
+            // but we still avoid forcing MENU as the network scene during the join.
+            SceneManager = _networkRunnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>(),
+            // Same reason as hub join: Multiple Peer mode needs a loaded scene root before runtime spawns work.
+            Scene = SceneRef.FromIndex(hubNetSceneBuildIndex),
         });
-        
+
+        Debug.Log($"[Client] JoinRoom StartGame: Ok={result.Ok} Reason={result.ShutdownReason}");
+
         EventBus.Raise(new HideLoadingScreenEvent());
-        
+
         if (result.Ok)
         {
             Debug.Log("Joined room successfully!");
-        } 
+        }
         else
         {
-            Debug.LogError($"Failed to join room: {result.ErrorMessage}, shutdown reason is {result.ShutdownReason}");
+            Debug.LogError($"Failed to join room: {result.ShutdownReason}");
+            EventBus.Raise(new RoomJoinRejectedEvent { Reason = DescribeShutdown(result.ShutdownReason) });
+            // Fall back to the hub so the player isn't stranded.
+            await ConnectToCustomLobby();
         }
     }
-    
-    public async Task LeaveRoom(string lobbyId)
+
+    public async Task LeaveRoom(string lobbyId = null)
     {
         await ShutdownRunner();
-        await ConnectToCustomLobby(lobbyId);
+        await ConnectToCustomLobby();
     }
 
-    // Leave the match: disconnect, reload the lobby scene, rejoin the same lobby.
+    // Leave the match: disconnect, reload the menu scene, rejoin the hub.
     public async Task ReturnToLobbyAsync(float flushDelay = 0f)
     {
-        var lobbyId = _currentLobbyId;
-        
         if (flushDelay > 0f)
             await Task.Delay((int)(flushDelay * 1000));
 
@@ -264,18 +309,16 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
         IsReturningFromMatch = true;
 
-        await LoadSceneAsync(LOBBY_SCENE);
-
-        if (!string.IsNullOrEmpty(lobbyId))
-            await ConnectToCustomLobby(lobbyId);
+        await LoadSceneAsync((int)SceneDefs.MENU);
+        await ConnectToCustomLobby();
 
         IsReturningFromMatch = false;
     }
 
-    private static Task LoadSceneAsync(string sceneName)
+    private static Task LoadSceneAsync(int buildIndex)
     {
         var tcs = new TaskCompletionSource<bool>();
-        var op = SceneManager.LoadSceneAsync(sceneName);
+        var op = SceneManager.LoadSceneAsync(buildIndex);
         op.completed += _ => tcs.TrySetResult(true);
         return tcs.Task;
     }
@@ -287,7 +330,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     private async Task CreateFreshRunner()
     {
         await ShutdownRunner();
-        
+
         _networkRunnerInstance = Instantiate(networkRunnerPrefab);
         _networkRunnerInstance.name = "Network_Runner";
         DontDestroyOnLoad(_networkRunnerInstance);
@@ -300,36 +343,36 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         if (_networkRunnerInstance)
         {
             if (_networkRunnerInstance.IsRunning || !_networkRunnerInstance.IsShutdown)
-            {
                 await _networkRunnerInstance.Shutdown(destroyGameObject: true);
-            }
             else
-            {
                 Destroy(_networkRunnerInstance.gameObject);
-            }
         }
-        
+
         _networkRunnerInstance = null;
         _playerDataMap.Clear();
     }
 
+    private string SafeName() => string.IsNullOrEmpty(LocalConfirmedName) ? "Player" : LocalConfirmedName;
+
+    private static string DescribeShutdown(ShutdownReason reason) => reason switch
+    {
+        ShutdownReason.GameNotFound => "Room no longer exists.",
+        ShutdownReason.GameIsFull => "Room is full.",
+        ShutdownReason.ConnectionRefused => "The server refused the connection.",
+        ShutdownReason.ConnectionTimeout => "Connection timed out.",
+        ShutdownReason.ServerInRoom => "Room is full.",
+        _ => $"Could not join room ({reason})."
+    };
+
     #endregion
-    
+
     #region Callbacks
 
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
 
-    // assignment 3
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-    {
-        if (runner.LocalPlayer != player)
-            return;
-        
-        runner.Spawn(playerDataPrefab, inputAuthority: player);
-        _masterObjectSpawner.EnsureLobbyObjects(runner);
-    }
+    // In server mode clients no longer spawn anything; the server owns all spawns.
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
@@ -344,79 +387,68 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (shutdownReason == ShutdownReason.Ok)
         {
-            Debug.Log("Joining a room...");
+            Debug.Log("Runner shut down cleanly.");
         }
         else
         {
             Debug.Log("Disconnected from session. Reason: " + shutdownReason);
-            SceneManager.LoadScene(0);
+            // WebGL commonly disconnects when the tab is backgrounded/suspended.
+            // Treat it as a transient connection loss and just return to the hub.
+            if (shutdownReason == ShutdownReason.DisconnectedByPluginLogic &&
+                Application.platform == RuntimePlatform.WebGLPlayer)
+            {
+                _ = ReturnToLobbyAsync();
+                return;
+            }
+
+            EventBus.Raise(new RoomJoinRejectedEvent { Reason = DescribeShutdown(shutdownReason) });
         }
     }
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
         Debug.Log($"Disconnected from server: {reason}");
+
+        // When kicked (or otherwise server-disconnected) we need to actively return to the hub.
+        // Otherwise the client can remain "stuck" in the room UI even though transport is gone.
+        if (_handlingDisconnect) return;
+        if (!_networkRunnerInstance) return;
+        if (runner != _networkRunnerInstance) return;
+        if (!_networkRunnerInstance.IsRunning) return;
+        if (_networkRunnerInstance.SessionInfo.Name == hubSessionName) return;
+
+        _handlingDisconnect = true;
+        _ = ReturnToLobbyAsync().ContinueWith(_ => _handlingDisconnect = false,
+            TaskScheduler.Current);
     }
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
 
-    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
+    {
+        Debug.LogWarning($"Connect failed: {reason}");
+        EventBus.Raise(new RoomJoinRejectedEvent { Reason = reason.ToString() });
+    }
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
-
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
-
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
-
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
 
     public void OnConnectedToServer(NetworkRunner runner)
     {
         Debug.Log("Connected to server!");
     }
-    
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
-    {
-        Debug.Log("Session list updated");
-        var totalPlayersInThisLobby = 0;
-        var validRooms = new List<SessionInfo>();
 
-        foreach (var session in sessionList)
-        {
-            if (!session.IsValid) continue;
-            
-            totalPlayersInThisLobby += session.PlayerCount;
-
-            // commented for assignment 3
-            if (session.IsVisible /*&& session.IsOpe*/)
-            {
-                validRooms.Add(session);
-            }
-        }
-
-        _cachedSessionData = new SessionDataRefreshedEvent
-        {
-            Sessions = validRooms,
-            TotalPlayers = totalPlayersInThisLobby
-        };
-        
-        EventBus.Raise(_cachedSessionData.Value);
-    }
+    // Photon lobby list is unused now; the room list comes from LobbyHubService.
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
 
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
-    // assignment 3
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        if (!GetLocalPlayerData())
-            runner.Spawn(playerDataPrefab, inputAuthority: runner.LocalPlayer);
-
-        _masterObjectSpawner.EnsureGameObjects(runner);
-
         EventBus.Raise(new SceneLoadDoneEvent());
     }
 
@@ -426,7 +458,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     #endregion
-    
+
     private async void OnApplicationQuit()
     {
         try
