@@ -1,14 +1,14 @@
 using Events;
 using UnityEngine;
 
-public class GameUIManager : MonoBehaviour
+public class InGameUIManager : MonoBehaviour
 {
-    [SerializeField] private InGameView inGameView;
+    [SerializeField] private InGameUIView inGameView;
     
-    public static GameUIManager Instance { get; private set; }
+    public static InGameUIManager Instance { get; private set; }
 
-    private InGameModel _model;
-    private InGamePresenter _presenter;
+    private InGameUIModel _model;
+    private InGameUIPresenter _presenter;
 
     private void Awake()
     {
@@ -37,12 +37,12 @@ public class GameUIManager : MonoBehaviour
     {
         if (inGameView == null)
         {
-            Debug.LogError("InGameView component not found on GameUIManager!");
+            Debug.LogError("[GameUIManager] InGameUIView component not found on InGameUIManager!");
             return;
         }
 
-        _model = new InGameModel();
-        _presenter = new InGamePresenter(_model, inGameView);
+        _model = new InGameUIModel();
+        _presenter = new InGameUIPresenter(_model, inGameView);
 
         _presenter.Initialize();
     }

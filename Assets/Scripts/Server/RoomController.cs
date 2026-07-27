@@ -1,5 +1,6 @@
 using Events;
 using Fusion;
+using UnityEngine.SceneManagement;
 using Utils;
 
 /// <summary>
@@ -77,7 +78,7 @@ public class RoomController : NetworkBehaviour
         Runner.SessionInfo.IsOpen = false;
 
         // Game scene selection by map is left to the game-logic pass; load the GAME scene.
-        Runner.LoadScene(SceneRef.FromIndex((int)SceneDefs.GAME));
+        Runner.LoadScene(SceneRef.FromIndex((int)SceneDefs.GAME), LoadSceneMode.Single);
     }
 
     private void OnMatchStartedChanged()

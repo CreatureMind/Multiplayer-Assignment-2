@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public class InGamePresenter
+public class InGameUIPresenter
 {
-    private readonly InGameModel _model;
-    private readonly InGameView _view;
+    private readonly InGameUIModel _model;
+    private readonly InGameUIView _view;
 
-    public InGamePresenter(InGameModel model, InGameView view)
+    public InGameUIPresenter(InGameUIModel model, InGameUIView view)
     {
         _model = model;
         _view = view;

@@ -32,15 +32,15 @@ public class GameSessionManager : NetworkBehaviour, IStateAuthorityChanged
 
         var isMasterClient = Runner.IsSharedModeMasterClient;
 
-        if (GameUIManager.Instance)
+        if (InGameUIManager.Instance)
         {
-            GameUIManager.Instance.OnGameEnded(isMasterClient);
+            InGameUIManager.Instance.OnGameEnded(isMasterClient);
         }
     }
     
     public void StateAuthorityChanged()
     {
-        if (GameUIManager.Instance)
-            GameUIManager.Instance.NotifyMasterClientMightHaveChanged();
+        if (InGameUIManager.Instance)
+            InGameUIManager.Instance.NotifyMasterClientMightHaveChanged();
     }
 }

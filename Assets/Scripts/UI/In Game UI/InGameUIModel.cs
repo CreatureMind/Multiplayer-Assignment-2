@@ -1,8 +1,9 @@
 using System;
 using Fusion;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class InGameModel
+public class InGameUIModel
 {
     public event Action OnMasterClientChanged;
     public event Action<bool> OnGameEndedByMaster;
@@ -20,7 +21,7 @@ public class InGameModel
         if (NetworkManager.Instance)
             _ = NetworkManager.Instance.ReturnToLobbyAsync(flushDelay);
         else
-            UnityEngine.SceneManagement.SceneManager.LoadScene(LOBBY_SCENE);
+            SceneManager.LoadScene(LOBBY_SCENE);
     }
 
     public void CheckMasterClientStatus()

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class InGameView : MonoBehaviour
+public class InGameUIView : MonoBehaviour
 {
     public event Action OnEndGameButtonClicked;
     public event Action OnLeaveButtonClicked;
