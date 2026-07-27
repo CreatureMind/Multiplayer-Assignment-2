@@ -23,7 +23,7 @@ public sealed class ServerGameManager : NetworkBehaviour
     private readonly HashSet<byte> _initialisedClientIds = new HashSet<byte>();
 
 
-    private void Awake()
+    public void Awake()
     {
         if (!HasStateAuthority) return;
 
