@@ -149,7 +149,7 @@ public class RoomRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        Debug.Log($"[Server] Room '{_sessionName}' OnSceneLoadDone: {runner.SceneManager.MainRunnerScene}.");
+        Debug.Log($"[Server] Room '{_sessionName}' OnSceneLoadDone: {runner.SceneManager.MainRunnerScene.name}.");
     }
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)

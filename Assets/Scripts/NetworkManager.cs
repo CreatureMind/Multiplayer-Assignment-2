@@ -24,7 +24,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public ReadyManager ReadyManagerInstance { get; set; }
     public ChatNetworkManager ChatNetworkManager { get; private set; }
 
-    private const int MIN_PLAYERS_TO_START = 2;
+    private const int MIN_PLAYERS_TO_START = 1;
 
     private NetworkRunner _networkRunnerInstance;
     private bool _handlingDisconnect;
@@ -457,9 +457,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
     private Scene _currentScene;
+    private int playerCount = 0;
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        Debug.Log($"Scene loaded: {SceneManager.GetActiveScene()}");
+        playerCount++;
+        Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name} player_{playerCount}");
         _currentScene = SceneManager.GetActiveScene();
         EventBus.Raise(new SceneLoadDoneEvent());
     }
