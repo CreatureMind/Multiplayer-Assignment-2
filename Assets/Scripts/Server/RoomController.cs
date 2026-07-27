@@ -65,7 +65,7 @@ public class RoomController : NetworkBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void Rpc_RequestStartMatch(NetworkString<_16> mode, NetworkString<_16> map, PlayerRef requester)
+    public void Rpc_RequestStartMatch(PlayerRef requester)
     {
         if (requester != Owner) return; // only the owner may start
         if (MatchStarted) return;
