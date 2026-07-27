@@ -21,18 +21,19 @@ public sealed class ServerGameManager : NetworkBehaviour
     private int _currentPlayerCount;
     private readonly HashSet<byte> _readyClientIds = new HashSet<byte>();
     private readonly HashSet<byte> _initialisedClientIds = new HashSet<byte>();
+    
 
-
-    public void Awake()
+    public override void Spawned()
     {
         if (!HasStateAuthority) return;
 
-        EventBus.Subscribe<SceneLoadDoneEvent>(SpawnBoardManager);
-        EventBus.Subscribe<SceneLoadDoneEvent>(InstantiateClientManagers); 
-        // **note** spawning TurnManager after ClientManagers are instantiated because of dependency so no event sub needed
+        base.Spawned();
+        
+        InstantiateClientManagers();
+        SpawnBoardManager();
     }
 
-    private void SpawnTurnManager(SceneLoadDoneEvent _)
+    private void SpawnTurnManager()
     {
         if (!HasStateAuthority) return;
 
@@ -61,7 +62,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         
     }
 
-    private void InstantiateClientManagers(SceneLoadDoneEvent _)
+    private void InstantiateClientManagers()
     {
         if (!HasStateAuthority) return;
 
@@ -93,11 +94,11 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (_clientManagers.Count != _currentPlayerCount) return;
         
         _ClientManagerSpawned = true;
-        SpawnTurnManager(_);
+        SpawnTurnManager();
     }
 
 
-    private void SpawnBoardManager(SceneLoadDoneEvent _)
+    private void SpawnBoardManager()
     {
         if (!HasStateAuthority) return;
         
@@ -148,13 +149,6 @@ public sealed class ServerGameManager : NetworkBehaviour
         {
             Debug.Log("All players have successfully instantiated first bases.");
         }
-    }
-
-
-    private void OnDestroy()
-    {
-        EventBus.Unsubscribe<SceneLoadDoneEvent>(SpawnBoardManager);
-        EventBus.Unsubscribe<SceneLoadDoneEvent>(InstantiateClientManagers);
     }
 
     public void HandleMoveRequest(ClientManager clientManager, Vector2Int cell, MoveIntent intent)

@@ -17,6 +17,7 @@ public class RoomManager : MonoBehaviour
     [SerializeField] private RoomController roomControllerPrefab;
     [SerializeField] private PlayerData playerDataPrefab;
     [SerializeField] private ChatRelay chatRelayPrefab;
+    [SerializeField] private ServerGameManager serverGameManagerPrefab;
 
     [SerializeField] private string hubLobbyName = "TinySoldiersLobby";
     [SerializeField] private int maxRooms = 16;
@@ -179,6 +180,17 @@ public class RoomManager : MonoBehaviour
             if (!announcer) announcer = runner.gameObject.AddComponent<RunnerChatAnnouncer>();
             announcer.SetRelay(relay);
             callbacks.SetAnnouncer(announcer);
+        }
+        
+        if (!serverGameManagerPrefab)
+        {
+            Debug.LogWarning($"[Server] Room '{sessionName}': serverGameManagerPrefab not assigned; game logic will be unavailable.");
+        }
+        else
+        {
+            var gameManager = runner.Spawn(serverGameManagerPrefab);
+            if (gameManager)
+                gameManager.name = $"ServerGameManager_{sessionName}";
         }
 
         var info = new RoomInfo
