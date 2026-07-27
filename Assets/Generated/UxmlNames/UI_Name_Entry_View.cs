@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Name_Entry_View.uxml
-// Updated: 2026-07-27 16:55 UTC
+// Updated: 2026-07-27 17:00 UTC
 
 using System.Collections.Generic;
 
