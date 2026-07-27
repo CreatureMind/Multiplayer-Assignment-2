@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2061933999244943973
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3124596392004042243}
+  - component: {fileID: 7819381871111231773}
+  - component: {fileID: 5474679731267697007}
+  m_Layer: 0
+  m_Name: Sound_Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3124596392004042243
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061933999244943973}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7819381871111231773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061933999244943973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3a6f7fee90847f8a6abe3fa2964e45b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioSystem.SoundManager
+  AutoUnparentOnAwake: 1
+  soundEmitterPrefab: {fileID: 8394576150634004667, guid: c8256f59b9bec134a87152184f1fd902, type: 3}
+  collectionCheck: 1
+  defaultCapacity: 10
+  maxPoolSize: 100
+  maxSoundInstances: 30
+--- !u!114 &5474679731267697007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061933999244943973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f92d4fec6dbb8432eafd92f1fd7f5805, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  dayAmbientSound:
+    data: {fileID: 11400000, guid: 179e472f6265a4f73b317994dc46a431, type: 2}
+    randomPitch: 0
+    pitchVariation: 0
+    followPositionSource: 0
+  nightAmbientSound:
+    data: {fileID: 11400000, guid: 6ed4eac66562a4176b0623d3135af570, type: 2}
+    randomPitch: 0
+    pitchVariation: 0
+    followPositionSource: 0
+  roosterSound:
+    data: {fileID: 11400000, guid: 1aa9a36e7f05a4c6c94cc8fac23bc8b8, type: 2}
+    randomPitch: 0
+    pitchVariation: 0
+    followPositionSource: 0
+  owlSound:
+    data: {fileID: 11400000, guid: 759663bae3f264a529244a3168511eb3, type: 2}
+    randomPitch: 0
+    pitchVariation: 0
+    followPositionSource: 0
+  popSound:
+    data: {fileID: 11400000, guid: fb34a1aea3cd78a4eac0e49c61d388e4, type: 2}
+    randomPitch: 1
+    pitchVariation: 0.1
+    followPositionSource: 0
+  dayThemeMusic: {fileID: 8300000, guid: 2a8da9ca6f939db4cb7caf8c54f85e0a, type: 3}
+  nightThemeMusic: {fileID: 8300000, guid: c97096e11a1cb524581002deeff486aa, type: 3}
+  dayNightTimer: {fileID: 0}
+  musicManager: {fileID: 0}

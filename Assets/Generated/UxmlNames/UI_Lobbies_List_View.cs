@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Lobbies_List_View.uxml
-// Updated: 2026-07-24 21:40 UTC
+// Updated: 2026-07-27 11:32 UTC
 
 using System.Collections.Generic;
 
