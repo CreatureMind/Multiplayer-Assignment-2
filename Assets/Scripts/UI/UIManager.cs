@@ -131,6 +131,7 @@ public class UIManager : MonoBehaviour
     private void StartMatch(MatchStartedEvent e)
     {
         EventBus.Raise(new ShowLoadingScreenEvent());
+        _uiDocument = null;
     }
 
     // commented out for assignment 3

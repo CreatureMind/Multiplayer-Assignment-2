@@ -68,8 +68,17 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         ChatNetworkManager = GetComponent<ChatNetworkManager>();
     }
 
-    private void OnEnable() => EventBus.Subscribe<RoomListChangedEvent>(CacheRoomList);
-    private void OnDisable() => EventBus.Unsubscribe<RoomListChangedEvent>(CacheRoomList);
+    private void OnEnable()
+    {
+        EventBus.Subscribe<RoomListChangedEvent>(CacheRoomList);
+        EventBus.Subscribe<MatchStartedEvent>(UnloadScene);
+    }
+
+    private void OnDisable()
+    {
+        EventBus.Unsubscribe<RoomListChangedEvent>(CacheRoomList);
+        EventBus.Unsubscribe<MatchStartedEvent>(UnloadScene);
+    }
 
     private void CacheRoomList(RoomListChangedEvent e) => _cachedRoomList = e;
 
@@ -447,47 +456,17 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
+    private Scene _currentScene;
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        // Check which scene the runner just loaded by looking at the runner's loaded scenes
-        // Note: We need to check the runner's scene context, not the global active scene
-        for (int i = 0; i < SceneManager.sceneCount; i++)
-        {
-            Scene scene = SceneManager.GetSceneAt(i);
-
-            // When the runner loads the GAME scene, unload the global Lobby_Scene
-            if (scene.buildIndex == (int)SceneDefs.GAME && scene.isLoaded)
-            {
-                Debug.Log($"[Client] GAME scene detected. Unloading Lobby_Scene...");
-
-                // Find and unload Lobby_Scene from the global scene list
-                for (int j = 0; j < SceneManager.sceneCount; j++)
-                {
-                    Scene lobbyScene = SceneManager.GetSceneAt(j);
-                    if (lobbyScene.name == "Lobby_Scene" && lobbyScene.isLoaded)
-                    {
-                        SceneManager.UnloadSceneAsync(lobbyScene);
-                        Debug.Log("[Client] Lobby_Scene unloaded successfully.");
-                        break;
-                    }
-                }
-                break;
-            }
-
-            // When returning to HUB_NET, reload Lobby_Scene if needed
-            if (scene.buildIndex == (int)SceneDefs.HUB_NET && scene.isLoaded)
-            {
-                Scene lobbyScene = SceneManager.GetSceneByName("Lobby_Scene");
-                if (!lobbyScene.isLoaded)
-                {
-                    Debug.Log($"[Client] HUB_NET scene detected. Reloading Lobby_Scene...");
-                    SceneManager.LoadSceneAsync("Lobby_Scene", LoadSceneMode.Additive);
-                }
-                break;
-            }
-        }
-
+        Debug.Log($"Scene loaded: {SceneManager.GetActiveScene()}");
+        _currentScene = SceneManager.GetActiveScene();
         EventBus.Raise(new SceneLoadDoneEvent());
+    }
+
+    private void UnloadScene(MatchStartedEvent e)
+    {
+        SceneManager.UnloadSceneAsync(_currentScene);
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
