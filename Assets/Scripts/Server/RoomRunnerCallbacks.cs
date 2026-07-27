@@ -149,8 +149,6 @@ public class RoomRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        // Server doesn't need scene management logic
-        if (runner.IsServer && !runner.IsClient) return;
     }
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)

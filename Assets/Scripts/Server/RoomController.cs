@@ -78,9 +78,7 @@ public class RoomController : NetworkBehaviour
         Runner.SessionInfo.IsOpen = false;
 
         // Game scene selection by map is left to the game-logic pass; load the GAME scene.
-        // Use Additive mode on server to prevent visual scene loading, Single mode on clients.
-        var sceneMode = Runner.IsServer && !Runner.IsClient ? LoadSceneMode.Additive : LoadSceneMode.Single;
-        Runner.LoadScene(SceneRef.FromIndex((int)SceneDefs.GAME), sceneMode);
+        Runner.LoadScene(SceneRef.FromIndex((int)SceneDefs.GAME), LoadSceneMode.Single);
     }
 
     private void OnMatchStartedChanged()

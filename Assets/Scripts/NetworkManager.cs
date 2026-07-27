@@ -449,34 +449,41 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        // Get the scene that the runner just loaded
-        Scene loadedScene = SceneManager.GetActiveScene();
-        int buildIndex = loadedScene.buildIndex;
-
-        // When transitioning to GAME scene, unload the local Lobby_Scene
-        if (buildIndex == (int)SceneDefs.GAME)
+        // Check which scene the runner just loaded by looking at the runner's loaded scenes
+        // Note: We need to check the runner's scene context, not the global active scene
+        for (int i = 0; i < SceneManager.sceneCount; i++)
         {
-            Debug.Log($"[Client] Runner '{runner.name}' loaded GAME scene. Unloading Lobby_Scene...");
+            Scene scene = SceneManager.GetSceneAt(i);
 
-            for (int i = 0; i < SceneManager.sceneCount; i++)
+            // When the runner loads the GAME scene, unload the global Lobby_Scene
+            if (scene.buildIndex == (int)SceneDefs.GAME && scene.isLoaded)
             {
-                Scene scene = SceneManager.GetSceneAt(i);
-                if (scene.name == "Lobby_Scene")
+                Debug.Log($"[Client] GAME scene detected. Unloading Lobby_Scene...");
+
+                // Find and unload Lobby_Scene from the global scene list
+                for (int j = 0; j < SceneManager.sceneCount; j++)
                 {
-                    SceneManager.UnloadSceneAsync(scene);
-                    break;
+                    Scene lobbyScene = SceneManager.GetSceneAt(j);
+                    if (lobbyScene.name == "Lobby_Scene" && lobbyScene.isLoaded)
+                    {
+                        SceneManager.UnloadSceneAsync(lobbyScene);
+                        Debug.Log("[Client] Lobby_Scene unloaded successfully.");
+                        break;
+                    }
                 }
+                break;
             }
-        }
 
-        // When returning to HUB_NET scene, reload the local Lobby_Scene
-        else if (buildIndex == (int)SceneDefs.HUB_NET)
-        {
-            Debug.Log($"[Client] Runner '{runner.name}' returned to HUB_NET. Reloading Lobby_Scene...");
-
-            if (!SceneManager.GetSceneByName("Lobby_Scene").isLoaded)
+            // When returning to HUB_NET, reload Lobby_Scene if needed
+            if (scene.buildIndex == (int)SceneDefs.HUB_NET && scene.isLoaded)
             {
-                SceneManager.LoadSceneAsync("Lobby_Scene", LoadSceneMode.Additive);
+                Scene lobbyScene = SceneManager.GetSceneByName("Lobby_Scene");
+                if (!lobbyScene.isLoaded)
+                {
+                    Debug.Log($"[Client] HUB_NET scene detected. Reloading Lobby_Scene...");
+                    SceneManager.LoadSceneAsync("Lobby_Scene", LoadSceneMode.Additive);
+                }
+                break;
             }
         }
 
