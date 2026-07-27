@@ -22,17 +22,16 @@ public sealed class ServerGameManager : NetworkBehaviour
     private readonly HashSet<byte> _readyClientIds = new HashSet<byte>();
     private readonly HashSet<byte> _initialisedClientIds = new HashSet<byte>();
 
-
-    public void Awake()
+    public override void Spawned()
     {
+        base.Spawned();
         if (!HasStateAuthority) return;
 
-        EventBus.Subscribe<MatchStartedEvent>(SpawnBoardManager);
-        EventBus.Subscribe<MatchStartedEvent>(InstantiateClientManagers); 
-        // **note** spawning TurnManager after ClientManagers are instantiated because of dependency so no event sub needed
+        InstantiateClientManagers();
+        SpawnBoardManager();
     }
 
-    private void SpawnTurnManager(MatchStartedEvent _)
+    private void SpawnTurnManager()
     {
         if (!HasStateAuthority) return;
 
@@ -61,7 +60,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         
     }
 
-    private void InstantiateClientManagers(MatchStartedEvent _)
+    private void InstantiateClientManagers()
     {
         if (!HasStateAuthority) return;
 
@@ -93,11 +92,11 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (_clientManagers.Count != _currentPlayerCount) return;
         
         _ClientManagerSpawned = true;
-        SpawnTurnManager(_);
+        SpawnTurnManager();
     }
 
 
-    private void SpawnBoardManager(MatchStartedEvent _)
+    private void SpawnBoardManager()
     {
         if (!HasStateAuthority) return;
         
@@ -148,13 +147,6 @@ public sealed class ServerGameManager : NetworkBehaviour
         {
             Debug.Log("All players have successfully instantiated first bases.");
         }
-    }
-
-
-    private void OnDestroy()
-    {
-        EventBus.Unsubscribe<MatchStartedEvent>(SpawnBoardManager);
-        EventBus.Unsubscribe<MatchStartedEvent>(InstantiateClientManagers);
     }
 
     public void HandleMoveRequest(ClientManager clientManager, Vector2Int cell, MoveIntent intent)
