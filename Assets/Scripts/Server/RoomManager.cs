@@ -51,17 +51,30 @@ public class RoomManager : MonoBehaviour
         Instance = this;
     }
 
-    private static async Task<T> SpawnAndWaitAsync<T>(NetworkRunner runner, T prefab, float timeoutSeconds = 3f)
-        where T : NetworkBehaviour
+    private static async Task<T> WaitForSpawnedBehaviour<T>(NetworkRunner runner, float timeoutSeconds = 3f) where T : NetworkBehaviour
     {
-        var tcs = new TaskCompletionSource<T>();
+        if (!runner) return null;
 
-        runner.Spawn(prefab, onBeforeSpawned: (_, obj) => tcs.TrySetResult(obj.GetComponent<T>()));
+        var until = Time.realtimeSinceStartup + timeoutSeconds;
+        while (Time.realtimeSinceStartup < until)
+        {
+            // Fusion can enqueue incomplete synchronous spawns (see NetworkProjectConfig.EnqueueIncompleteSynchronousSpawns),
+            // which means runner.Spawn(...) may return null even though the object will appear shortly after.
+#if UNITY_2023_1_OR_NEWER
+            var all = UnityEngine.Object.FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+#else
+            var all = UnityEngine.Object.FindObjectsOfType<T>(includeInactive: true);
+#endif
+            foreach (var it in all)
+            {
+                if (it && it.Runner == runner)
+                    return it;
+            }
 
-        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeoutSeconds));
-        var finished = await Task.WhenAny(tcs.Task, timeoutTask);
+            await Task.Yield();
+        }
 
-        return finished == tcs.Task ? tcs.Task.Result : null;
+        return null;
     }
 
     public async Task<RoomCreateResult> CreateRoomAsync(string roomName, string mode, string map,
@@ -134,8 +147,12 @@ public class RoomManager : MonoBehaviour
 
         _rooms[roomId] = new RoomRuntime { Runner = runner, Callbacks = callbacks };
 
-        // Spawn the room's authority object now that the runner is up (no scene load to wait on).
-        var roomController = await SpawnAndWaitAsync(runner, roomControllerPrefab);
+        var roomController = runner.Spawn(roomControllerPrefab);
+        if (!roomController)
+        {
+            Debug.LogWarning($"[Server] Room '{sessionName}' controller spawn returned NULL (likely enqueued). Waiting for it to appear...");
+            roomController = await WaitForSpawnedBehaviour<RoomController>(runner);
+        }
 
         if (!roomController)
         {
