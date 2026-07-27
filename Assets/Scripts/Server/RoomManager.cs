@@ -250,6 +250,7 @@ public class RoomManager : MonoBehaviour
 
         GameObject requiredComponents;
         SceneRef loadedScene;
+        INetworkSceneManager sceneManager = room.Runner.SceneManager;
         var timeoutAt = Time.realtimeSinceStartup + 15f;
         while (Time.realtimeSinceStartup < timeoutAt)
         {
@@ -262,14 +263,33 @@ public class RoomManager : MonoBehaviour
             if (!requiredComponents)
                 break;
 
-            loadedScene = room.Runner.SceneManager.GetSceneRef(requiredComponents);
+            sceneManager = room.Runner.SceneManager;
+            if (sceneManager ==  null)
+                break;
+
+            loadedScene = sceneManager.GetSceneRef(requiredComponents);
             if (loadedScene.IsValid)
                 break;
 
             yield return null;
         }
         requiredComponents = FindAnyObjectByType<ClientSceneContext>()?.gameObject;
-        loadedScene = room.Runner.SceneManager.GetSceneRef(requiredComponents);
+        if (!requiredComponents)
+        {
+            room.BootstrapStarted = false;
+            Debug.Log("[Server] Room bootstrap gate timed out haven't found RequiredComponents.");
+            yield break;
+        }
+        
+        sceneManager = room.Runner.SceneManager;
+        if (sceneManager ==  null)
+        {
+            room.BootstrapStarted = false;
+            Debug.Log("[Server] Room bootstrap gate timed out sceneManager is null.");
+            yield break;
+        }
+
+        loadedScene = sceneManager.GetSceneRef(requiredComponents);
         
         if (!loadedScene.IsValid)
         {
