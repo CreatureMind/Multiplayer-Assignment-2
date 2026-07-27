@@ -149,12 +149,12 @@ public class RoomRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        /*Debug.Log($"[Server] Room '{_sessionName}' scene loaded.");
+        Debug.Log($"[Server] Room '{_sessionName}' scene loaded.");
         if (SceneManager.GetSceneByName("Lobby_Scene").isLoaded)
         {
             Debug.Log($"[Server] Room '{_sessionName}' unloading Lobby_Scene.");
             SceneManager.UnloadSceneAsync("Lobby_Scene");
-        }*/
+        }
     }
 
     #region Unused callbacks
