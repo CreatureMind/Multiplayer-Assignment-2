@@ -147,25 +147,60 @@ public class RoomRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
         _manager?.OnRoomRunnerShutdown(_roomId);
     }
 
-    public void OnSceneLoadDone(NetworkRunner runner)
+    public void OnSceneLoadDone(NetworkRunner runner) 
     {
-        Debug.Log($"[Server] Room '{_sessionName}' scene loaded.");
-        if (SceneManager.GetSceneByName("Lobby_Scene").isLoaded)
+        // 1. Safety check: Headless servers should skip UI logic entirely.
+        if (runner.IsServer && !runner.IsClient) return;
+
+        // 2. Get the active scene that just finished loading inside this specific runner's context
+        Scene loadedScene = SceneManager.GetActiveScene();
+        int buildIndex = loadedScene.buildIndex;
+
+        // Case A: The server shifted this room runner into the GAME scene
+        if (buildIndex == (int)SceneDefs.GAME) 
         {
-            Debug.Log($"[Server] Room '{_sessionName}' unloading Lobby_Scene.");
-            SceneManager.UnloadSceneAsync("Lobby_Scene");
+            Debug.Log($"[Client] Runner '{runner.name}' loaded the GAME scene. Unloading old global UI layout...");
+        
+            // Loop natively through all global scenes to wipe out the baseline Lobby_Scene wrapper
+            for (int i = 0; i < SceneManager.sceneCount; i++) 
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+                if (scene.name == "Lobby_Scene") 
+                {
+                    SceneManager.UnloadSceneAsync(scene);
+                    break;
+                }
+            }
+        }
+
+        // Case B: The match finished, and the server brought everyone back to the staging HUB_NET scene
+        if (buildIndex == (int)SceneDefs.HUB_NET) 
+        {
+            Debug.Log($"[Client] Runner '{runner.name}' returned to HUB_NET scene. Re-loading local global UI layout...");
+        
+            if (!SceneManager.GetSceneByName("Lobby_Scene").isLoaded) 
+            {
+                SceneManager.LoadSceneAsync("Lobby_Scene", LoadSceneMode.Additive);
+            }
         }
     }
 
-    #region Unused callbacks
+    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
+    {
+        Debug.Log($"[Server] Room '{_sessionName}' OnDisconnectedFromServer: {reason}.");
+    }
 
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
+    {
+        Debug.Log($"[Server] Room '{_sessionName}' OnConnectFailed: {reason}.");
+    }
+
+    #region Unused callbacks
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnConnectedToServer(NetworkRunner runner) { }
-    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { Debug.Log($"[Server] Room '{_sessionName}' OnDisconnectedFromServer: {reason}."); }
-    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { Debug.Log($"[Server] Room '{_sessionName}' OnConnectFailed: {reason}."); }
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
