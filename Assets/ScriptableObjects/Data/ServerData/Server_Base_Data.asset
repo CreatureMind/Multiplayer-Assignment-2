@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26cf4600d6eed0e4cb756673378368c4, type: 3}
   m_Name: Server_Base_Data
   m_EditorClassIdentifier: Assembly-CSharp::GameDataSO
-  clientManagerPrefab: {fileID: 0}
+  clientManagerPrefab: {fileID: 3960052332827775379, guid: f62d68399f72d9747825ab6895cee5a7, type: 3}
   boardManagerPrefab: {fileID: 6854663345647215228, guid: 8c6e889ac859d184ebd16fdf0e12d3aa, type: 3}
   turnManagerPrefab: {fileID: 1893937165651741746, guid: b14575d9a96856a45bd3091ff6b4aac8, type: 3}
   numberOfPlayersToEnforce: 04000000
-  startingPosition: {fileID: 0}
+  startingPosition: {fileID: 11400000, guid: 95d57fa7237bad74b87e21f03a9dba5a, type: 2}
   turnStats: {fileID: 11400000, guid: 129f3b29d0a95304c8e3e037a430dd23, type: 2}
