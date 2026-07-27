@@ -182,16 +182,7 @@ public class RoomManager : MonoBehaviour
             callbacks.SetAnnouncer(announcer);
         }
         
-        if (!serverGameManagerPrefab)
-        {
-            Debug.LogWarning($"[Server] Room '{sessionName}': serverGameManagerPrefab not assigned; game logic will be unavailable.");
-        }
-        else
-        {
-            var gameManager = runner.Spawn(serverGameManagerPrefab);
-            if (gameManager)
-                gameManager.name = $"ServerGameManager_{sessionName}";
-        }
+        
 
         var info = new RoomInfo
         {
@@ -251,5 +242,17 @@ public class RoomManager : MonoBehaviour
         if (string.IsNullOrWhiteSpace(raw)) return "Room";
         var cleaned = raw.Trim().Replace(" ", "_");
         return cleaned.Length > 16 ? cleaned[..16] : cleaned;
+    }
+
+    public void BootServerGameManager(NetworkRunner runner)
+    {
+        if (!serverGameManagerPrefab)
+        {
+            Debug.LogWarning($"[Server] Room '{runner.SessionInfo.Name}': serverGameManagerPrefab not assigned; game logic will be unavailable.");
+        }
+        else
+        {
+            runner.Spawn(serverGameManagerPrefab);
+        }
     }
 }

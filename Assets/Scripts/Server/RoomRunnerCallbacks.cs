@@ -155,6 +155,11 @@ public class RoomRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
             Debug.Log($"[Server] Room '{_sessionName}' unloading Lobby_Scene.");
             SceneManager.UnloadSceneAsync("Lobby_Scene");
         }*/
+
+        if (SceneManager.GetSceneByName("Clean_Game_Scene").isLoaded)
+        {
+            _manager.BootServerGameManager(runner);
+        }
     }
 
     #region Unused callbacks
