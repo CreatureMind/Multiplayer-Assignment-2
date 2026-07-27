@@ -147,42 +147,10 @@ public class RoomRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
         _manager?.OnRoomRunnerShutdown(_roomId);
     }
 
-    public void OnSceneLoadDone(NetworkRunner runner) 
+    public void OnSceneLoadDone(NetworkRunner runner)
     {
-        // 1. Safety check: Headless servers should skip UI logic entirely.
+        // Server doesn't need scene management logic
         if (runner.IsServer && !runner.IsClient) return;
-
-        // 2. Get the active scene that just finished loading inside this specific runner's context
-        Scene loadedScene = SceneManager.GetActiveScene();
-        int buildIndex = loadedScene.buildIndex;
-
-        // Case A: The server shifted this room runner into the GAME scene
-        if (buildIndex == (int)SceneDefs.GAME) 
-        {
-            Debug.Log($"[Client] Runner '{runner.name}' loaded the GAME scene. Unloading old global UI layout...");
-        
-            // Loop natively through all global scenes to wipe out the baseline Lobby_Scene wrapper
-            for (int i = 0; i < SceneManager.sceneCount; i++) 
-            {
-                Scene scene = SceneManager.GetSceneAt(i);
-                if (scene.name == "Lobby_Scene") 
-                {
-                    SceneManager.UnloadSceneAsync(scene);
-                    break;
-                }
-            }
-        }
-
-        // Case B: The match finished, and the server brought everyone back to the staging HUB_NET scene
-        if (buildIndex == (int)SceneDefs.HUB_NET) 
-        {
-            Debug.Log($"[Client] Runner '{runner.name}' returned to HUB_NET scene. Re-loading local global UI layout...");
-        
-            if (!SceneManager.GetSceneByName("Lobby_Scene").isLoaded) 
-            {
-                SceneManager.LoadSceneAsync("Lobby_Scene", LoadSceneMode.Additive);
-            }
-        }
     }
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)

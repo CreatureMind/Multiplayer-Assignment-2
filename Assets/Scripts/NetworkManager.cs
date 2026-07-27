@@ -140,7 +140,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void StartMatch(string modeName, string mapName)
     {
         if (!IsRoomOwner() || !RoomController.Instance) return;
-        RoomController.Instance.Rpc_RequestStartMatch(modeName, mapName, LocalPlayer);
+        RoomController.Instance.Rpc_RequestStartMatch(LocalPlayer);
     }
 
     public bool CanKick() => IsRoomOwner();
@@ -449,6 +449,37 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
+        // Get the scene that the runner just loaded
+        Scene loadedScene = SceneManager.GetActiveScene();
+        int buildIndex = loadedScene.buildIndex;
+
+        // When transitioning to GAME scene, unload the local Lobby_Scene
+        if (buildIndex == (int)SceneDefs.GAME)
+        {
+            Debug.Log($"[Client] Runner '{runner.name}' loaded GAME scene. Unloading Lobby_Scene...");
+
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+                if (scene.name == "Lobby_Scene")
+                {
+                    SceneManager.UnloadSceneAsync(scene);
+                    break;
+                }
+            }
+        }
+
+        // When returning to HUB_NET scene, reload the local Lobby_Scene
+        else if (buildIndex == (int)SceneDefs.HUB_NET)
+        {
+            Debug.Log($"[Client] Runner '{runner.name}' returned to HUB_NET. Reloading Lobby_Scene...");
+
+            if (!SceneManager.GetSceneByName("Lobby_Scene").isLoaded)
+            {
+                SceneManager.LoadSceneAsync("Lobby_Scene", LoadSceneMode.Additive);
+            }
+        }
+
         EventBus.Raise(new SceneLoadDoneEvent());
     }
 

@@ -65,7 +65,7 @@ public class RoomController : NetworkBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void Rpc_RequestStartMatch(NetworkString<_16> mode, NetworkString<_16> map, PlayerRef requester)
+    public void Rpc_RequestStartMatch(PlayerRef requester)
     {
         if (requester != Owner) return; // only the owner may start
         if (MatchStarted) return;
@@ -78,7 +78,9 @@ public class RoomController : NetworkBehaviour
         Runner.SessionInfo.IsOpen = false;
 
         // Game scene selection by map is left to the game-logic pass; load the GAME scene.
-        Runner.LoadScene(SceneRef.FromIndex((int)SceneDefs.GAME), LoadSceneMode.Single);
+        // Use Additive mode on server to prevent visual scene loading, Single mode on clients.
+        var sceneMode = Runner.IsServer && !Runner.IsClient ? LoadSceneMode.Additive : LoadSceneMode.Single;
+        Runner.LoadScene(SceneRef.FromIndex((int)SceneDefs.GAME), sceneMode);
     }
 
     private void OnMatchStartedChanged()
