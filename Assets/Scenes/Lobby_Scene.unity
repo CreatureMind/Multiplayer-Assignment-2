@@ -474,6 +474,8 @@ MonoBehaviour:
   growPoolIfNeeded: 1
   sortingLayerName: Default
   orderInLayer: -100
+  pauseWhenUnfocused: 0
+  maxCatchUpSeconds: 3600
 --- !u!4 &797237191
 Transform:
   m_ObjectHideFlags: 0
@@ -685,6 +687,7 @@ MonoBehaviour:
   characterRegistry: {fileID: 11400000, guid: b078e7d09a00cc84084417637653ba0f, type: 2}
   hubSessionName: LobbyHub
   hubLobbyName: TinySoldiersLobby
+  hubNetSceneBuildIndex: 3
 --- !u!114 &1668919665
 MonoBehaviour:
   m_ObjectHideFlags: 0
