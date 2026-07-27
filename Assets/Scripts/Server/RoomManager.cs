@@ -248,6 +248,8 @@ public class RoomManager : MonoBehaviour
         }
         Debug.Log($"[Server] Room '{room.Runner.SessionInfo.Name}' bootstrap gate opened. Waiting for Clean_Game_Scene to settle...");
 
+        GameObject requiredComponents;
+        SceneRef loadedScene;
         var timeoutAt = Time.realtimeSinceStartup + 15f;
         while (Time.realtimeSinceStartup < timeoutAt)
         {
@@ -256,16 +258,17 @@ public class RoomManager : MonoBehaviour
                 room.BootstrapStarted = false;
                 yield break;
             }
-
-            var gameScene = SceneManager.GetSceneByName("Clean_Game_Scene");
-            if (gameScene.IsValid() && gameScene.isLoaded)
+            requiredComponents = FindAnyObjectByType<ClientSceneContext>()?.gameObject; 
+            loadedScene = room.Runner.SceneManager.GetSceneRef(requiredComponents);
+            if (loadedScene.IsValid)
                 break;
 
             yield return null;
         }
-
-        var loadedScene = SceneManager.GetSceneByName("Clean_Game_Scene");
-        if (!loadedScene.IsValid() || !loadedScene.isLoaded)
+        requiredComponents = FindAnyObjectByType<ClientSceneContext>()?.gameObject;
+        loadedScene = room.Runner.SceneManager.GetSceneRef(requiredComponents);
+        
+        if (!loadedScene.IsValid)
         {
             room.BootstrapStarted = false;
             Debug.LogWarning($"[Server] Room '{room.Runner.SessionInfo.Name}' bootstrap gate timed out waiting for Clean_Game_Scene. Will retry on next scene load callback.");
