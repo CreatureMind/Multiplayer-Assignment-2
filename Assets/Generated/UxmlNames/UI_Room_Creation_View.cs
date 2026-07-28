@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Room_Creation_View.uxml
-// Updated: 2026-07-28 06:18 UTC
+// Updated: 2026-07-28 11:19 UTC
 
 using System.Collections.Generic;
 
