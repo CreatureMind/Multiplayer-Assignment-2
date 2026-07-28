@@ -371,8 +371,37 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         if (boardValidationPassed == ValidationType.Bomb)
         {
-            CascadingExplosionLogic(cell);
-            GameTraceLogger.Move(TraceLogsEnabled, $"Bomb-triggered cascade resolved for P{clientManager.PlayerId} at {cell}.");
+            var explosionChangedCells = CascadingExplosionLogic(cell);
+            if (explosionChangedCells.Count > 0)
+            {
+                GameTraceLogger.Move(TraceLogsEnabled, $"Broadcasting {explosionChangedCells.Count} explosion cells for P{clientManager.PlayerId}.");
+                _boardDiffBroadcaster?.Broadcast(explosionChangedCells);
+            }
+
+            switch (intent)
+            {
+                case MoveIntent.MoveSoldier:
+                    actionResult = _turnManagerInstance.PlayerPlacedPawn(clientManager.PlayerId);
+                    break;
+                case MoveIntent.PlaceBomb:
+                    actionResult = _turnManagerInstance.PlayerPlacedBomb(clientManager.PlayerId);
+                    break;
+                default:
+                    GameTraceLogger.Move(TraceLogsEnabled, $"Bomb-triggered path received unsupported intent={intent} for P{clientManager.PlayerId}.");
+                    return false;
+            }
+
+            GameTraceLogger.Move(TraceLogsEnabled, $"Explosion action result for P{clientManager.PlayerId}, intent={intent}: {actionResult}.");
+            if (actionResult == ActionResult.NotStateAuthority)
+                return false;
+
+            if (actionResult == ActionResult.SuccessAndTurnEnded)
+            {
+                GameTraceLogger.Move(TraceLogsEnabled, $"Ending turn for P{clientManager.PlayerId} due to explosion action budget depletion.");
+                _turnManagerInstance.EndPlayerTurn(clientManager.PlayerId);
+            }
+
+            return true;
         }
         
         Vector2Int bottomLeftCorner =  cell;
@@ -408,6 +437,8 @@ public sealed class ServerGameManager : NetworkBehaviour
                 break;
         }
         GameTraceLogger.Move(TraceLogsEnabled, $"Turn action result for P{clientManager.PlayerId}, intent={intent}: {actionResult}.");
+        if (actionResult == ActionResult.NotStateAuthority)
+            return false;
 
         var changedBases = _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState();
         GameTraceLogger.Move(TraceLogsEnabled, $"Conquered base updates after move: {changedBases.Count}.");
@@ -418,6 +449,19 @@ public sealed class ServerGameManager : NetworkBehaviour
             GameTraceLogger.Move(TraceLogsEnabled, $"Applying base gain for owner P{ownerId} at {baseBottomLeft}.");
             _turnManagerInstance.PlayerBuiltBase(ownerId);
         }
+
+        GameTraceLogger.Move(TraceLogsEnabled, $"Check for base conquer P{clientManager.PlayerId} after intent={intent}.");
+        ServerBoardRules.ConqueredBasesByPawnPlacementCheck(_boardManagerInstance, clientManager.PlayerId, cell, out var conqueredBases);
+        if (conqueredBases.Count > 0)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Conquered bases by P{clientManager.PlayerId} after intent={intent}: {conqueredBases.Count}.");
+            foreach (var baseBottomLeft in conqueredBases)
+            {
+                AddBaseCells(baseBottomLeft, changedCells);
+                GameTraceLogger.Move(TraceLogsEnabled, $"Applying base gain for owner P{clientManager.PlayerId} at {baseBottomLeft}.");
+                _turnManagerInstance.PlayerBuiltBase(clientManager.PlayerId);
+            }
+        }   
 
         GameTraceLogger.Move(TraceLogsEnabled, $"Broadcasting {changedCells.Count} changed cells.");
         _boardDiffBroadcaster?.Broadcast(changedCells);
@@ -438,27 +482,24 @@ public sealed class ServerGameManager : NetworkBehaviour
             GameTraceLogger.Move(TraceLogsEnabled, $"Motherload conquered by P{clientManager.PlayerId} after intent={intent}. Ending game.");
             _turnManagerInstance.EndGame(clientManager.PlayerId);
         }
-        
-        GameTraceLogger.Move(TraceLogsEnabled, $"Check for base conquer P{clientManager.PlayerId} after intent={intent}.");
-        ServerBoardRules.ConqueredBasesByPawnPlacementCheck(_boardManagerInstance, clientManager.PlayerId, cell, out var conqueredBases);
-        if (conqueredBases.Count > 0)
-        {
-            GameTraceLogger.Move(TraceLogsEnabled, $"Conquered bases by P{clientManager.PlayerId} after intent={intent}: {conqueredBases.Count}.");
-            foreach (var baseBottomLeft in conqueredBases)
-            {
-                AddBaseCells(baseBottomLeft, changedCells);
-                GameTraceLogger.Move(TraceLogsEnabled, $"Applying base gain for owner P{clientManager.PlayerId} at {baseBottomLeft}.");
-                _turnManagerInstance.PlayerBuiltBase(clientManager.PlayerId);
-            }
-        }   
-        
+
         return true;
     }
 
-    private void CascadingExplosionLogic(Vector2Int cell)
+    private List<Vector2Int> CascadingExplosionLogic(Vector2Int cell)
     {
         var toExplode = BoardUtilities.DetonateBomb(cell);
-        
+        var changedCells = new List<Vector2Int>(toExplode.Count);
+
+        while (toExplode.Count > 0)
+        {
+            var explodeCell = toExplode.Dequeue();
+            if (_boardManagerInstance.SetTileEmptyServerOnly(explodeCell))
+                changedCells.Add(explodeCell);
+        }
+
+        GameTraceLogger.Move(TraceLogsEnabled, $"CascadingExplosionLogic cleared {changedCells.Count} cells from epicenter {cell}.");
+        return changedCells;
     }
 
     private void HandlePassIntent(ClientManager clientManager)

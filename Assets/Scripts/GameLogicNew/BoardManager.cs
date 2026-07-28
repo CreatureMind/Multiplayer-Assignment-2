@@ -365,6 +365,20 @@ public class BoardManager : NetworkBehaviour
         }
     }
 
+    public bool SetTileEmptyServerOnly(Vector2Int gridPosition)
+    {
+        if (!TryGetIndex(gridPosition.x, gridPosition.y, out var index))
+            return false;
+
+        var currentTile = Tiles[index];
+        if (!currentTile.IsBlastable)
+            return false;
+
+        Tiles.Set(index, TileState.Empty);
+        GameTraceLogger.Board(TraceLogsEnabled, $"SetTileEmpty applied at cell={gridPosition} from type={currentTile.Type}.");
+        return true;
+    }
+
     private void SetBase(Vector2Int gridPosition, int playerId)
     {
         GameTraceLogger.Board(TraceLogsEnabled, $"SetBase start player={playerId}, buildOrigin={gridPosition}.");
