@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Events;
@@ -69,13 +70,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     private void OnEnable()
     {
         EventBus.Subscribe<RoomListChangedEvent>(CacheRoomList);
-        EventBus.Subscribe<MatchStartedEvent>(UnloadScene);
     }
 
     private void OnDisable()
     {
         EventBus.Unsubscribe<RoomListChangedEvent>(CacheRoomList);
-        EventBus.Unsubscribe<MatchStartedEvent>(UnloadScene);
     }
 
     private void CacheRoomList(RoomListChangedEvent e) => _cachedRoomList = e;
@@ -453,38 +452,32 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
-    private bool _lobbyUnloadPending;
-    private int playerCount = 0;
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        playerCount++;
-        Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name} player_{playerCount}");
+        Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name}");
         EventBus.Raise(new SceneLoadDoneEvent());
-        TryUnloadLobbyScene();
+
+        // Once the match has started, the only Fusion scene load is the game scene.
+        // In Multiple-Peer mode it merges into Fusion's scene, so the local lobby
+        // scene must be unloaded explicitly here.
+        if (RoomController.Instance && RoomController.Instance.MatchStarted)
+            StartCoroutine(UnloadLobbySceneNextFrame());
     }
 
-    private void UnloadScene(MatchStartedEvent e)
+    private IEnumerator UnloadLobbySceneNextFrame()
     {
-        _lobbyUnloadPending = true;
-        TryUnloadLobbyScene();
-    }
-
-    // Runs from both MatchStartedEvent and OnSceneLoadDone so the unload happens regardless of which arrives first.
-    private void TryUnloadLobbyScene()
-    {
-        if (!_lobbyUnloadPending) return;
+        yield return null; // let Fusion finish its scene merge before we touch scenes
 
         var lobby = SceneManager.GetSceneByBuildIndex((int)SceneDefs.MENU);
-        if (!lobby.IsValid() || !lobby.isLoaded) { _lobbyUnloadPending = false; return; }
-
-        var fallback = FindOtherLoadedScene(lobby);
-        if (!fallback.IsValid()) return; // defer until the game scene is loaded; retried from OnSceneLoadDone
+        if (!lobby.IsValid() || !lobby.isLoaded) yield break;
 
         if (SceneManager.GetActiveScene() == lobby)
-            SceneManager.SetActiveScene(fallback);
+        {
+            var fallback = FindOtherLoadedScene(lobby);
+            if (fallback.IsValid()) SceneManager.SetActiveScene(fallback);
+        }
 
-        _lobbyUnloadPending = false;
-        SceneManager.UnloadSceneAsync(lobby);
+        yield return SceneManager.UnloadSceneAsync(lobby);
     }
 
     private static Scene FindOtherLoadedScene(Scene exclude)
