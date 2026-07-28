@@ -36,7 +36,6 @@ public class InGameUIView : MonoBehaviour
         }
         
         InitializeUI(_document);
-        OnObjectLoaded.Invoke(_document);
     }
 
     private void InitializeUI(UIDocument document)
@@ -49,6 +48,7 @@ public class InGameUIView : MonoBehaviour
         _returnToLobbyButton = _root.Q<Button>(UI_In_Game_View.return_button);
 
         SetupButtonCallbacks();
+        OnObjectLoaded?.Invoke(_document);
     }
 
     private void SetupButtonCallbacks()
