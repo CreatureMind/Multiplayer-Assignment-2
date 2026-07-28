@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Events;
 using Fusion;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using Angle = UnityEngine.UIElements.Angle;
@@ -36,6 +37,7 @@ public class UIManager : MonoBehaviour
     
     [Header("UI Elements")]
     [SerializeField] private SessionsListDataSO sessionsListData;
+    [SerializeField] private AudioMixer _audioMixer;
     
     private UIDocument _uiDocument;
     private VisualElement _root;
@@ -226,22 +228,116 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void ShowOptions()
-    {
-        _uiDocument.visualTreeAsset = optionsView;
-        _root = _uiDocument.rootVisualElement;
-        
-        var backBtn = _root.Q<Button>(UI_Options_View.back_button);
-        if (backBtn != null)
-        {
-            backBtn.clicked += ShowMainMenu;
-        }
-        else
-        {
-            Debug.LogError("Could not find Button named 'back-button' in optionsView.");
-        }
-    }
+    private void ShowOptions() 
+    { 
+        _uiDocument.visualTreeAsset = optionsView; 
+        _root = _uiDocument.rootVisualElement; 
 
+        var musicVolumeSlider = _root.Q<SliderInt>(UI_Options_View.music_volume_slider); 
+        if (musicVolumeSlider != null) 
+        { 
+            if (_audioMixer.GetFloat("MusicVolume", out float currentMusicDb)) 
+            { 
+                float linearPct = Mathf.Pow(10f, currentMusicDb / 20f); 
+                musicVolumeSlider.value = Mathf.RoundToInt(linearPct * 10f); 
+            } 
+
+            musicVolumeSlider.RegisterValueChangedCallback(evt => 
+            {
+                float normalizedMusicValue = Mathf.Max(evt.newValue / 10f, 0.0001f); 
+                float musicDb = Mathf.Log10(normalizedMusicValue) * 20f; 
+                _audioMixer.SetFloat("MusicVolume", musicDb); 
+            });
+        } 
+        else 
+        { 
+            Debug.LogError("Could not find SliderInt named 'music-volume-slider' in optionsView."); 
+        } 
+
+        var soundFXSlider = _root.Q<SliderInt>(UI_Options_View.sfx_volume_slider); 
+        if (soundFXSlider != null) 
+        { 
+            if (_audioMixer.GetFloat("SfxVolume", out float currentSFXDb)) 
+            { 
+                float linearPct = Mathf.Pow(10f, currentSFXDb / 20f); 
+                soundFXSlider.value = Mathf.RoundToInt(linearPct * 10f); 
+            } 
+
+            soundFXSlider.RegisterValueChangedCallback(evt => 
+            {
+                float normalizedSFXValue = Mathf.Max(evt.newValue / 10f, 0.0001f); 
+                float sfxDb = Mathf.Log10(normalizedSFXValue) * 20f; 
+                _audioMixer.SetFloat("SfxVolume", sfxDb); 
+            });
+        } 
+        else 
+        { 
+            Debug.LogError("Could not find SliderInt named 'sfx-volume-slider' in optionsView."); 
+        } 
+
+        var musicMuteToggle = _root.Q<Toggle>(UI_Options_View.mute_music_toggle); 
+        if (musicMuteToggle != null) 
+        { 
+            if (_audioMixer.GetFloat("MusicVolume", out float currentMusicDb)) 
+            { 
+                musicMuteToggle.value = (currentMusicDb <= -79f);
+            } 
+
+            musicMuteToggle.RegisterValueChangedCallback(evt => 
+            {
+                float targetDb = evt.newValue ? -80f : 0f; 
+                _audioMixer.SetFloat("MusicVolume", targetDb); 
+                
+                // Optional Quality of Life: If unmuted, restore the slider's value to the mixer
+                if (!evt.newValue && musicVolumeSlider != null)
+                {
+                    float normalizedMusicValue = Mathf.Max(musicVolumeSlider.value / 10f, 0.0001f); 
+                    _audioMixer.SetFloat("MusicVolume", Mathf.Log10(normalizedMusicValue) * 20f);
+                }
+            });
+        } 
+        else 
+        { 
+            Debug.LogError("Could not find Toggle named 'mute-music-toggle' in optionsView."); 
+        } 
+
+        var soundFXMuteToggle = _root.Q<Toggle>(UI_Options_View.mute_sfx_toggle); 
+        if (soundFXMuteToggle != null) 
+        { 
+            if (_audioMixer.GetFloat("SfxVolume", out float currentSFXDb)) 
+            { 
+                soundFXMuteToggle.value = (currentSFXDb <= -79f);
+            } 
+
+            soundFXMuteToggle.RegisterValueChangedCallback(evt => 
+            {
+                float targetDb = evt.newValue ? -80f : 0f; 
+                _audioMixer.SetFloat("SfxVolume", targetDb); 
+                
+                if (!evt.newValue && soundFXSlider != null)
+                {
+                    float normalizedSFXValue = Mathf.Max(soundFXSlider.value / 10f, 0.0001f); 
+                    _audioMixer.SetFloat("SfxVolume", Mathf.Log10(normalizedSFXValue) * 20f);
+                }
+            });
+        } 
+        else 
+        { 
+            Debug.LogError("Could not find Toggle named 'mute-sfx-toggle' in optionsView."); 
+        } 
+
+        var backBtn = _root.Q<Button>(UI_Options_View.back_button); 
+        if (backBtn != null) 
+        { 
+            backBtn.clicked -= ShowMainMenu; 
+            backBtn.clicked += ShowMainMenu; 
+        } 
+        else 
+        { 
+            Debug.LogError("Could not find Button named 'back-button' in optionsView."); 
+        } 
+    }
+    
     private void EnterGlobalLobby()
     {
         if (!NetworkManager.Instance) return;

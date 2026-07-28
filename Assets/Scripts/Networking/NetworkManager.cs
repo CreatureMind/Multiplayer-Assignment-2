@@ -34,9 +34,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public bool IsReturningFromMatch { get; private set; }
     public string LocalConfirmedName { get; set; }
-
-    // Owner token handed back by the server on room creation; presented as the
-    // connection token so the room can recognise the creator as its owner.
+    
     private string _pendingOwnerToken;
 
     // Pending create request, so we can raise RoomCreatedEvent once the server approves.
@@ -106,9 +104,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void UnregisterPlayer(PlayerRef player)
     {
         if (!Application.isPlaying) return;
-
-        // Always drop the entry, even during shutdown, so a despawned PlayerData can't linger
-        // in the map (accessing its networked props later throws "not Spawned").
+        
         Debug.Log($"Unregistering player: {player.ToString()}");
         _playerDataMap.Remove(player);
 
@@ -202,7 +198,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             EnableClientSessionCreation = false,
             ConnectionToken = ConnectionTokenUtils.Encode(SafeName()),
             SceneManager = _networkRunnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>(),
-            // must be set in Multiple Peer mode, otherwise the scene manager remains "busy" (no scene root), and spawns get stuck.
             Scene = SceneRef.FromIndex(hubNetSceneBuildIndex),
         });
 
@@ -281,10 +276,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             CustomLobbyName = hubLobbyName,
             EnableClientSessionCreation = false,
             ConnectionToken = ConnectionTokenUtils.Encode(SafeName(), ownerToken),
-            // Needed so server-driven scene loads (Runner.LoadScene in RoomController) work,
-            // but we still avoid forcing MENU as the network scene during the join.
             SceneManager = _networkRunnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>(),
-            // Same reason as hub join: Multiple Peer mode needs a loaded scene root before runtime spawns work.
             Scene = SceneRef.FromIndex(hubNetSceneBuildIndex),
         });
 
@@ -316,9 +308,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (flushDelay > 0f)
             await Task.Delay((int)(flushDelay * 1000));
-
-        // The in-game UI dies with the game scene on the MENU load below; allow the next
-        // match to unload the lobby and spawn a fresh UI again.
+        
         _inGameUIInstance = null;
         _unloading = false;
 
