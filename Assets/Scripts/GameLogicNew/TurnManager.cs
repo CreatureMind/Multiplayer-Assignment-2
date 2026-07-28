@@ -10,6 +10,9 @@ public class TurnManager : NetworkBehaviour
     [Networked] public NetworkBool TraceLogsEnabled { get; private set; }
     private TurnStatsSO _turnStats;
     private List<ClientManager> _clientManagers = new List<ClientManager>();
+    private readonly Dictionary<int, ClientManager> _clientManagersByPlayerId = new Dictionary<int, ClientManager>();
+    private readonly Dictionary<int, int> _playerActionIndexByPlayerId = new Dictionary<int, int>();
+    private int _highestPlayerId;
     // Authoritative transport for turn/action diffs via per-client input-authority RPCs.
     private TurnDiffBroadcaster _turnDiffBroadcaster;
 
@@ -30,24 +33,56 @@ public class TurnManager : NetworkBehaviour
         get => _currentTurnIndex;
         set
         {
-            // Wraps turns against live player count so indexing stays valid across authoritative progression.
-            var playerCount = _clientManagers.Count;
-            if (playerCount <= 0)
+            // Stores turn owner by player id and resolves to the next valid id (with wrap) when needed.
+            if (_clientManagersByPlayerId.Count == 0)
             {
                 _currentTurnIndex = 0;
                 return;
             }
 
-            var wrapped = value % playerCount;
-            _currentTurnIndex = wrapped < 0 ? wrapped + playerCount : wrapped;
+            if (_clientManagersByPlayerId.ContainsKey(value))
+            {
+                _currentTurnIndex = value;
+                return;
+            }
+
+            var candidate = value < 0 ? 0 : value;
+
+            for (var playerId = candidate; playerId <= _highestPlayerId; playerId++)
+            {
+                if (_clientManagersByPlayerId.ContainsKey(playerId))
+                {
+                    _currentTurnIndex = playerId;
+                    return;
+                }
+            }
+
+            for (var playerId = 0; playerId <= _highestPlayerId; playerId++)
+            {
+                if (_clientManagersByPlayerId.ContainsKey(playerId))
+                {
+                    _currentTurnIndex = playerId;
+                    return;
+                }
+            }
+
+            _currentTurnIndex = 0;
+            GameTraceLogger.Turn(TraceLogsEnabled, $"CurrentTurnIndex fallback applied: no valid player id found up to highest id {_highestPlayerId}.");
         }
     }
 
     private void CurrentTurnIndexChanged()
     {
-        if (!_isInstantiated || _clientManagers.Count == 0)
+        if (!_isInstantiated || _clientManagersByPlayerId.Count == 0)
             return;
-        GameTraceLogger.Turn(TraceLogsEnabled, $"Turn changed to player {_clientManagers[CurrentTurnIndex].PlayerId} (index={CurrentTurnIndex}).");
+
+        if (!_clientManagersByPlayerId.ContainsKey(CurrentTurnIndex))
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Turn changed to unresolved player id {CurrentTurnIndex}.");
+            return;
+        }
+
+        GameTraceLogger.Turn(TraceLogsEnabled, $"Turn changed to player {CurrentTurnIndex}.");
     }
 
     #region Lifetime Methods
@@ -67,13 +102,21 @@ public class TurnManager : NetworkBehaviour
     {
         // Injects broadcaster and emits initial turn snapshot once setup is complete.
         _clientManagers = clientManagers;
+        _clientManagersByPlayerId.Clear();
+        _playerActionIndexByPlayerId.Clear();
+        _highestPlayerId = 0;
         _turnStats = turnStats;
         _turnDiffBroadcaster = turnDiffBroadcaster;
 
         for (int i = 0; i < _clientManagers.Count; i++)
         {
-            var playerActionData = new PlayerActionData(0, _clientManagers[i].PlayerId);
+            var playerId = _clientManagers[i].PlayerId;
+            var playerActionData = new PlayerActionData(0, playerId);
             PlayerActions.Set(i, playerActionData);
+            _clientManagersByPlayerId[playerId] = _clientManagers[i];
+            _playerActionIndexByPlayerId[playerId] = i;
+            if (i == 0 || playerId > _highestPlayerId)
+                _highestPlayerId = playerId;
         }
         
         Debug.Log($"Instantiated turn manager with {clientManagers.Count} players.");
@@ -89,8 +132,16 @@ public class TurnManager : NetworkBehaviour
 
     private void RandomizeTurnOrder()
     {
-        CurrentTurnIndex = Random.Range(0, _clientManagers.Count);
-        GameTraceLogger.Turn(TraceLogsEnabled, $"Randomized starting turn index to {CurrentTurnIndex}.");
+        if (_clientManagersByPlayerId.Count == 0)
+        {
+            CurrentTurnIndex = 0;
+            GameTraceLogger.Turn(TraceLogsEnabled, "RandomizeTurnOrder skipped: no clients.");
+            return;
+        }
+
+        var playerIds = new List<int>(_clientManagersByPlayerId.Keys);
+        CurrentTurnIndex = playerIds[Random.Range(0, playerIds.Count)];
+        GameTraceLogger.Turn(TraceLogsEnabled, $"Randomized starting turn player id to {CurrentTurnIndex}.");
     }
 
     public void SetTraceLoggingEnabled(NetworkBool enabled)
@@ -114,8 +165,8 @@ public class TurnManager : NetworkBehaviour
             return false;
         }
 
-        var isValid = playerIndex == CurrentTurnIndex;
-        GameTraceLogger.Turn(TraceLogsEnabled, $"ValidatePlayerTurn player={playerId}, playerIndex={playerIndex}, currentTurnIndex={CurrentTurnIndex}, result={isValid}.");
+        var isValid = playerId == CurrentTurnIndex;
+        GameTraceLogger.Turn(TraceLogsEnabled, $"ValidatePlayerTurn player={playerId}, playerIndex={playerIndex}, currentTurnPlayerId={CurrentTurnIndex}, result={isValid}.");
         return isValid;
     }
 
@@ -274,7 +325,7 @@ public class TurnManager : NetworkBehaviour
             return;
         }
 
-        if (_clientManagers.Count == 0)
+        if (_clientManagersByPlayerId.Count == 0)
         {
             GameTraceLogger.Turn(TraceLogsEnabled, $"EndPlayerTurn ignored for player={playerId}: no clients.");
             return;
@@ -290,14 +341,7 @@ public class TurnManager : NetworkBehaviour
 
         CurrentTurnIndex++;
 
-        var correctIndex = 0;
-        for (correctIndex = 0; correctIndex < _clientManagers.Count; correctIndex++)
-        {
-            if (_clientManagers[correctIndex].PlayerId == CurrentTurnIndex)
-                break;
-        }
-
-        var nextPlayerId = _clientManagers[correctIndex].PlayerId;
+        var nextPlayerId = CurrentTurnIndex;
         if (!TryReadPlayerActionData(nextPlayerId, out var nextPlayerIndex, out var nextPlayerActionData))
         {
             GameTraceLogger.Turn(TraceLogsEnabled, $"EndPlayerTurn failed: could not read action data for next player={nextPlayerId}.");
@@ -336,14 +380,13 @@ public class TurnManager : NetworkBehaviour
     private bool TryGetCurrentPlayerActionData(out PlayerActionData currentPlayingPlayer)
     {
         // Returns the authoritative action payload for whichever player currently owns the turn.
-        if (_clientManagers.Count == 0)
+        if (_clientManagersByPlayerId.Count == 0)
         {
             currentPlayingPlayer = default;
             return false;
         }
 
-        var currentPlayerId = _clientManagers[CurrentTurnIndex].PlayerId;
-        return TryReadPlayerActionData(currentPlayerId, out _, out currentPlayingPlayer);
+        return TryReadPlayerActionData(CurrentTurnIndex, out _, out currentPlayingPlayer);
     }
 
     private IReadOnlyList<PlayerActionData> GetPlayerActionsSnapshot()
@@ -361,16 +404,15 @@ public class TurnManager : NetworkBehaviour
     private bool IsCurrentTurnPlayer(int playerId)
     {
         // Centralised ownership check used to guard turn-only updates and end-turn requests.
-        if (_clientManagers.Count == 0)
+        if (_clientManagersByPlayerId.Count == 0)
             return false;
 
-        return _clientManagers[CurrentTurnIndex].PlayerId == playerId;
+        return CurrentTurnIndex == playerId;
     }
 
     private bool TryGetPlayerIndex(int playerId, out int playerIndex)
     {
-        playerIndex = _clientManagers.FindIndex(cm => cm.PlayerId == playerId);
-        return playerIndex >= 0 && playerIndex < _clientManagers.Count;
+        return _playerActionIndexByPlayerId.TryGetValue(playerId, out playerIndex);
     }
 
     private bool TryReadPlayerActionData(int playerId, out int playerIndex, out PlayerActionData playerActionData)
