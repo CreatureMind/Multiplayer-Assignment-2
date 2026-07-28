@@ -6,12 +6,10 @@ using UnityEngine;
 public static class BoardUtilities
 {
     private static BoardManager Manager { get; set; }
-    private static NetworkArray<TileState> Tiles { get; set; }
 
     public static void InstantiateBoardData(BoardManager boardManager, NetworkArray<TileState> tiles)
     {
         Manager = boardManager;
-        Tiles = tiles;
         Debug.Log("Instantiated board utilities.");
     }
     
@@ -43,8 +41,9 @@ public static class BoardUtilities
 
         // check if I am in bounds and reached a friendly base
         if (Manager.IsValidIndex(currentTile) &&
-            Tiles[Manager.ToIndex(currentTile)].Type == TileType.Base &&
-            Tiles[Manager.ToIndex(currentTile)].OwnerId == currentOwnerId)
+            Manager.TryGetTile(currentTile, out var tile) &&
+            tile.Type == TileType.Base &&
+            tile.OwnerId == currentOwnerId)
         {
             return true;
         }
@@ -70,7 +69,8 @@ public static class BoardUtilities
 
             checkedTileIndexes.Add(nextIndex);
 
-            var nextState = Tiles[nextIndex];
+            if (!Manager.TryGetTile(nextTile, out var nextState))
+                continue;
 
             // We can walk through friendly pawns, bombs, and stop at a friendly base.
             var isFriendlyPawn = nextState.Type == TileType.Soldier && nextState.OwnerId == currentOwnerId;
@@ -87,7 +87,48 @@ public static class BoardUtilities
         return false;
     }
     
-    public static bool TryGetBottomLeftCornerOfBase4By4(Vector2Int startTile, PlayerRef owner, out  Vector2Int targetTile)
+    public static Queue<Vector2Int> DetonateBomb(Vector2Int epicenter)
+    {
+        var visitedBombs = new HashSet<Vector2Int>();
+        var visitedAffected = new HashSet<Vector2Int>();
+        var frontier = new Queue<Vector2Int>();
+        var affected = new Queue<Vector2Int>();
+
+        frontier.Enqueue(epicenter);
+        visitedBombs.Add(epicenter);
+        visitedAffected.Add(epicenter);
+        affected.Enqueue(epicenter);
+
+        Vector2Int size = Manager.GetSize();
+        
+        while (frontier.Count > 0)
+        {
+            var bombCell = frontier.Dequeue();
+
+            foreach (var off in Diagonal8)
+            {
+                var n = bombCell + off;
+                if (n.x < 0 || n.y < 0 || n.x >= size.x || n.y >= size.y)
+                    continue;
+
+                if (!Manager.TryGetTile(n, out var s))
+                    continue;
+
+                if (!s.IsBlastable)
+                    continue;
+
+                if (visitedAffected.Add(n))
+                    affected.Enqueue(n);
+                
+                if (s.Type == TileType.Bomb && visitedBombs.Add(n))
+                    frontier.Enqueue(n);
+            }
+        }
+        
+        return affected;
+    }
+    
+    public static bool TryGetBottomLeftCornerOfBase4By4(Vector2Int startTile, byte owner, out  Vector2Int targetTile)
     {
         targetTile = default;
 
@@ -96,9 +137,7 @@ public static class BoardUtilities
             Debug.LogError("BoardManager instance is not set. Ensure InstantiateBoardData is called before using this method.");
             return false;
         }
-
-        var ownerId = owner.PlayerId;
-
+        
         // The start tile can be anywhere inside the 4x4.
         // Try every possible 4x4 bottom-left candidate that could contain it.
         for (var offsetX = 0; offsetX < 4; offsetX++)
@@ -119,9 +158,14 @@ public static class BoardUtilities
                             break;
                         }
 
-                        var tileState = Tiles[Manager.ToIndex(currentTile)];
-                        var isFriendlyPawn = tileState.Type == TileType.Soldier && tileState.OwnerId == ownerId;
-                        var isFriendlyBomb = tileState.Type == TileType.Bomb && tileState.OwnerId == ownerId;
+                        if (!Manager.TryGetTile(currentTile, out var tileState))
+                        {
+                            isValidArea = false;
+                            break;
+                        }
+
+                        var isFriendlyPawn = tileState.Type == TileType.Soldier && tileState.OwnerId == owner;
+                        var isFriendlyBomb = tileState.Type == TileType.Bomb && tileState.OwnerId == owner;
 
                         if (!isFriendlyPawn && !isFriendlyBomb)
                         {
@@ -143,4 +187,16 @@ public static class BoardUtilities
         return false;
     }
     
+    
+    private static readonly Vector2Int[] Diagonal8 =
+    {
+        new(0, 1),
+        new(0, -1),
+        new(1, 0),
+        new(-1, 0),
+        new(1, 1),
+        new(1, -1),
+        new(-1, 1),
+        new(-1, -1),
+    };
 }

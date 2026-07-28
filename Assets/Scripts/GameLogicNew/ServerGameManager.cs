@@ -286,6 +286,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         Debug.Log("Successfully spawned board manager.");
     }
 
+    [ContextMenu("Request Move Manually")]
     public void HandleMoveRequest(ClientManager clientManager, Vector2Int cell, MoveIntent intent)
     {
         GameTraceLogger.Move(TraceLogsEnabled, $"HandleMoveRequest start player={clientManager?.PlayerId.ToString() ?? "null"}, intent={intent}, cell={cell}.");
@@ -325,7 +326,7 @@ public sealed class ServerGameManager : NetworkBehaviour
             GameTraceLogger.Move(TraceLogsEnabled, $"Rejected move P{clientManager.PlayerId}: board manager missing.");
             return false;
         }
-        
+
         if (!_turnManagerInstance)
         {
             GameTraceLogger.Move(TraceLogsEnabled, $"Rejected move P{clientManager.PlayerId}: turn manager missing.");
@@ -336,9 +337,12 @@ public sealed class ServerGameManager : NetworkBehaviour
         var isValidTurn = _turnManagerInstance.ValidatePlayerTurn(clientManager.PlayerId);
         GameTraceLogger.Move(TraceLogsEnabled, $"Turn validation P{clientManager.PlayerId}: {isValidTurn}.");
         if (!isValidTurn)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Rejected move P{clientManager.PlayerId}: not player's turn.");
             return false;
+        }
 
-        if (intent == MoveIntent.Pass)  // pass intent is always valid, no need to check board state
+        if (intent == MoveIntent.Pass) // pass intent is always valid, no need to check board state
         {
             GameTraceLogger.Move(TraceLogsEnabled, $"Pass intent accepted for P{clientManager.PlayerId}; ending turn.");
             HandlePassIntent(clientManager);
@@ -346,24 +350,50 @@ public sealed class ServerGameManager : NetworkBehaviour
         }
 
         var hasResourcesForIntent = _turnManagerInstance.ValidatePlayerIntent(clientManager.PlayerId, intent);
-        GameTraceLogger.Move(TraceLogsEnabled, $"Intent validation P{clientManager.PlayerId}, intent={intent}: {hasResourcesForIntent}.");
+        GameTraceLogger.Move(TraceLogsEnabled,
+            $"Intent validation P{clientManager.PlayerId}, intent={intent}: {hasResourcesForIntent}.");
         if (!hasResourcesForIntent)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Rejected move P{clientManager.PlayerId}: insufficient resources for intent {intent}.");
             return false;
+        }
+
+        var actionResult = ActionResult.Success;
 
         var boardValidationPassed = _boardManagerInstance.ValidateBoardChange(cell, clientManager.PlayerId, intent);
-        GameTraceLogger.Move(TraceLogsEnabled, $"Board validation P{clientManager.PlayerId}, intent={intent}, cell={cell}: {boardValidationPassed}.");
-        if (!boardValidationPassed)
+        GameTraceLogger.Move(TraceLogsEnabled,
+            $"Board validation P{clientManager.PlayerId}, intent={intent}, cell={cell}: {boardValidationPassed}.");
+        if (boardValidationPassed == ValidationType.False)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Board validation failed for P{clientManager.PlayerId}, intent={intent}, cell={cell}.");
             return false;
+        }
         
+        if (boardValidationPassed == ValidationType.Bomb)
+        {
+            CascadingExplosionLogic(cell);
+            GameTraceLogger.Move(TraceLogsEnabled, $"Bomb-triggered cascade resolved for P{clientManager.PlayerId} at {cell}.");
+        }
+        
+        Vector2Int bottomLeftCorner =  cell;
+        if (intent == MoveIntent.BuildBase)
+        {
+            if (!BoardUtilities.TryGetBottomLeftCornerOfBase4By4(cell, clientManager.PlayerId, out bottomLeftCorner))
+            {
+                GameTraceLogger.Move(TraceLogsEnabled,
+                    $"BuildBase ring validation failed for P{clientManager.PlayerId} at {cell}.");
+                return false;
+            }
+        }
+
         GameTraceLogger.Move(TraceLogsEnabled, $"Applying board mutation for P{clientManager.PlayerId}, intent={intent}, cell={cell}.");
-        _boardManagerInstance.SetTileServerOnly(cell, clientManager.PlayerId, intent);
+        _boardManagerInstance.SetTileServerOnly(bottomLeftCorner, clientManager.PlayerId, intent);
 
         var changedCells = new List<Vector2Int>();
         if (intent == MoveIntent.BuildBase)
             AddBuildBaseCoreCells(cell, changedCells);
         else
             changedCells.Add(cell);
-        var actionResult = ActionResult.Success;
 
         switch (intent)
         {
@@ -402,7 +432,33 @@ public sealed class ServerGameManager : NetworkBehaviour
             GameTraceLogger.Move(TraceLogsEnabled, $"Turn remains with P{clientManager.PlayerId} after intent={intent}.");
         }
         
+        GameTraceLogger.Move(TraceLogsEnabled, $"Check for motherload conquer P{clientManager.PlayerId} after intent={intent}.");
+        if (ServerBoardRules.MotherloadConqueredWinConditionCheck(_boardManagerInstance, clientManager.PlayerId, cell))
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Motherload conquered by P{clientManager.PlayerId} after intent={intent}. Ending game.");
+            _turnManagerInstance.EndGame(clientManager.PlayerId);
+        }
+        
+        GameTraceLogger.Move(TraceLogsEnabled, $"Check for base conquer P{clientManager.PlayerId} after intent={intent}.");
+        ServerBoardRules.ConqueredBasesByPawnPlacementCheck(_boardManagerInstance, clientManager.PlayerId, cell, out var conqueredBases);
+        if (conqueredBases.Count > 0)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Conquered bases by P{clientManager.PlayerId} after intent={intent}: {conqueredBases.Count}.");
+            foreach (var baseBottomLeft in conqueredBases)
+            {
+                AddBaseCells(baseBottomLeft, changedCells);
+                GameTraceLogger.Move(TraceLogsEnabled, $"Applying base gain for owner P{clientManager.PlayerId} at {baseBottomLeft}.");
+                _turnManagerInstance.PlayerBuiltBase(clientManager.PlayerId);
+            }
+        }   
+        
         return true;
+    }
+
+    private void CascadingExplosionLogic(Vector2Int cell)
+    {
+        var toExplode = BoardUtilities.DetonateBomb(cell);
+        
     }
 
     private void HandlePassIntent(ClientManager clientManager)

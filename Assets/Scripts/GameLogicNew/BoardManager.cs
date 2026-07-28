@@ -36,6 +36,18 @@ public class BoardManager : NetworkBehaviour
         return true;
     }
 
+    public bool TryGetTile(Vector2Int position, out TileState tile)
+    {
+        if (!TryGetIndex(position.x, position.y, out var index))
+        {
+            tile = default;
+            return false;
+        }
+
+        tile = Tiles[index];
+        return true;    
+    }
+
     public int ToIndex(Vector2Int gridPosition)
     {
         return gridPosition.y * Width + gridPosition.x;
@@ -287,49 +299,48 @@ public class BoardManager : NetworkBehaviour
         return new Vector2Int(width, height);
     }
 
-    public bool ValidateBoardChange(Vector2Int gridPosition, int playerId , MoveIntent intent)
+    public ValidationType ValidateBoardChange(Vector2Int gridPosition, int playerId , MoveIntent intent)
     {
         GameTraceLogger.Board(TraceLogsEnabled, $"ValidateBoardChange player={playerId}, intent={intent}, cell={gridPosition}.");
         switch (intent)
         {
+            case MoveIntent.PlaceBomb:
             case MoveIntent.MoveSoldier:
             {
                 var result = PawnCheck(gridPosition, playerId);
                 GameTraceLogger.Board(TraceLogsEnabled, $"PawnCheck result for player={playerId}, cell={gridPosition}: {result}.");
                 return result;
             }
-            case MoveIntent.PlaceBomb:
-            {
-                var result = BombCheck(gridPosition, playerId);
-                GameTraceLogger.Board(TraceLogsEnabled, $"BombCheck result for player={playerId}, cell={gridPosition}: {result}.");
-                return result;
-            }
             case MoveIntent.BuildBase:
             {
                 var result = BaseCheck(gridPosition, playerId);
                 GameTraceLogger.Board(TraceLogsEnabled, $"BaseCheck result for player={playerId}, cell={gridPosition}: {result}.");
-                return result;
+                return result ? ValidationType.True : ValidationType.False;
             }
             default:
                 GameTraceLogger.Board(TraceLogsEnabled, $"ValidateBoardChange rejected unknown intent {intent}.");
-                return false;
+                return ValidationType.False;
         }
     }
 
-    private bool BaseCheck(Vector2Int gridPosition, int playerId) // TODO
+    private bool BaseCheck(Vector2Int gridPosition, int playerId)
     {
-        return BoardUtilities.PawnElegabiltyCheckDFS(Tiles[ToIndex(gridPosition)], gridPosition, playerId);
+        return ServerBoardRules.IsBaseWindow(this, (byte)playerId, gridPosition);
     }
 
-    private bool PawnCheck(Vector2Int gridPosition, int playerId)
+    private ValidationType PawnCheck(Vector2Int gridPosition, int playerId)
     {
-        return BoardUtilities.PawnElegabiltyCheckDFS(Tiles[ToIndex(gridPosition)], gridPosition, playerId);
+        var con = BoardUtilities.PawnElegabiltyCheckDFS(Tiles[ToIndex(gridPosition)], gridPosition, playerId);
+        if (!con)
+            return ValidationType.False;
+        
+        if (TryGetTile(gridPosition.x, gridPosition.y, out var tile) && tile.Type == TileType.Bomb && tile.OwnerId != playerId)
+            return ValidationType.Bomb;
+        
+        return ValidationType.True;
+        
     }
-
-    private bool BombCheck(Vector2Int gridPosition, int playerId)
-    {
-        return BoardUtilities.PawnElegabiltyCheckDFS(Tiles[ToIndex(gridPosition)], gridPosition, playerId);
-    }
+    
     #endregion
 
     // never call without the correct checks
@@ -425,4 +436,17 @@ public class BoardManager : NetworkBehaviour
         var tile = Tiles[index];
         return tile.OwnerId;
     }
+
+    public Vector2Int GetSize()
+    {
+        return new Vector2Int(Width, Height);
+    }
+}
+
+
+public enum ValidationType
+{
+    True,
+    False,
+    Bomb
 }
