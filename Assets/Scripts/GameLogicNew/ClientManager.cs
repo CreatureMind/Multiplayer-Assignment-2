@@ -122,7 +122,7 @@ public class ClientManager : NetworkBehaviour
     
     // Carries an INTENT, not a target type: move-into-empty and capture both yield Soldier, and BuildBase carries a window origin.
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
-    public void RPC_RequestMove(Vector2Int cell, MoveIntent intent)
+    public void RPC_RequestMove(Vector2Int cell, MoveIntent intent = MoveIntent.MoveSoldier)
     {
         if (!HasStateAuthority)
         {
