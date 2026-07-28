@@ -15,7 +15,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public static NetworkManager Instance;
 
     [SerializeField] private NetworkRunner networkRunnerPrefab;
-    [SerializeField] private GameObject inGameUIPrefab;
+    [SerializeField] private InGameUIManager inGameUIPrefab;
 
     [Header("Dedicated Server")]
     [SerializeField] private string hubSessionName = "LobbyHub";
@@ -458,7 +458,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
     private bool _unloading = false;
-    private GameObject _inGameUIInstance;
+    private InGameUIManager _inGameUIInstance;
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name}");
@@ -502,13 +502,13 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
         SpawnInGameUI();
     }
-
-    // Instantiated locally on the client into the active game scene (never a networked/scene
-    // object), so the server never has it and it dies with the scene on return to lobby.
+    
     private void SpawnInGameUI()
     {
         if (!inGameUIPrefab || _inGameUIInstance) return;
         _inGameUIInstance = Instantiate(inGameUIPrefab);
+        _inGameUIInstance.name = $"InGameUI_{LocalConfirmedName}";
+        _inGameUIInstance.NetworkManager = this;
     }
 
     private static Scene FindOtherLoadedScene(Scene exclude)

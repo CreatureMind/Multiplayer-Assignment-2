@@ -9,6 +9,16 @@ public class InGameUIManager : MonoBehaviour
     private InGameUIModel _model;
     private InGameUIPresenter _presenter;
 
+    private NetworkManager _networkManager;
+    public NetworkManager NetworkManager
+    {
+        get => _networkManager;
+        set
+        {
+            _networkManager = value;
+        }
+    }
+
     private void Start()
     {
         InitializeMVP();
@@ -22,7 +32,7 @@ public class InGameUIManager : MonoBehaviour
             return;
         }
 
-        _model = new InGameUIModel();
+        _model = new InGameUIModel(_networkManager);
         _presenter = new InGameUIPresenter(_model, inGameView);
     }
 

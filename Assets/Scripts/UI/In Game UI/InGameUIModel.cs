@@ -7,15 +7,22 @@ using Utils;
 public class InGameUIModel
 {
     public event Action OnGameEnded;
+    
+    private NetworkManager _networkManager;
+    
+    public InGameUIModel(NetworkManager networkManager)
+    {
+        _networkManager = networkManager;
+    }
 
     public void ReturnToLobby(float flushDelay = 0f)
     {
         Debug.Log("[InGameUI] Returning to lobby...");
         
-        if (NetworkManager.Instance)
+        if (_networkManager)
         {
             Debug.Log("[InGameUI] Returning to lobby through network manager.");
-            _ = NetworkManager.Instance.ReturnToLobbyAsync(flushDelay);
+            _ = _networkManager.ReturnToLobbyAsync(flushDelay);
         }
         else
         {
