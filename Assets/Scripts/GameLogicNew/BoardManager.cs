@@ -22,7 +22,7 @@ public class BoardManager : NetworkBehaviour
     
     public int TileCount => Width * Height;
 
-    #region Helper Methods
+    #region Grid Access and Indexing
 
     public bool TryGetTile(int x, int y, out TileState tile)
     {
@@ -82,7 +82,7 @@ public class BoardManager : NetworkBehaviour
 
     #endregion
 
-    #region Life Time Methods
+    #region Lifecycle and Initialization
 
     public override void Spawned()
     {
@@ -147,6 +147,10 @@ public class BoardManager : NetworkBehaviour
     }
     
 
+    #endregion
+
+    #region Base Compilation and Conquest
+
     private void CompileAndCacheAllBases(HashSet<Vector2Int> baseTiles)
     {
         _baseCache.Clear();
@@ -178,7 +182,7 @@ public class BoardManager : NetworkBehaviour
         }
     }
     
-    public HashSet<Vector2Int> CheckForConqueredBasesAndUpdateBoardState()
+    public HashSet<Vector2Int> CheckForConqueredBasesAndUpdateBoardState(bool includeAlreadyConquered = true)
     {
         GameTraceLogger.Board(TraceLogsEnabled, $"Checking conquered bases. Cached bases={_baseCache.Count}.");
         var updatedBottomLeftKeys = new HashSet<Vector2Int>();
@@ -230,7 +234,10 @@ public class BoardManager : NetworkBehaviour
             }
 
             if (!allSurroundingTilesMatch)
+            {
+                GameTraceLogger.Board(TraceLogsEnabled, $"Base at {bottomLeft} is not conquered: surrounding ring is not uniformly owned.");
                 continue;
+            }
 
             var baseTiles = cacheEntry.Value is { Count: 4 }
                 ? cacheEntry.Value
@@ -256,12 +263,20 @@ public class BoardManager : NetworkBehaviour
                 wasUpdated = true;
             }
 
-            if (!wasUpdated)
-                continue;
+            if (wasUpdated)
+            {
+                GameTraceLogger.Board(TraceLogsEnabled, $"Conquered base ownership updated for base at {bottomLeft} to owner {surroundingOwnerId}.");
+            }
+            else
+            {
+                GameTraceLogger.Board(TraceLogsEnabled, $"Base at {bottomLeft} is conquered by owner {surroundingOwnerId}, but no ownership change was needed.");
+            }
 
-            GameTraceLogger.Board(TraceLogsEnabled, $"Conquered base ownership updated for base at {bottomLeft} to owner {surroundingOwnerId}.");
-            updatedBottomLeftKeys.Add(bottomLeft);
-            keysToRefreshInCache.Add(bottomLeft);
+            if (wasUpdated || includeAlreadyConquered)
+            {
+                updatedBottomLeftKeys.Add(bottomLeft);
+                keysToRefreshInCache.Add(bottomLeft);
+            }
         }
 
         foreach (var bottomLeft in keysToRefreshInCache)
@@ -278,9 +293,27 @@ public class BoardManager : NetworkBehaviour
         return updatedBottomLeftKeys;
     }
 
+    private void ExistingBaseConqueredByPlayer(Vector2Int bottomLeft, int playerId)
+    {
+        if (!_baseCache.TryGetValue(bottomLeft, out var baseTiles))
+            return;
+
+        foreach (var baseTilePosition in baseTiles)
+        {
+            if (!TryGetIndex(baseTilePosition.x, baseTilePosition.y, out var baseTileIndex))
+                continue;
+
+            var currentState = Tiles[baseTileIndex];
+            if (currentState.Type != TileType.Base || currentState.OwnerId == playerId)
+                continue;
+
+            Tiles.Set(baseTileIndex, currentState.WithOwner((byte)playerId));
+        }
+    }
+
     #endregion
 
-    #region Board Change Validation
+    #region Move Validation
     private static Vector2Int ValidateBoardDimensions(int width, int height)
     {
         if (width <= 0 || height <= 0)
@@ -344,7 +377,7 @@ public class BoardManager : NetworkBehaviour
     #endregion
 
     // never call without the correct checks
-    #region Server Only Board Change Methods
+    #region Server Board Mutations
 
     public void SetTileServerOnly(Vector2Int gridPosition, int playerId, MoveIntent intent)
     {
@@ -423,25 +456,9 @@ public class BoardManager : NetworkBehaviour
         // broadcast diff 
     }
     
-    private void ExistingBaseConqueredByPlayer(Vector2Int bottomLeft, int playerId)
-    {
-        if (!_baseCache.TryGetValue(bottomLeft, out var baseTiles))
-            return;
-
-        foreach (var baseTilePosition in baseTiles)
-        {
-            if (!TryGetIndex(baseTilePosition.x, baseTilePosition.y, out var baseTileIndex))
-                continue;
-
-            var currentState = Tiles[baseTileIndex];
-            if (currentState.Type != TileType.Base || currentState.OwnerId == playerId)
-                continue;
-
-            Tiles.Set(baseTileIndex, currentState.WithOwner((byte)playerId));
-        }
-    }
-
     #endregion
+
+    #region Public Queries
 
 
     public int GetTileOwnerByIndex(Vector2Int tileIndex)
@@ -455,6 +472,8 @@ public class BoardManager : NetworkBehaviour
     {
         return new Vector2Int(Width, Height);
     }
+
+    #endregion
 }
 
 

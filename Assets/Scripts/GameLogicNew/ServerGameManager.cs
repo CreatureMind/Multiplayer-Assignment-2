@@ -28,6 +28,8 @@ public sealed class ServerGameManager : NetworkBehaviour
     private readonly HashSet<byte> _diffHandshakeClientIds = new HashSet<byte>();
     private readonly HashSet<byte> _loggedSkippedLiveDiffClientIds = new HashSet<byte>();
 
+    #region Lifecycle
+
     public override void Spawned()
     {
         if (Instance != null && Instance != this)
@@ -52,6 +54,10 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         SyncTraceLoggingToManagers();
     }
+
+    #endregion
+
+    #region Bootstrap and Spawning
 
     public void RequestInstantiation()
     {
@@ -257,7 +263,7 @@ public sealed class ServerGameManager : NetworkBehaviour
             await Task.Yield();
         }
         
-        var changedBases= _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState();
+        var changedBases= _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState(includeAlreadyConquered: true);
         var setupDiffCells = new List<Vector2Int>();
         foreach (var baseBottomLeft in changedBases)
             AddBaseCells(baseBottomLeft, setupDiffCells);
@@ -285,6 +291,10 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         Debug.Log("Successfully spawned board manager.");
     }
+
+    #endregion
+
+    #region Move Pipeline
 
     [ContextMenu("Request Move Manually")]
     public void HandleMoveRequest(ClientManager clientManager, Vector2Int cell, MoveIntent intent)
@@ -449,7 +459,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         GameTraceLogger.Move(TraceLogsEnabled, $"Applying board mutation for P{request.PlayerId}, intent={request.Intent}, cell={request.RequestedCell}.");
         _boardManagerInstance.SetTileServerOnly(request.MutationCell, request.PlayerId, request.Intent);
 
-        var changedBases = _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState();
+        var changedBases = _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState(includeAlreadyConquered: false);
         GameTraceLogger.Move(TraceLogsEnabled, $"Conquered base updates after move: {changedBases.Count}.");
         foreach (var baseBottomLeft in changedBases)
         {
@@ -579,6 +589,33 @@ public sealed class ServerGameManager : NetworkBehaviour
         }
     }
 
+    private List<Vector2Int> CascadingExplosionLogic(Vector2Int cell)
+    {
+        var toExplode = BoardUtilities.DetonateBomb(cell);
+        var changedCells = new List<Vector2Int>(toExplode.Count);
+
+        while (toExplode.Count > 0)
+        {
+            var explodeCell = toExplode.Dequeue();
+            if (_boardManagerInstance.SetTileEmptyServerOnly(explodeCell))
+                changedCells.Add(explodeCell);
+        }
+
+        GameTraceLogger.Move(TraceLogsEnabled, $"CascadingExplosionLogic cleared {changedCells.Count} cells from epicenter {cell}.");
+        return changedCells;
+    }
+
+    private void HandlePassIntent(ClientManager clientManager)
+    {
+        if (!HasStateAuthority || !_turnManagerInstance) return;
+        GameTraceLogger.Move(TraceLogsEnabled, $"HandlePassIntent ending turn for P{clientManager.PlayerId}.");
+        _turnManagerInstance.EndPlayerTurn(clientManager.PlayerId);
+    }
+
+    #endregion
+
+    #region Nested Data Models
+
     private enum MovePipelineGateResult
     {
         Rejected,
@@ -627,28 +664,9 @@ public sealed class ServerGameManager : NetworkBehaviour
         public List<int> BaseGainOwners { get; } = new List<int>();
     }
 
-    private List<Vector2Int> CascadingExplosionLogic(Vector2Int cell)
-    {
-        var toExplode = BoardUtilities.DetonateBomb(cell);
-        var changedCells = new List<Vector2Int>(toExplode.Count);
+    #endregion
 
-        while (toExplode.Count > 0)
-        {
-            var explodeCell = toExplode.Dequeue();
-            if (_boardManagerInstance.SetTileEmptyServerOnly(explodeCell))
-                changedCells.Add(explodeCell);
-        }
-
-        GameTraceLogger.Move(TraceLogsEnabled, $"CascadingExplosionLogic cleared {changedCells.Count} cells from epicenter {cell}.");
-        return changedCells;
-    }
-
-    private void HandlePassIntent(ClientManager clientManager)
-    {
-        if (!HasStateAuthority || !_turnManagerInstance) return;
-        GameTraceLogger.Move(TraceLogsEnabled, $"HandlePassIntent ending turn for P{clientManager.PlayerId}.");
-        _turnManagerInstance.EndPlayerTurn(clientManager.PlayerId);
-    }
+    #region Client Handshake and Readiness
 
     public void OnClientReady(ClientManager clientManager)
     {
@@ -715,6 +733,10 @@ public sealed class ServerGameManager : NetworkBehaviour
             GameTraceLogger.Handshake(TraceLogsEnabled, $"Skipping live diff broadcast for P{playerId} until RPC_ClientInitFinished arrives.");
     }
 
+    #endregion
+
+    #region Synchronization Utilities
+
     private void SyncTraceLoggingToManagers()
     {
         if (_boardManagerInstance && _boardManagerInstance.TraceLogsEnabled != TraceLogsEnabled)
@@ -753,4 +775,6 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         GameTraceLogger.Move(TraceLogsEnabled, "Added motherload cells.");
     }
+
+    #endregion
 }
