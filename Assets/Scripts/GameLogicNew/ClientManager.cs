@@ -17,11 +17,10 @@ public class ClientManager : NetworkBehaviour
 {
     // Cells per diff RPC; keep payload conservative to stay below Fusion's reliable RPC byte limit after framing overhead.
     public const int MaxDiffsPerRpc = 24;
-    private const string ReadyLogPrefix = "<color=#4DD0E1>[ClientHandshake]</color>";
-    private const string RpcLogPrefix = "<color=#FFD166>[ClientRPC]</color>";
     
     [Networked] public PlayerRef Player { get; private set; }
     [Networked] public byte PlayerId { get; private set; } // 1-based; 0 = no owner
+    [Networked] public NetworkBool TraceLogsEnabled { get; private set; }
     
     private ServerGameManager _server; // server-side only
     private ClientBoardCache _board; // client-side only
@@ -66,6 +65,14 @@ public class ClientManager : NetworkBehaviour
 
         Debug.Log($"Instantiated client manager at {name}.");
     }
+
+    public void SetTraceLoggingEnabled(NetworkBool enabled)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        TraceLogsEnabled = enabled;
+    }
     
     public override void Spawned()
     {
@@ -83,7 +90,7 @@ public class ClientManager : NetworkBehaviour
         _inputHandler = context.InputHandler;
 
         // Rig cached -> tell the server we're ready. The server replies with init + the full board once it exists.
-        Debug.Log($"{ReadyLogPrefix} Sending RPC_ClientReady from {name}.");
+        GameTraceLogger.Handshake(TraceLogsEnabled, $"Sending RPC_ClientReady from {name}.");
         RPC_ClientReady();
     }
     
@@ -116,7 +123,7 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_ClientReady()
     {
-        Debug.Log($"{ReadyLogPrefix} Server received RPC_ClientReady from {name} (P{PlayerId}).");
+        GameTraceLogger.Handshake(TraceLogsEnabled, $"Server received RPC_ClientReady from {name} (P{PlayerId}).");
 
         if (!_server)
         {
@@ -130,7 +137,7 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_ClientInitFinished()
     {
-        Debug.Log($"{ReadyLogPrefix} Server received RPC_ClientInitFinished from {name} (P{PlayerId}).");
+        GameTraceLogger.Handshake(TraceLogsEnabled, $"Server received RPC_ClientInitFinished from {name} (P{PlayerId}).");
 
         if (!HasStateAuthority)
         {
@@ -151,6 +158,8 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_RequestMove(Vector2Int cell, MoveIntent intent = MoveIntent.MoveSoldier)
     {
+        GameTraceLogger.Move(TraceLogsEnabled, $"RPC_RequestMove from {name}: intent={intent}, cell={cell}.");
+
         if (!HasStateAuthority)
         {
             Debug.LogError("[ClientManager] RPC_RequestMove on a non-authoritative peer.");
@@ -173,7 +182,7 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_InitialiseClient(byte playerId, short width, short height)
     {
-        Debug.Log($"{RpcLogPrefix} RPC_InitialiseClient for {name} (P{playerId}) {width}x{height}.");
+        GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_InitialiseClient for {name} (P{playerId}) {width}x{height}.");
 
         if (_clientReady || _bootstrapConfigured)
         {
@@ -212,7 +221,7 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_ApplyDiffs(CellDiff[] diffs, int count, NetworkBool isFinalChunk)
     {
-        Debug.Log($"{RpcLogPrefix} RPC_ApplyDiffs for {name} count={count}, final={isFinalChunk}.");
+        GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_ApplyDiffs for {name} count={count}, final={isFinalChunk}.");
 
         if (!HasInputAuthority)
         {
@@ -249,7 +258,7 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_SetTurnState(NetworkBool isMyTurn, int remainingBudget)
     {
-        Debug.Log($"{RpcLogPrefix} RPC_SetTurnState for {name} isMyTurn={isMyTurn}, remainingBudget={remainingBudget}.");
+        GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_SetTurnState for {name} isMyTurn={isMyTurn}, remainingBudget={remainingBudget}.");
 
         if (!HasInputAuthority)
         {
@@ -274,7 +283,7 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_InitialisePlayerActions(PlayerActionData[] playerActions, int count)
     {
-        Debug.Log($"{RpcLogPrefix} RPC_InitialisePlayerActions for {name} count={count}.");
+        GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_InitialisePlayerActions for {name} count={count}.");
 
         // Seeds the local mirror with the authoritative PlayerActionData snapshot for all players.
         if (!HasInputAuthority)
@@ -306,7 +315,7 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_CurrentPlayingPlayerChanged(PlayerActionData currentPlayingPlayer)
     {
-        Debug.Log($"{RpcLogPrefix} RPC_CurrentPlayingPlayerChanged for {name} playerId={currentPlayingPlayer.PlayerId}.");
+        GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_CurrentPlayingPlayerChanged for {name} playerId={currentPlayingPlayer.PlayerId}.");
 
         // Applies authoritative "current active player" updates during the active turn.
         if (!HasInputAuthority)
@@ -323,7 +332,7 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_TurnChanged(PlayerActionData upcomingPlayer)
     {
-        Debug.Log($"{RpcLogPrefix} RPC_TurnChanged for {name} upcomingPlayerId={upcomingPlayer.PlayerId}.");
+        GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_TurnChanged for {name} upcomingPlayerId={upcomingPlayer.PlayerId}.");
 
         // Applies authoritative "next player turn started" updates at end-turn transition.
         if (!HasInputAuthority)
@@ -339,7 +348,10 @@ public class ClientManager : NetworkBehaviour
     #endregion
 
     private void OnRequestSubmitted(MoveRequest request)
-        => RPC_RequestMove(request.Cell, request.Intent);
+    {
+        GameTraceLogger.Move(TraceLogsEnabled, $"Local request submitted from {name}: intent={request.Intent}, cell={request.Cell}.");
+        RPC_RequestMove(request.Cell, request.Intent);
+    }
     private void OnBoardChanged(IReadOnlyList<CellDiff> _)
         => _actions.OnBoardChanged(); // renderer subscribes to _board.Changed itself
     private void OnHighlightsInvalidated()
@@ -370,7 +382,7 @@ public class ClientManager : NetworkBehaviour
         if (!_initFinishedHandshakeSent && HasInputAuthority)
         {
             _initFinishedHandshakeSent = true;
-            Debug.Log($"{ReadyLogPrefix} Sending RPC_ClientInitFinished from {name}.");
+            GameTraceLogger.Handshake(TraceLogsEnabled, $"Sending RPC_ClientInitFinished from {name}.");
             RPC_ClientInitFinished();
         }
     }

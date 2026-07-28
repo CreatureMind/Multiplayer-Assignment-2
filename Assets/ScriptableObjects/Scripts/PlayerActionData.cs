@@ -21,6 +21,7 @@ public struct PlayerActionData : INetworkStruct
     public void UpdateMaxActionAmountPerTurn(int amountToAdd)
     {
         MaxActionAmountPerTurn += amountToAdd;
+        CurrentActionAmount += amountToAdd;
     }
 
     public void UpdateCurrentActionAmount(int amountToReduce)

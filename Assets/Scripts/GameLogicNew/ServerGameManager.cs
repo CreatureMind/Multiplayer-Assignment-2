@@ -7,9 +7,10 @@ using UnityEngine;
 
 public sealed class ServerGameManager : NetworkBehaviour
 {
-    private const string HandshakeLogPrefix = "<color=#4DD0E1>[ClientHandshake]</color>";
+    public static ServerGameManager Instance { get; private set; }
 
     [SerializeField] private GameDataSO data;
+    [SerializeField] private bool _traceLogsEnabledAtStart = true;
     private BoardManager _boardManagerInstance;
     private BoardDiffBroadcaster _boardDiffBroadcaster;
     private TurnManager _turnManagerInstance;
@@ -20,11 +21,37 @@ public sealed class ServerGameManager : NetworkBehaviour
     private bool _TurnManagerSpawned;
     private bool _ClientManagerSpawned;
     private NetworkBool _initRequested;
+    [Networked] public NetworkBool TraceLogsEnabled { get; private set; }
     private int _currentPlayerCount;
     private readonly HashSet<byte> _readyClientIds = new HashSet<byte>();
     private readonly HashSet<byte> _initialisedClientIds = new HashSet<byte>();
     private readonly HashSet<byte> _diffHandshakeClientIds = new HashSet<byte>();
     private readonly HashSet<byte> _loggedSkippedLiveDiffClientIds = new HashSet<byte>();
+
+    public override void Spawned()
+    {
+        if (Instance != null && Instance != this)
+            return;
+
+        Instance = this;
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if ((bool)TraceLogsEnabled != _traceLogsEnabledAtStart)
+            TraceLogsEnabled = _traceLogsEnabledAtStart;
+
+        SyncTraceLoggingToManagers();
+    }
 
     public void RequestInstantiation()
     {
@@ -45,6 +72,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         if (!HasStateAuthority) return;
         _initRequested = true;
+        TraceLogsEnabled = _traceLogsEnabledAtStart;
         _readyClientIds.Clear();
         _initialisedClientIds.Clear();
         _diffHandshakeClientIds.Clear();
@@ -115,6 +143,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         }
 
         _turnDiffBroadcaster = new TurnDiffBroadcaster(_turnManagerInstance, _clientManagers);
+        _turnManagerInstance.SetTraceLoggingEnabled(TraceLogsEnabled);
         _turnManagerInstance.InstantiateTurnManager(_clientManagers, data.TurnStats, _turnDiffBroadcaster);
         _TurnManagerSpawned = true;
         
@@ -163,6 +192,7 @@ public sealed class ServerGameManager : NetworkBehaviour
             }
 
             clientManager.InstantiateClientManager(this, (byte)player.PlayerId);
+            clientManager.SetTraceLoggingEnabled(TraceLogsEnabled);
             _clientManagers.Add(clientManager);
 
             Debug.Log($"Spawned Client Manager for {player.PlayerId}...");
@@ -209,6 +239,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         }
 
         _boardManagerSpawned = true;
+        _boardManagerInstance.SetTraceLoggingEnabled(TraceLogsEnabled);
         
         
         _boardManagerInstance.InitializeBoardWithMadeMap_ServerOnly(data.StartingPosition);
@@ -257,41 +288,74 @@ public sealed class ServerGameManager : NetworkBehaviour
 
     public void HandleMoveRequest(ClientManager clientManager, Vector2Int cell, MoveIntent intent)
     {
-        Debug.Log("Attempting to execute move request...");
+        GameTraceLogger.Move(TraceLogsEnabled, $"HandleMoveRequest start player={clientManager?.PlayerId.ToString() ?? "null"}, intent={intent}, cell={cell}.");
         
-        if (!HasStateAuthority) return;
+        if (!HasStateAuthority)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, "HandleMoveRequest aborted: no state authority.");
+            return;
+        }
 
         if (HandleMoveRequestCheckAndUpdate(clientManager, cell, intent))
         {
-            Debug.Log("Executed move request.");
+            GameTraceLogger.Move(TraceLogsEnabled, $"HandleMoveRequest success player={clientManager.PlayerId}, intent={intent}, cell={cell}.");
         }
         else
         {
-            Debug.Log("Failed to execute move request.");
+            GameTraceLogger.Move(TraceLogsEnabled, $"HandleMoveRequest rejected player={clientManager?.PlayerId.ToString() ?? "null"}, intent={intent}, cell={cell}.");
         }
     }
 
     private bool HandleMoveRequestCheckAndUpdate(ClientManager clientManager, Vector2Int cell, MoveIntent intent)
     {
-        if (!HasStateAuthority) return false;
+        if (!HasStateAuthority)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, "Rejected move: no state authority.");
+            return false;
+        }
 
-        if (!_boardManagerInstance) return false;   
+        if (!clientManager)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, "Rejected move: client manager was null.");
+            return false;
+        }
+
+        if (!_boardManagerInstance)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Rejected move P{clientManager.PlayerId}: board manager missing.");
+            return false;
+        }
         
-        if (!_turnManagerInstance) return false;
+        if (!_turnManagerInstance)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Rejected move P{clientManager.PlayerId}: turn manager missing.");
+            return false;
+        }
 
         // check turnManager first cause it's cheaper that the DFS checks in boardManager
-        if (!_turnManagerInstance.ValidatePlayerTurn(clientManager.PlayerId)) return false;
+        var isValidTurn = _turnManagerInstance.ValidatePlayerTurn(clientManager.PlayerId);
+        GameTraceLogger.Move(TraceLogsEnabled, $"Turn validation P{clientManager.PlayerId}: {isValidTurn}.");
+        if (!isValidTurn)
+            return false;
 
         if (intent == MoveIntent.Pass)  // pass intent is always valid, no need to check board state
         {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Pass intent accepted for P{clientManager.PlayerId}; ending turn.");
             HandlePassIntent(clientManager);
             return true;
         }
 
-        if (!_turnManagerInstance.ValidatePlayerIntent(clientManager.PlayerId, intent)) return false;
+        var hasResourcesForIntent = _turnManagerInstance.ValidatePlayerIntent(clientManager.PlayerId, intent);
+        GameTraceLogger.Move(TraceLogsEnabled, $"Intent validation P{clientManager.PlayerId}, intent={intent}: {hasResourcesForIntent}.");
+        if (!hasResourcesForIntent)
+            return false;
 
-        if (!_boardManagerInstance.ValidateBoardChange(cell, clientManager.PlayerId, intent)) return false;
+        var boardValidationPassed = _boardManagerInstance.ValidateBoardChange(cell, clientManager.PlayerId, intent);
+        GameTraceLogger.Move(TraceLogsEnabled, $"Board validation P{clientManager.PlayerId}, intent={intent}, cell={cell}: {boardValidationPassed}.");
+        if (!boardValidationPassed)
+            return false;
         
+        GameTraceLogger.Move(TraceLogsEnabled, $"Applying board mutation for P{clientManager.PlayerId}, intent={intent}, cell={cell}.");
         _boardManagerInstance.SetTileServerOnly(cell, clientManager.PlayerId, intent);
 
         var changedCells = new List<Vector2Int>();
@@ -313,19 +377,30 @@ public sealed class ServerGameManager : NetworkBehaviour
                 actionResult = _turnManagerInstance.PlayerBuiltBase(clientManager.PlayerId);
                 break;
         }
+        GameTraceLogger.Move(TraceLogsEnabled, $"Turn action result for P{clientManager.PlayerId}, intent={intent}: {actionResult}.");
 
         var changedBases = _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState();
+        GameTraceLogger.Move(TraceLogsEnabled, $"Conquered base updates after move: {changedBases.Count}.");
         foreach (var baseBottomLeft in changedBases)
         {
             AddBaseCells(baseBottomLeft, changedCells);
             var ownerId = _boardManagerInstance.GetTileOwnerByIndex(baseBottomLeft);
+            GameTraceLogger.Move(TraceLogsEnabled, $"Applying base gain for owner P{ownerId} at {baseBottomLeft}.");
             _turnManagerInstance.PlayerBuiltBase(ownerId);
         }
 
+        GameTraceLogger.Move(TraceLogsEnabled, $"Broadcasting {changedCells.Count} changed cells.");
         _boardDiffBroadcaster?.Broadcast(changedCells);
 
         if (intent == MoveIntent.BuildBase || actionResult == ActionResult.SuccessAndTurnEnded)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Ending turn for P{clientManager.PlayerId}. reason={(intent == MoveIntent.BuildBase ? "BuildBase intent" : "ActionResult.SuccessAndTurnEnded")}.");
             _turnManagerInstance.EndPlayerTurn(clientManager.PlayerId);
+        }
+        else
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Turn remains with P{clientManager.PlayerId} after intent={intent}.");
+        }
         
         return true;
     }
@@ -333,6 +408,7 @@ public sealed class ServerGameManager : NetworkBehaviour
     private void HandlePassIntent(ClientManager clientManager)
     {
         if (!HasStateAuthority || !_turnManagerInstance) return;
+        GameTraceLogger.Move(TraceLogsEnabled, $"HandlePassIntent ending turn for P{clientManager.PlayerId}.");
         _turnManagerInstance.EndPlayerTurn(clientManager.PlayerId);
     }
 
@@ -342,7 +418,7 @@ public sealed class ServerGameManager : NetworkBehaviour
             return;
 
         _readyClientIds.Add(clientManager.PlayerId);
-        Debug.Log($"{HandshakeLogPrefix} Server accepted readiness for P{clientManager.PlayerId}.");
+        GameTraceLogger.Handshake(TraceLogsEnabled, $"Server accepted readiness for P{clientManager.PlayerId}.");
         TryInitialiseReadyClient(clientManager);
     }
 
@@ -353,14 +429,14 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         if (!_initialisedClientIds.Contains(clientManager.PlayerId))
         {
-            Debug.LogWarning($"{HandshakeLogPrefix} Ignoring RPC_ClientInitFinished from P{clientManager.PlayerId} before init was sent.");
+            Debug.LogWarning($"[ServerGameManager] Ignoring RPC_ClientInitFinished from P{clientManager.PlayerId} before init was sent.");
             return;
         }
 
         if (_diffHandshakeClientIds.Add(clientManager.PlayerId))
         {
             _loggedSkippedLiveDiffClientIds.Remove(clientManager.PlayerId);
-            Debug.Log($"{HandshakeLogPrefix} Server marked P{clientManager.PlayerId} as live-diff enabled.");
+            GameTraceLogger.Handshake(TraceLogsEnabled, $"Server marked P{clientManager.PlayerId} as live-diff enabled.");
         }
     }
 
@@ -398,30 +474,45 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         var playerId = clientManager.PlayerId;
         if (_loggedSkippedLiveDiffClientIds.Add(playerId))
-            Debug.LogWarning($"{HandshakeLogPrefix} Skipping live diff broadcast for P{playerId} until RPC_ClientInitFinished arrives.");
+            GameTraceLogger.Handshake(TraceLogsEnabled, $"Skipping live diff broadcast for P{playerId} until RPC_ClientInitFinished arrives.");
     }
 
-    private static void AddBaseCells(Vector2Int bottomLeft, List<Vector2Int> changedCells)
+    private void SyncTraceLoggingToManagers()
     {
-        Debug.Log($"Attempting to add base cells for base at ({bottomLeft.x}, {bottomLeft.y})");
+        if (_boardManagerInstance && _boardManagerInstance.TraceLogsEnabled != TraceLogsEnabled)
+            _boardManagerInstance.SetTraceLoggingEnabled(TraceLogsEnabled);
+
+        if (_turnManagerInstance && _turnManagerInstance.TraceLogsEnabled != TraceLogsEnabled)
+            _turnManagerInstance.SetTraceLoggingEnabled(TraceLogsEnabled);
+
+        foreach (var clientManager in _clientManagers)
+        {
+            if (clientManager && clientManager.TraceLogsEnabled != TraceLogsEnabled)
+                clientManager.SetTraceLoggingEnabled(TraceLogsEnabled);
+        }
+    }
+
+    private void AddBaseCells(Vector2Int bottomLeft, List<Vector2Int> changedCells)
+    {
+        GameTraceLogger.Move(TraceLogsEnabled, $"Adding base cells from bottom-left {bottomLeft}.");
         
         changedCells.Add(bottomLeft);
         changedCells.Add(new Vector2Int(bottomLeft.x + 1, bottomLeft.y));
         changedCells.Add(new Vector2Int(bottomLeft.x, bottomLeft.y + 1));
         changedCells.Add(new Vector2Int(bottomLeft.x + 1, bottomLeft.y + 1));
 
-        Debug.Log("Added base cells.");
+        GameTraceLogger.Move(TraceLogsEnabled, "Added base cells.");
     }
 
-    private static void AddBuildBaseCoreCells(Vector2Int buildWindowOrigin, List<Vector2Int> changedCells)
+    private void AddBuildBaseCoreCells(Vector2Int buildWindowOrigin, List<Vector2Int> changedCells)
     {
-        Debug.Log($"Attempting to add base cells for base at ({buildWindowOrigin.x}, {buildWindowOrigin.y})");
+        GameTraceLogger.Move(TraceLogsEnabled, $"Adding build-base core cells from origin {buildWindowOrigin}.");
         
         changedCells.Add(new Vector2Int(buildWindowOrigin.x + 1, buildWindowOrigin.y + 1));
         changedCells.Add(new Vector2Int(buildWindowOrigin.x + 2, buildWindowOrigin.y + 1));
         changedCells.Add(new Vector2Int(buildWindowOrigin.x + 1, buildWindowOrigin.y + 2));
         changedCells.Add(new Vector2Int(buildWindowOrigin.x + 2, buildWindowOrigin.y + 2));
         
-        Debug.Log("Added motherload cells.");
+        GameTraceLogger.Move(TraceLogsEnabled, "Added motherload cells.");
     }
 }

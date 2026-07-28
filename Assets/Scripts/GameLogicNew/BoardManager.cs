@@ -14,6 +14,7 @@ public class BoardManager : NetworkBehaviour
 
     [Networked] public int Width { get; private set; }
     [Networked] public int Height { get; private set; }
+    [Networked] public NetworkBool TraceLogsEnabled { get; private set; }
     [Networked, Capacity(MaxBoardTiles)] private NetworkArray<TileState> Tiles => default;
 
     private Dictionary<Vector2Int, List<Vector2Int>> _baseCache = new();
@@ -89,6 +90,14 @@ public class BoardManager : NetworkBehaviour
             Instance = null;
     }
 
+    public void SetTraceLoggingEnabled(NetworkBool enabled)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        TraceLogsEnabled = enabled;
+    }
+
     public void InitializeBoardWithMadeMap_ServerOnly(StartingPositionSO startingPosition)
     {
         // size 
@@ -159,6 +168,7 @@ public class BoardManager : NetworkBehaviour
     
     public HashSet<Vector2Int> CheckForConqueredBasesAndUpdateBoardState()
     {
+        GameTraceLogger.Board(TraceLogsEnabled, $"Checking conquered bases. Cached bases={_baseCache.Count}.");
         var updatedBottomLeftKeys = new HashSet<Vector2Int>();
         var keysToRefreshInCache = new List<Vector2Int>();
 
@@ -237,6 +247,7 @@ public class BoardManager : NetworkBehaviour
             if (!wasUpdated)
                 continue;
 
+            GameTraceLogger.Board(TraceLogsEnabled, $"Conquered base ownership updated for base at {bottomLeft} to owner {surroundingOwnerId}.");
             updatedBottomLeftKeys.Add(bottomLeft);
             keysToRefreshInCache.Add(bottomLeft);
         }
@@ -278,15 +289,29 @@ public class BoardManager : NetworkBehaviour
 
     public bool ValidateBoardChange(Vector2Int gridPosition, int playerId , MoveIntent intent)
     {
+        GameTraceLogger.Board(TraceLogsEnabled, $"ValidateBoardChange player={playerId}, intent={intent}, cell={gridPosition}.");
         switch (intent)
         {
             case MoveIntent.MoveSoldier:
-                return PawnCheck(gridPosition, playerId);
+            {
+                var result = PawnCheck(gridPosition, playerId);
+                GameTraceLogger.Board(TraceLogsEnabled, $"PawnCheck result for player={playerId}, cell={gridPosition}: {result}.");
+                return result;
+            }
             case MoveIntent.PlaceBomb:
-                return BombCheck(gridPosition, playerId);
+            {
+                var result = BombCheck(gridPosition, playerId);
+                GameTraceLogger.Board(TraceLogsEnabled, $"BombCheck result for player={playerId}, cell={gridPosition}: {result}.");
+                return result;
+            }
             case MoveIntent.BuildBase:
-                return BaseCheck(gridPosition, playerId);
+            {
+                var result = BaseCheck(gridPosition, playerId);
+                GameTraceLogger.Board(TraceLogsEnabled, $"BaseCheck result for player={playerId}, cell={gridPosition}: {result}.");
+                return result;
+            }
             default:
+                GameTraceLogger.Board(TraceLogsEnabled, $"ValidateBoardChange rejected unknown intent {intent}.");
                 return false;
         }
     }
@@ -312,6 +337,7 @@ public class BoardManager : NetworkBehaviour
 
     public void SetTileServerOnly(Vector2Int gridPosition, int playerId, MoveIntent intent)
     {
+        GameTraceLogger.Board(TraceLogsEnabled, $"SetTileServerOnly player={playerId}, intent={intent}, cell={gridPosition}.");
         switch (intent)
         {
             case MoveIntent.MoveSoldier:
@@ -330,6 +356,7 @@ public class BoardManager : NetworkBehaviour
 
     private void SetBase(Vector2Int gridPosition, int playerId)
     {
+        GameTraceLogger.Board(TraceLogsEnabled, $"SetBase start player={playerId}, buildOrigin={gridPosition}.");
         for (var y = gridPosition.y + 1; y <= gridPosition.y + 2; y++)
         {
             for (var x = gridPosition.x + 1; x <= gridPosition.x + 2; x++)
@@ -345,6 +372,7 @@ public class BoardManager : NetworkBehaviour
         }
         
         // TODO
+        GameTraceLogger.Board(TraceLogsEnabled, $"SetBase completed player={playerId}, buildOrigin={gridPosition}.");
         
     }
 
@@ -354,6 +382,7 @@ public class BoardManager : NetworkBehaviour
         // Writes authoritative Bomb state so board diffs carry the actual mutation.
         var updatedTile = TileState.Bomb((byte)playerId);
         Tiles.Set(index, updatedTile);
+        GameTraceLogger.Board(TraceLogsEnabled, $"SetBomb applied player={playerId}, cell={gridPosition}.");
         
         // broadcast diff
     }
@@ -364,6 +393,7 @@ public class BoardManager : NetworkBehaviour
         // Writes authoritative Soldier state so board diffs carry the actual mutation.
         var updatedTile = TileState.Soldier((byte)playerId);
         Tiles.Set(index, updatedTile);
+        GameTraceLogger.Board(TraceLogsEnabled, $"SetPawn applied player={playerId}, cell={gridPosition}.");
         
         // broadcast diff 
     }

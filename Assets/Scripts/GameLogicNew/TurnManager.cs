@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 public class TurnManager : NetworkBehaviour
 {
     public static TurnManager Instance;
+    [Networked] public NetworkBool TraceLogsEnabled { get; private set; }
     private TurnStatsSO _turnStats;
     private List<ClientManager> _clientManagers = new List<ClientManager>();
     // Authoritative transport for turn/action diffs via per-client input-authority RPCs.
@@ -46,7 +47,7 @@ public class TurnManager : NetworkBehaviour
     {
         if (!_isInstantiated || _clientManagers.Count == 0)
             return;
-        Debug.Log($"Turn changed to player: {_clientManagers[CurrentTurnIndex].PlayerId}");
+        GameTraceLogger.Turn(TraceLogsEnabled, $"Turn changed to player {_clientManagers[CurrentTurnIndex].PlayerId} (index={CurrentTurnIndex}).");
     }
 
     #region Lifetime Methods
@@ -76,6 +77,7 @@ public class TurnManager : NetworkBehaviour
         }
         
         Debug.Log($"Instantiated turn manager with {clientManagers.Count} players.");
+        GameTraceLogger.Turn(TraceLogsEnabled, $"Turn manager instantiated with {clientManagers.Count} clients.");
 
         RandomizeTurnOrder();
         _isInstantiated = true;
@@ -88,6 +90,15 @@ public class TurnManager : NetworkBehaviour
     private void RandomizeTurnOrder()
     {
         CurrentTurnIndex = Random.Range(0, _clientManagers.Count);
+        GameTraceLogger.Turn(TraceLogsEnabled, $"Randomized starting turn index to {CurrentTurnIndex}.");
+    }
+
+    public void SetTraceLoggingEnabled(NetworkBool enabled)
+    {
+        if (!HasStateAuthority)
+            return;
+
+        TraceLogsEnabled = enabled;
     }
 
     #endregion
@@ -98,24 +109,40 @@ public class TurnManager : NetworkBehaviour
     public bool ValidatePlayerTurn(int playerId)
     {
         var playerIndex = _clientManagers.FindIndex(cm => cm.PlayerId == playerId);
-        return playerIndex == CurrentTurnIndex;
+        var isValid = playerIndex == CurrentTurnIndex;
+        GameTraceLogger.Turn(TraceLogsEnabled, $"ValidatePlayerTurn player={playerId}, playerIndex={playerIndex}, currentTurnIndex={CurrentTurnIndex}, result={isValid}.");
+        return isValid;
     }
 
     public bool ValidatePlayerIntent(int playerId, MoveIntent intent)
     {
+        GameTraceLogger.Turn(TraceLogsEnabled, $"ValidatePlayerIntent player={playerId}, intent={intent}.");
         switch (intent)
         {
             case MoveIntent.MoveSoldier:                // Handle move soldier intent
-                return CanPlayerPlacePawn(playerId);
-            
+            {
+                var result = CanPlayerPlacePawn(playerId);
+                GameTraceLogger.Turn(TraceLogsEnabled, $"ValidatePlayerIntent result for MoveSoldier and player={playerId}: {result}.");
+                return result;
+            }
+             
             case MoveIntent.PlaceBomb:                  // Handle place bomb intent
-                return CanPlayerPlaceBomb(playerId);
-            
+            {
+                var result = CanPlayerPlaceBomb(playerId);
+                GameTraceLogger.Turn(TraceLogsEnabled, $"ValidatePlayerIntent result for PlaceBomb and player={playerId}: {result}.");
+                return result;
+            }
+             
             case MoveIntent.BuildBase:                  // Handle build base intent
-                return CanPlayerBuildBase(playerId);
-            
+            {
+                var result = CanPlayerBuildBase(playerId);
+                GameTraceLogger.Turn(TraceLogsEnabled, $"ValidatePlayerIntent result for BuildBase and player={playerId}: {result}.");
+                return result;
+            }
+             
             default:
                 Debug.LogWarning("Unknown move intent.");
+                GameTraceLogger.Turn(TraceLogsEnabled, $"ValidatePlayerIntent failed: unknown intent {intent} for player={playerId}.");
                 return false;
         }
     }
@@ -130,6 +157,7 @@ public class TurnManager : NetworkBehaviour
             }
         }
 
+        GameTraceLogger.Turn(TraceLogsEnabled, $"CanPlayerBuildBase failed: player {playerId} not found.");
         return false;
     }
 
@@ -142,6 +170,8 @@ public class TurnManager : NetworkBehaviour
                 return PlayerActions[i].HasEnoughToPlacePawn(_turnStats.PawnActionPrice);
             }
         }
+
+        GameTraceLogger.Turn(TraceLogsEnabled, $"CanPlayerPlacePawn failed: player {playerId} not found.");
         return false;
     }
 
@@ -154,6 +184,8 @@ public class TurnManager : NetworkBehaviour
                 return PlayerActions[i].HasEnoughToPlaceBomb(_turnStats.BombActionPrice);
             }
         }
+
+        GameTraceLogger.Turn(TraceLogsEnabled, $"CanPlayerPlaceBomb failed: player {playerId} not found.");
         return false;
     }
 
@@ -165,15 +197,21 @@ public class TurnManager : NetworkBehaviour
 
     public ActionResult PlayerPlacedPawn(int playerId)
     {
-        if (!HasStateAuthority) return ActionResult.NotStateAuthority;
+        if (!HasStateAuthority)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"PlayerPlacedPawn rejected for player={playerId}: no state authority.");
+            return ActionResult.NotStateAuthority;
+        }
 
         for (var i = 0; i < _clientManagers.Count; i++)
         {
             if (PlayerActions[i].PlayerId != playerId) continue;
             
             var pad = PlayerActions[i];
+            var previousBudget = pad.CurrentActionAmount;
             pad.UpdateCurrentActionAmount(_turnStats.PawnActionPrice);
             PlayerActions.Set(i, pad);
+            GameTraceLogger.Turn(TraceLogsEnabled, $"PlayerPlacedPawn applied for player={playerId}: budget {previousBudget}->{pad.CurrentActionAmount}.");
             // Mirrors updated active-player budget immediately after successful pawn placement.
             if (IsCurrentTurnPlayer(pad.PlayerId))
                 _turnDiffBroadcaster?.BroadcastCurrentPlayingPlayer(pad);
@@ -191,15 +229,21 @@ public class TurnManager : NetworkBehaviour
 
     public ActionResult PlayerBuiltBase(int playerId)
     {
-        if (!HasStateAuthority) return ActionResult.NotStateAuthority;
+        if (!HasStateAuthority)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"PlayerBuiltBase rejected for player={playerId}: no state authority.");
+            return ActionResult.NotStateAuthority;
+        }
 
         for (var i = 0; i < _clientManagers.Count; i++)
         {
             if (PlayerActions[i].PlayerId != playerId) continue;
             
             var pad = PlayerActions[i];
+            var previousMax = pad.MaxActionAmountPerTurn;
             pad.UpdateMaxActionAmountPerTurn(_turnStats.ActionGainPerBase);
             PlayerActions.Set(i, pad);
+            GameTraceLogger.Turn(TraceLogsEnabled, $"PlayerBuiltBase applied for player={playerId}: max budget {previousMax}->{pad.MaxActionAmountPerTurn}.");
             
             // Mirrors base gain adjustments (max/remaining actions) from authoritative state.
             if (IsCurrentTurnPlayer(pad.PlayerId))
@@ -218,15 +262,21 @@ public class TurnManager : NetworkBehaviour
 
     public ActionResult PlayerPlacedBomb(int playerId)
     {
-        if (!HasStateAuthority) return ActionResult.NotStateAuthority;
+        if (!HasStateAuthority)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"PlayerPlacedBomb rejected for player={playerId}: no state authority.");
+            return ActionResult.NotStateAuthority;
+        }
 
         for (int i = 0; i < _clientManagers.Count; i++)
         {
             if (PlayerActions[i].PlayerId == playerId)
             {
                 var pad = PlayerActions[i];
+                var previousBudget = pad.CurrentActionAmount;
                 pad.UpdateCurrentActionAmount(_turnStats.BombActionPrice);
                 PlayerActions.Set(i, pad);
+                GameTraceLogger.Turn(TraceLogsEnabled, $"PlayerPlacedBomb applied for player={playerId}: budget {previousBudget}->{pad.CurrentActionAmount}.");
                 // Mirrors updated active-player budget immediately after successful bomb placement.
                 if (IsCurrentTurnPlayer(pad.PlayerId))
                     _turnDiffBroadcaster?.BroadcastCurrentPlayingPlayer(pad);
@@ -250,15 +300,33 @@ public class TurnManager : NetworkBehaviour
     public void EndPlayerTurn(int playerId)
     {
         // Advances authoritative turn index and broadcasts the newly active player's turn payload.
-        if (!HasStateAuthority) return;
-        if (_clientManagers.Count == 0) return;
-        if (!IsCurrentTurnPlayer(playerId)) return;
+        if (!HasStateAuthority)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"EndPlayerTurn ignored for player={playerId}: no state authority.");
+            return;
+        }
+
+        if (_clientManagers.Count == 0)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"EndPlayerTurn ignored for player={playerId}: no clients.");
+            return;
+        }
+
+        if (!IsCurrentTurnPlayer(playerId))
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"EndPlayerTurn ignored for player={playerId}: not current turn owner.");
+            return;
+        }
+
+        GameTraceLogger.Turn(TraceLogsEnabled, $"EndPlayerTurn processing for player={playerId}, currentTurnIndex={CurrentTurnIndex}.");
 
         CurrentTurnIndex++;
 
         var pad = PlayerActions[CurrentTurnIndex];
+        var previousBudget = pad.CurrentActionAmount;
         pad.ResetCurrentActionAmount();
         PlayerActions.Set(CurrentTurnIndex, pad);
+        GameTraceLogger.Turn(TraceLogsEnabled, $"Turn advanced to player={pad.PlayerId}, index={CurrentTurnIndex}, budget reset {previousBudget}->{pad.CurrentActionAmount}.");
 
         _turnDiffBroadcaster?.BroadcastTurnChanged(pad);
         OnTurnChanged?.Invoke();
@@ -290,6 +358,7 @@ public class TurnManager : NetworkBehaviour
         if (!TryGetCurrentPlayerActionData(out var currentPlayingPlayer))
             return;
 
+        GameTraceLogger.Turn(TraceLogsEnabled, $"SyncClientTurnState -> client P{clientManager.PlayerId}, current player P{currentPlayingPlayer.PlayerId}.");
         _turnDiffBroadcaster?.SendInstantiationToClient(clientManager, GetPlayerActionsSnapshot(), currentPlayingPlayer);
     }
 
