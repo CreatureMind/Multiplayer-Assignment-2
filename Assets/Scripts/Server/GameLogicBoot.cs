@@ -26,7 +26,7 @@ public class GameLogicBoot : MonoBehaviour//, INetworkRunnerCallbacks
             Debug.LogError($"[GameLogicBoot] Couldn't find NetworkRunner component.");
         }
 
-        if (_runner.IsServer) // so i do this
+        if (!_runner.IsServer) // so i do this
         {
             Destroy(gameObject);
             Destroy(gameObject);
