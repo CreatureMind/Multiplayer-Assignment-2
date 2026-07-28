@@ -19,6 +19,19 @@ namespace Events
         public int TotalPlayers;
     }
 
+    // Server-driven room list (replaces SessionDataRefreshedEvent as the lobby data source).
+    public struct RoomListChangedEvent
+    {
+        public List<RoomInfo> Rooms;
+        public int TotalPlayers;
+    }
+
+    // Raised on the requesting client when the server refuses a create/join.
+    public struct RoomJoinRejectedEvent
+    {
+        public string Reason;
+    }
+
     public struct ShowLoadingScreenEvent { }
 
     public struct HideLoadingScreenEvent { }

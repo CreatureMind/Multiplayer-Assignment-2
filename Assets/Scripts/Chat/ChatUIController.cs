@@ -41,6 +41,7 @@ public class ChatUIController : MonoBehaviour
     private void Start()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
+
         _chatScrollView = root.Q<ScrollView>(UI_Chat_View.chat_scroll_view);
         _chatScrollView.Clear();
         _chatTextField = root.Q<TextField>(UI_Chat_View.text_field);
@@ -210,7 +211,11 @@ public class ChatUIController : MonoBehaviour
     
     private string GetLocalPlayerName()
     {
-        var data = NetworkManager.Instance ? NetworkManager.Instance.GetLocalPlayerData() : null;
+        if (!NetworkManager.Instance) return string.Empty;
+        
+        if (!string.IsNullOrEmpty(NetworkManager.Instance.LocalConfirmedName))
+            return NetworkManager.Instance.LocalConfirmedName;
+        var data = NetworkManager.Instance.GetLocalPlayerData();
         return data ? data.DisplayName.ToString() : string.Empty;
     }
     

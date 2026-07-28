@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/UI%20Toolkit/Styles/LobbyStyle.uss?fileID=7433441132597879392&amp;guid=c1ae93633323eed4e9baa1825210ea51&amp;type=3#LobbyStyle"/>
     <ui:VisualElement name="" style="flex-grow: 1; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.4);">
         <ui:VisualElement name="container" style="flex-grow: 1; position: absolute;">
-            <ui:Image source="project://database/Assets/Art/2D/UI/Loading/Loading.png?fileID=2800000&amp;guid=47ae825ab7a93184d89d567616a490e6&amp;type=3#Loading" scale-mode="ScaleToFit" name="loading-spinner" style="transition-property: rotate; transition-duration: 472s; opacity: 1;"/>
+            <ui:Image source="project://database/Assets/Art/2D/UI/Loading/Loading.png?fileID=2800000&amp;guid=47ae825ab7a93184d89d567616a490e6&amp;type=3#Loading" scale-mode="ScaleToFit" name="loading-spinner" style="opacity: 1;"/>
             <ui:Label text="Loading..." name="loading-text" class="Lable" style="align-self: auto; -unity-font-style: italic; -unity-text-align: middle-center; font-size: 50px; color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&amp;guid=19184939772a7974a86fbd3229349203&amp;type=3#Geometos&quot;);"/>
         </ui:VisualElement>
     </ui:VisualElement>

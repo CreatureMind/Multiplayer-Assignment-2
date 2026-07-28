@@ -105,6 +105,24 @@ public class MatrixPawnRain : MonoBehaviour
 
     private float _left, _right, _top, _bottom;
     private Transform _poolRoot;
+    
+    [Header("Focus Handling")]
+    [Tooltip("If true, the effect fully pauses while the app/tab is unfocused. If false (default), it keeps running in real time and resolves any missed steps instantly in a single frame the moment it's visible again, instead of visibly rushing to catch up.")]
+    [SerializeField] private bool pauseWhenUnfocused = false;
+    [Tooltip("Upper bound, in seconds, on how much elapsed time a single frame will bother catching up on. Only matters for extreme gaps (e.g. a tab left hidden for hours) — prevents an unbounded backlog, at the cost of slight real-time inaccuracy only in that edge case.")]
+    [SerializeField] private float maxCatchUpSeconds = 3600f;
+
+    private bool _isFocused = true;
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        _isFocused = hasFocus;
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        _isFocused = !pauseStatus;
+    }
 
     private void Awake()
     {
@@ -170,7 +188,10 @@ public class MatrixPawnRain : MonoBehaviour
 
     private void Update()
     {
+        if (pauseWhenUnfocused && !_isFocused) return;
+
         float dt = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+        dt = Mathf.Min(dt, maxCatchUpSeconds);
 
         TickSpawning(dt);
         TickActiveStripes(dt);
@@ -180,13 +201,13 @@ public class MatrixPawnRain : MonoBehaviour
     {
         for (int c = 0; c < _columnCount; c++)
         {
-            if (_columnActiveCount[c] >= maxActiveStripesPerColumn) continue;
-
             _columnSpawnTimer[c] -= dt;
-            if (_columnSpawnTimer[c] > 0f) continue;
 
-            TrySpawnStripe(c);
-            _columnSpawnTimer[c] = Random.Range(minSpawnDelay, maxSpawnDelay);
+            while (_columnSpawnTimer[c] <= 0f && _columnActiveCount[c] < maxActiveStripesPerColumn)
+            {
+                TrySpawnStripe(c);
+                _columnSpawnTimer[c] += Random.Range(minSpawnDelay, maxSpawnDelay);
+            }
         }
     }
 
@@ -234,18 +255,18 @@ public class MatrixPawnRain : MonoBehaviour
             Stripe stripe = _activeStripes[i];
             stripe.timer += dt;
 
-            float progress = Mathf.Clamp01(stripe.timer / stripe.stepInterval);
-
-            if (stripe.timer >= stripe.stepInterval)
+            // Resolve every step this stripe missed in one go, so a large dt (e.g. a WebGL
+            // tab that was hidden and had its rendering throttled) catches up instantly
+            // instead of trickling out one step per subsequent rendered frame.
+            while (stripe.timer >= stripe.stepInterval)
             {
                 stripe.headRow++;
                 stripe.timer -= stripe.stepInterval;
                 stripe.stepInterval = Random.Range(minStepInterval, maxStepInterval);
-                progress = 0f;
-
                 if (recolorChance > 0f) MaybeRecolor(stripe);
             }
 
+            float progress = Mathf.Clamp01(stripe.timer / stripe.stepInterval);
             float easedProgress = snapToGrid ? 0f : stepEaseCurve.Evaluate(progress);
             PositionStripe(stripe, easedProgress);
 

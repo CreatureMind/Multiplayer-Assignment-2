@@ -4,6 +4,7 @@ using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using Angle = UnityEngine.UIElements.Angle;
 
 [RequireComponent(typeof(UIDocument))]
 public class UIManager : MonoBehaviour
@@ -49,7 +50,7 @@ public class UIManager : MonoBehaviour
     private bool _isReturningToLobby = false;
 
     // Caching for client-side filtering
-    private SessionDataRefreshedEvent? _cachedSessionData;
+    private RoomListChangedEvent? _cachedRoomData;
     private DropdownField _roomsDropdown;
     private DropdownField _modesDropdown;
     private DropdownField _mapsDropdown;
@@ -66,10 +67,11 @@ public class UIManager : MonoBehaviour
         
         // Sessions List
         EventBus.Subscribe<JoinedLobbyEvent>(ShowRoomsListView);
-        EventBus.Subscribe<SessionDataRefreshedEvent>(UpdateRoomsList);
-        
+        EventBus.Subscribe<RoomListChangedEvent>(UpdateRoomsList);
+
         // Rooms List
         EventBus.Subscribe<RoomCreatedEvent>(ShowRoomView);
+        EventBus.Subscribe<RoomJoinRejectedEvent>(OnRoomJoinRejected);
         
         // Loading Screen
         EventBus.Subscribe<ShowLoadingScreenEvent>(ShowLoadingScreen);
@@ -93,10 +95,11 @@ public class UIManager : MonoBehaviour
         
         // Sessions List
         EventBus.Unsubscribe<JoinedLobbyEvent>(ShowRoomsListView);
-        EventBus.Unsubscribe<SessionDataRefreshedEvent>(UpdateRoomsList);
-        
+        EventBus.Unsubscribe<RoomListChangedEvent>(UpdateRoomsList);
+
         // Rooms List
         EventBus.Unsubscribe<RoomCreatedEvent>(ShowRoomView);
+        EventBus.Unsubscribe<RoomJoinRejectedEvent>(OnRoomJoinRejected);
         
         // Loading Screen
         EventBus.Unsubscribe<ShowLoadingScreenEvent>(ShowLoadingScreen);
@@ -128,6 +131,7 @@ public class UIManager : MonoBehaviour
     private void StartMatch(MatchStartedEvent e)
     {
         EventBus.Raise(new ShowLoadingScreenEvent());
+        _uiDocument = null;
     }
 
     // commented out for assignment 3
@@ -240,22 +244,10 @@ public class UIManager : MonoBehaviour
 
     private void EnterGlobalLobby()
     {
-        if (!sessionsListData) return;
-        if (sessionsListData.sessionsList.Count == 0) return;
-        
-        if (!_isReturningToLobby)
-        {
-            var session = sessionsListData.sessionsList[0];
-        
-            if (!NetworkManager.Instance) return;
-        
-            _ = NetworkManager.Instance.ConnectToCustomLobby(session.sessionName);
-            _currentLobbyId = session.sessionName;
-        }
-        else
-        {
-            ShowRoomsListView(new JoinedLobbyEvent());
-        }
+        if (!NetworkManager.Instance) return;
+
+        // Connects to the server Lobby Hub (or re-surfaces the cached list if already connected).
+        _ = NetworkManager.Instance.ConnectToCustomLobby();
     }
 
     private void ShowRoomsListView(JoinedLobbyEvent e)
@@ -319,17 +311,19 @@ public class UIManager : MonoBehaviour
         }
     }
     
-    private void UpdateRoomsList(SessionDataRefreshedEvent e)
+    private void UpdateRoomsList(RoomListChangedEvent e)
     {
-        // Cache the session data for client-side filtering
-        _cachedSessionData = e;
+        // Cache the room data for client-side filtering
+        _cachedRoomData = e;
 
         // Apply filters and render
         ApplyRoomFilters();
     }
 
-    private void RenderRoomsList(List<SessionInfo> rooms, int totalPlayers)
+    private void RenderRoomsList(List<RoomInfo> rooms, int totalPlayers)
     {
+        if (_roomsScrollView == null) return;
+
         _roomsScrollView.Clear();
 
         UpdatePlayerCountInLobby(totalPlayers);
@@ -339,28 +333,29 @@ public class UIManager : MonoBehaviour
         foreach (var room in rooms)
         {
             var roomRow = roomRowTemplate.CloneTree();
-            
-            room.Properties.TryGetValue(DisplayName, out var displayName);
-            room.Properties.TryGetValue(ModeName, out var modeName);
-            room.Properties.TryGetValue(MapName, out var mapName);
-            
-            roomRow.tooltip = room.IsOpen ? "Waiting for players" : "Match is in progress";
-            
+
+            var displayName = room.DisplayName.Value;
+            var modeName = room.Mode;
+            var mapName = room.Map;
+            var isOpen = (bool)room.IsOpen;
+
+            roomRow.tooltip = isOpen ? "Waiting for players" : "Match is in progress";
+
             var playIndicator = roomRow.Q<VisualElement>(UI_Room_Row_Template.play_indicator);
-            playIndicator?.EnableInClassList("green", room.IsOpen);
+            playIndicator?.EnableInClassList("green", isOpen);
 
             var roomNameLabel = roomRow.Q<Label>(UI_Room_Row_Template.room_name);                                              //room-name
             if (roomNameLabel != null)
             {
                 roomNameLabel.text = displayName;
             }
-            
+
             var roomModeLabel = roomRow.Q<Label>(UI_Room_Row_Template.room_mode);
             if (roomModeLabel != null)
             {
                 roomModeLabel.text = modeName;
             }
-            
+
             var roomMapLabel = roomRow.Q<Label>(UI_Room_Row_Template.room_map);
             if (roomMapLabel != null)
             {
@@ -370,40 +365,39 @@ public class UIManager : MonoBehaviour
             var enterBtn = roomRow.Q<Button>(UI_Room_Row_Template.enter_button);                                               //enter-button
             if (enterBtn != null)
             {
-                var isFull = room.PlayerCount >= room.MaxPlayers;
-                enterBtn.SetEnabled(!isFull);
-                enterBtn.SetEnabled(room.IsOpen);
-                
+                enterBtn.SetEnabled(isOpen && !room.IsFull);
+
+                var sessionName = room.SessionName;
                 enterBtn.clicked += () =>
                 {
                     if (!NetworkManager.Instance) return;
-                    
+
                     enterBtn.SetEnabled(false);
-                    _ = NetworkManager.Instance.JoinRoom(room.Name);
+                    _ = NetworkManager.Instance.JoinRoom(sessionName);
                     ShowRoomView(displayName, modeName, mapName);
                 };
             }
-            
+
             var playerCountLabel = roomRow.Q<Label>(UI_Room_Row_Template.player_count);                                         //player-count
             if (playerCountLabel != null) playerCountLabel.text = $"{room.PlayerCount}/{room.MaxPlayers}";
-            
+
             _roomsScrollView.Add(roomRow);
         }
     }
     
     private void UpdatePlayerCountInLobby(int totalPlayers)
     {
+        var activePlayers = totalPlayers + NetworkManager.Instance.GetAllPlayerCount();
         var playerCountLabel = _root.Q<Label>(UI_Rooms_List_View.online_label);                                              //online-label
-        if (playerCountLabel != null) playerCountLabel.text = $"Online Players: {totalPlayers}";
+        if (playerCountLabel != null) playerCountLabel.text = $"Online Players: {activePlayers}";
     }
-
-    // Assignment 3
+    
     private void ApplyRoomFilters()
     {
-        if (!_cachedSessionData.HasValue) return;
+        if (!_cachedRoomData.HasValue) return;
 
-        var allRooms = _cachedSessionData.Value.Sessions;
-        var filteredRooms = new List<SessionInfo>();
+        var allRooms = _cachedRoomData.Value.Rooms;
+        var filteredRooms = new List<RoomInfo>();
 
         // Get current dropdown values
         var selectedRoomFilter = _roomsDropdown?.value ?? "All";
@@ -412,14 +406,14 @@ public class UIManager : MonoBehaviour
 
         foreach (var room in allRooms)
         {
-            // Get room properties
-            room.Properties.TryGetValue(ModeName, out var modeName);
-            room.Properties.TryGetValue(MapName, out var mapName);
+            var modeName = room.Mode;
+            var mapName = room.Map;
+            var isOpen = (bool)room.IsOpen;
 
             // Apply filters
             var matchesRoomFilter = selectedRoomFilter == "All" ||
-                                    (selectedRoomFilter == "Open" && room.IsOpen) ||
-                                    (selectedRoomFilter == "Closed" && !room.IsOpen);
+                                    (selectedRoomFilter == "Open" && isOpen) ||
+                                    (selectedRoomFilter == "Closed" && !isOpen);
 
             var matchesModeFilter = selectedModeFilter == "All" || modeName == selectedModeFilter;
             var matchesMapFilter = selectedMapFilter == "All" || mapName == selectedMapFilter;
@@ -431,7 +425,7 @@ public class UIManager : MonoBehaviour
         }
 
         // Update the UI with filtered rooms
-        RenderRoomsList(filteredRooms, _cachedSessionData.Value.TotalPlayers);
+        RenderRoomsList(filteredRooms, _cachedRoomData.Value.TotalPlayers);
     }
 
     private void ShowRoomCreationView()
@@ -535,8 +529,8 @@ public class UIManager : MonoBehaviour
         {
             startBtn.clicked += () =>
             {
-                if (NetworkManager.Instance?.ReadyManagerInstance is { } rm)
-                    rm.StartMatch(modeName, mapName);
+                if (NetworkManager.Instance)
+                    NetworkManager.Instance.StartMatch(modeName, mapName);
             };
         }
         RefreshStartButton();
@@ -622,10 +616,10 @@ public class UIManager : MonoBehaviour
         var startBtn = _root.Q<Button>(UI_Room_View.start_button);
         if (startBtn == null) return;
 
-        var isMaster = NetworkManager.Instance.CanStartGame();
+        var isOwner = NetworkManager.Instance.CanStartGame();
         var allReady = NetworkManager.Instance.AreAllPlayersReady();
 
-        startBtn.style.display = isMaster ? DisplayStyle.Flex : DisplayStyle.None;
+        startBtn.style.display = isOwner ? DisplayStyle.Flex : DisplayStyle.None;
         startBtn.SetEnabled(allReady);
     }
 
@@ -645,16 +639,33 @@ public class UIManager : MonoBehaviour
     private void SpinLoading(VisualElement loadingSpinner)
     {
         _canSpin = true;
-        
-        loadingSpinner.schedule.Execute(() => {
-            var currentAngle = loadingSpinner.style.rotate.value.angle.value;
-            loadingSpinner.style.rotate = new Rotate(currentAngle + 360f);
-        }).Every(16).Until((() => !_canSpin));
+        float currentAngle = 0f;
+
+        loadingSpinner.schedule.Execute(() =>
+        {
+            currentAngle += 1.5f; // degrees per tick — 6° × ~60 ticks/sec ≈ 360°/sec (1 spin per second)
+            if (currentAngle >= 360f) currentAngle -= 360f;
+
+            loadingSpinner.style.rotate = new Rotate(new Angle(currentAngle, AngleUnit.Degree));
+        }).Every(16).Until(() => !_canSpin);
     }
     
     private void HideLoadingScreen(HideLoadingScreenEvent e)
     {
         loadingScreenViewPrefab.gameObject.SetActive(false);
         _canSpin = false;
+    }
+
+    // Server refused a create/join. Surface it and return the player to the rooms list.
+    private void OnRoomJoinRejected(RoomJoinRejectedEvent e)
+    {
+        HideLoadingScreen(new HideLoadingScreenEvent());
+
+        Debug.LogWarning($"[Lobby] Room request rejected: {e.Reason}");
+
+        // TODO: replace with a dedicated toast/popup element.
+        var header = _root?.Q<Label>(UI_Rooms_List_View_v3.header);
+        if (header != null)
+            header.text = $"Rejected: {e.Reason}";
     }
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2310888521266419612}
   - component: {fileID: 9154657109218801968}
   - component: {fileID: 334901924756375737}
+  - component: {fileID: 7744812446386418896}
   m_Layer: 5
   m_Name: In_Game_View
   m_TagString: Untagged
@@ -26,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4656111340782765190}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -48,7 +49,7 @@ MonoBehaviour:
   m_PanelSettings: {fileID: 11400000, guid: 6c08430eecf72264290999c4483ef5d0, type: 2}
   m_ParentUI: {fileID: 0}
   sourceAsset: {fileID: 9197481963319205126, guid: 03d96a6e716ed4808b0e559a425d9b88, type: 3}
-  m_SortingOrder: -1
+  m_SortingOrder: 0
   m_Position: 0
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
@@ -68,3 +69,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e32874d772ae54ef08991f05c19ccf6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+--- !u!1652712579 &7744812446386418896
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4656111340782765190}
+  m_GameObjectRolesMask: 3
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 9154657109218801968}
+    m_RolesMask: 1
+  - m_Object: {fileID: 334901924756375737}
+    m_RolesMask: 1
