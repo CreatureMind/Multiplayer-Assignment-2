@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -18,6 +19,11 @@ public class InGameUIView : MonoBehaviour
     private void Awake()
     {
         _document = GetComponent<UIDocument>();
+        if (!_document.GetComponent<PanelEventHandler>())
+            _document.AddComponent<PanelEventHandler>();
+        if (!_document.GetComponent<PanelRaycaster>())
+            _document.AddComponent<PanelRaycaster>();
+        
     }
 
     private void Start()
