@@ -86,4 +86,7 @@ public sealed class InputHandler : MonoBehaviour
     }
     
     public void SubmitPass() => RequestSubmitted?.Invoke(MoveRequest.Pass);
+    public void SelectMoveSoldier() => _actions?.SetMode(MoveIntent.MoveSoldier);
+    public void SelectPlaceBomb() => _actions?.SetMode(MoveIntent.PlaceBomb);
+    public void SelectBuildBase() => _actions?.SetMode(MoveIntent.BuildBase);
 }
