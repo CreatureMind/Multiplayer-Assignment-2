@@ -174,7 +174,21 @@ public class RoomManager : MonoBehaviour
             callbacks.SetAnnouncer(announcer);
         }
         
-        
+        if (!serverGameManagerPrefab)
+        {
+            Debug.LogWarning($"[Server] Room '{sessionName}': serverGameManagerPrefab not assigned; server game manager will be unavailable.");
+        }
+        else
+        {
+            var gM = runner.Spawn(serverGameManagerPrefab);
+            if (gM)
+            {
+                gM.name = $"ServerGameManager_{sessionName}";
+                // One relay serves the room for its whole life (lobby + match), so keep it
+                // out of the scene that the Single game-scene load unloads.
+                runner.MakeDontDestroyOnLoad(gM.gameObject);
+            }
+        }
 
         var info = new RoomInfo
         {
