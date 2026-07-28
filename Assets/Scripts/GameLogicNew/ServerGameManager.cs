@@ -352,7 +352,7 @@ public sealed class ServerGameManager : NetworkBehaviour
             return;
 
         clientManager.RPC_InitialiseClient(clientManager.PlayerId, (short)_boardManagerInstance.Width, (short)_boardManagerInstance.Height);
-        // _boardDiffBroadcaster.SendFullBoard(clientManager);
+        _boardDiffBroadcaster.SendFullBoard(clientManager);
         _turnManagerInstance?.SyncClientTurnState(clientManager);
         _initialisedClientIds.Add(clientManager.PlayerId);
     }
