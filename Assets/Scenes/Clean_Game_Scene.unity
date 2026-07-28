@@ -269,7 +269,7 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 263421736907131711, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
+    - target: {fileID: 1548668606815030391, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
       propertyPath: m_GameObjectRolesMask
       value: 2
       objectReference: {fileID: 0}
