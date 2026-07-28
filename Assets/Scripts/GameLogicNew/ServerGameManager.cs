@@ -138,9 +138,11 @@ public sealed class ServerGameManager : NetworkBehaviour
         _boardManagerInstance = Runner.Spawn(data.BoardManagerPrefab, Vector3.zero, Quaternion.identity);
         _boardManagerSpawned = true;
         
-        Debug.Log("Spawned board manager...");
         
         _boardManagerInstance.InitializeBoardWithMadeMap_ServerOnly(data.StartingPosition);
+        
+        Debug.Log("Instantiated board manager...");
+
         _boardDiffBroadcaster = new BoardDiffBroadcaster(_boardManagerInstance, _clientManagers);
         
         Debug.Log("Spawned board diff broadcaster...");

@@ -80,26 +80,8 @@ public class BoardManager : NetworkBehaviour
         }
 
         Instance = this;
-        
-        BoardUtilities.InstantiateBoardData(this, Tiles);
-
-        if (HasStateAuthority)
-        {
-            ValidateBoardDimensions(boardWidth, boardHeight);
-            Width = boardWidth;
-            Height = boardHeight;
-            
-            InitializeBoard(new TileState(TileType.Empty));
-        }
-
     }
-    
-    private void InitializeBoard(in TileState initialState)
-    {
-        var count = TileCount;
-        for (var index = 0; index < count; index++)
-            Tiles.Set(index, initialState);
-    }
+
 
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
@@ -110,9 +92,9 @@ public class BoardManager : NetworkBehaviour
     public void InitializeBoardWithMadeMap_ServerOnly(StartingPositionSO startingPosition)
     {
         // size 
-        ValidateBoardDimensions(boardWidth, boardHeight);
-        Width = boardWidth;
-        Height = boardHeight;
+        var size = ValidateBoardDimensions(startingPosition.Width, startingPosition.Height);
+        Width = size.x;
+        Height = size.y;
         
         var tempBaseCache = new HashSet<Vector2Int>();
         
@@ -139,6 +121,8 @@ public class BoardManager : NetworkBehaviour
         
         // cache the bases 
         CompileAndCacheAllBases(tempBaseCache);
+        
+        BoardUtilities.InstantiateBoardData(this, Tiles);
     }
     
 
@@ -274,15 +258,22 @@ public class BoardManager : NetworkBehaviour
     #endregion
 
     #region Board Change Validation
-    private static void ValidateBoardDimensions(int width, int height)
+    private static Vector2Int ValidateBoardDimensions(int width, int height)
     {
         if (width <= 0 || height <= 0)
-            throw new InvalidOperationException("Board dimensions must be greater than zero.");
+        {
+            Debug.Log("Board dimensions must be greater than zero.");
+            return Vector2Int.one;
+        }
 
         if (width * height > MaxBoardTiles)
-            throw new InvalidOperationException($"Board dimensions exceed max tile capacity ({MaxBoardTiles}).");
-        
+        {
+            Debug.Log($"Board dimensions exceed max tile capacity ({MaxBoardTiles}).");
+            return Vector2Int.one;
+        }
+
         Debug.Log($"Board dimensions are: {width}x{height}.");
+        return new Vector2Int(width, height);
     }
 
     public bool ValidateBoardChange(Vector2Int gridPosition, int playerId , MoveIntent intent)
