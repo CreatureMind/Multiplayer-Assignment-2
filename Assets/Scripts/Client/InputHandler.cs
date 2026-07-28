@@ -31,7 +31,7 @@ public sealed class InputHandler : MonoBehaviour
         _ready = true;
     }
 
-    private void OnEnable()
+    private void Start()
     {
         Debug.Log($"[Input] OnEnable ran, primaryAction={(primaryAction ? primaryAction.name : "NULL")}");
         
