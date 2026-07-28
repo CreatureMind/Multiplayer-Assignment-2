@@ -88,6 +88,7 @@ public class BoardManager : NetworkBehaviour
             ValidateBoardDimensions(boardWidth, boardHeight);
             Width = boardWidth;
             Height = boardHeight;
+            
             InitializeBoard(new TileState(TileType.Empty));
         }
 
@@ -102,7 +103,6 @@ public class BoardManager : NetworkBehaviour
 
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
-
         if (Instance == this)
             Instance = null;
     }
@@ -273,8 +273,6 @@ public class BoardManager : NetworkBehaviour
 
     #endregion
 
-    
-
     #region Board Change Validation
     private static void ValidateBoardDimensions(int width, int height)
     {
@@ -283,6 +281,8 @@ public class BoardManager : NetworkBehaviour
 
         if (width * height > MaxBoardTiles)
             throw new InvalidOperationException($"Board dimensions exceed max tile capacity ({MaxBoardTiles}).");
+        
+        Debug.Log($"Board dimensions are: {width}x{height}.");
     }
 
     public bool ValidateBoardChange(Vector2Int gridPosition, int playerId , MoveIntent intent)

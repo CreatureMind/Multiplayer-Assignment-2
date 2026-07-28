@@ -51,6 +51,8 @@ public class ClientManager : NetworkBehaviour
     // Server-side setup, called by ServerGameManager right after spawn.
     public void InstantiateClientManager(ServerGameManager server, byte seatId)
     {
+        Debug.Log("Attempting to instantiate a client manager...");
+        
         if (!HasStateAuthority)
             return;
         
@@ -58,6 +60,8 @@ public class ClientManager : NetworkBehaviour
         Player = Object.InputAuthority;
         PlayerId = seatId;
         name = $"ClientManager_P{seatId}";
+
+        Debug.Log($"Instantiated client manager at {name}.");
     }
     
     public override void Spawned()

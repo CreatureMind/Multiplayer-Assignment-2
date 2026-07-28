@@ -74,6 +74,8 @@ public class TurnManager : NetworkBehaviour
             var playerActionData = new PlayerActionData(0, _clientManagers[i].PlayerId);
             PlayerActions.Set(i, playerActionData);
         }
+        
+        Debug.Log($"Instantiated turn manager with {clientManagers.Count} players.");
 
         RandomizeTurnOrder();
         _isInstantiated = true;
