@@ -3,6 +3,10 @@
     <ui:VisualElement name="ui-container" style="flex-grow: 1; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
         <ui:VisualElement name="buttons-container" style="flex-grow: 0; flex-direction: row;">
             <ui:Button text="Leave Game" name="leave-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative;"/>
+            <ui:Button text="end turn" name="end-turn-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative;"/>
+            <ui:Button text="pawn" name="pawn-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative;"/>
+            <ui:Button text="bomb" name="bomb-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative;"/>
+            <ui:Button text="base" name="base-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative;"/>
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="ended-popup" class="hidden" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.2);">
