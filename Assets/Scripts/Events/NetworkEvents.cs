@@ -47,6 +47,7 @@ namespace Events
     
     public struct MatchStartedEvent { }
 
+    public struct GameSceneLoadedEvent { }
 
     public struct SceneLoadStartedEvent { }
     

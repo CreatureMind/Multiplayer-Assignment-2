@@ -16,7 +16,7 @@ public enum SoundEffectEnum
     YOUR_BASE_CONQUERED,
     ENEMY_BASE_CONQUERED,
     LOSE,
-    WIN,
+    WIN
 }
 
 public class AudioHandler : MonoBehaviour
@@ -59,14 +59,14 @@ public class AudioHandler : MonoBehaviour
         
         EventBus.Subscribe<PlaySoundEvent>(HandleSounds);
         EventBus.Subscribe<JoinedLobbyEvent>(HandleLobbyMusic);
-        EventBus.Subscribe<MatchStartedEvent>(HandleGameMusic);
+        EventBus.Subscribe<GameSceneLoadedEvent>(HandleGameMusic);
     }
     
     private void OnDisable()
     {
         EventBus.Unsubscribe<PlaySoundEvent>(HandleSounds);
         EventBus.Unsubscribe<JoinedLobbyEvent>(HandleLobbyMusic);
-        EventBus.Unsubscribe<MatchStartedEvent>(HandleGameMusic);
+        EventBus.Unsubscribe<GameSceneLoadedEvent>(HandleGameMusic);
     }
 
     private void HandleSounds(PlaySoundEvent obj)
@@ -130,7 +130,7 @@ public class AudioHandler : MonoBehaviour
         musicManager.PlayNextTrack();
     }
 
-    private void HandleGameMusic(MatchStartedEvent e)
+    private void HandleGameMusic(GameSceneLoadedEvent e)
     {
         musicManager.AddToPlaylist(gameThemeMusic);
         musicManager.SetVolume(0.5f);
