@@ -51,39 +51,19 @@ public class ClientManager : NetworkBehaviour
     public static event Action<PlayerActionData> TurnChanged;
 
     // Server-side setup, called by ServerGameManager right after spawn.
-    public bool InstantiateClientManager(ServerGameManager server, byte seatId)
+    public void InstantiateClientManager(ServerGameManager server, byte seatId)
     {
         Debug.Log("Attempting to instantiate a client manager...");
         
         if (!HasStateAuthority)
-            return false;
-
-        if (!Object || !Object.HasInputAuthority)
-        {
-            Debug.LogWarning("[ClientManager] Rejecting server-side init: missing input authority.");
-            return false;
-        }
-
-        var inputAuthority = Object.InputAuthority;
-        if (inputAuthority.PlayerId <= 0)
-        {
-            Debug.LogWarning($"[ClientManager] Rejecting server-side init: invalid input authority id {inputAuthority.PlayerId}.");
-            return false;
-        }
-
-        if (seatId == 0 || seatId != (byte)inputAuthority.PlayerId)
-        {
-            Debug.LogWarning($"[ClientManager] Rejecting server-side init: seatId={seatId}, inputAuthorityId={inputAuthority.PlayerId}.");
-            return false;
-        }
+            return;
         
         _server = server ?? throw new ArgumentNullException(nameof(server));
-        Player = inputAuthority;
+        Player = Object.InputAuthority;
         PlayerId = seatId;
         name = $"ClientManager_P{seatId}";
 
         Debug.Log($"Instantiated client manager at {name}.");
-        return true;
     }
 
     public void SetTraceLoggingEnabled(NetworkBool enabled)
