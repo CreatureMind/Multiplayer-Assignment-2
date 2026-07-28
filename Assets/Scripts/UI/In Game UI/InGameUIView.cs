@@ -8,6 +8,8 @@ public class InGameUIView : MonoBehaviour
     public event Action OnLeaveButtonClicked;
     public event Action OnReturnButtonClicked;
 
+    public static event Action<UIDocument> OnObjectLoaded;
+
     private UIDocument _document;
     private VisualElement _root;
 
@@ -23,7 +25,6 @@ public class InGameUIView : MonoBehaviour
             _document.AddComponent<PanelEventHandler>();
         if (!_document.GetComponent<PanelRaycaster>())
             _document.AddComponent<PanelRaycaster>();
-        
     }
 
     private void Start()
@@ -35,6 +36,7 @@ public class InGameUIView : MonoBehaviour
         }
         
         InitializeUI(_document);
+        OnObjectLoaded.Invoke(_document);
     }
 
     private void InitializeUI(UIDocument document)

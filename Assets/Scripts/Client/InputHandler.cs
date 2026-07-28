@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 // Converts pointer input into a MoveRequest and raises it.
 // It never validates and never mutates.
@@ -23,12 +23,15 @@ public sealed class InputHandler : MonoBehaviour
     private Vector2Int? _lastHover;
     private bool _ready;
     
+    private UIDocument _document;
+    
     // Called once by ClientManager after the board dimensions are known
     public void Initialize(BoardCoordinateMapper mapper, PlayerActionController actions)
     {
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _actions = actions ?? throw new ArgumentNullException(nameof(actions));
         _ready = true;
+        InGameUIView.OnObjectLoaded += SetDocument;
     }
 
     private void OnEnable()
@@ -53,9 +56,26 @@ public sealed class InputHandler : MonoBehaviour
             Debug.Log($"[Input] DISABLED: {obj}\n{Environment.StackTrace}");
     }
 
+    private void SetDocument(UIDocument doc)
+    {
+        _document = doc;
+    }
+
+    private bool PointerOverToolkitUI(Vector2 screenPos)
+    {
+        var root = _document ? _document.rootVisualElement : null;
+        if (root?.panel == null)
+            return false;
+        
+        var panelPos = RuntimePanelUtils.ScreenToPanel(
+            root.panel, new Vector2(screenPos.x, Screen.height - screenPos.y));
+
+        return root.panel.Pick(panelPos) != null;
+    }
+
     private void OnDisable()
     {
-        InputSystem.onActionChange += OnAnyActionChange;
+        InputSystem.onActionChange -= OnAnyActionChange;
         
         if (primaryAction)
         {
@@ -64,6 +84,8 @@ public sealed class InputHandler : MonoBehaviour
         }
         if (pointerPosition)
             pointerPosition.action.Disable();
+        
+        InGameUIView.OnObjectLoaded -= SetDocument;
     }
 
     private void Update()
@@ -95,14 +117,13 @@ public sealed class InputHandler : MonoBehaviour
             Debug.Log("[Input] not ready");
             return;
         }
-
-        if (EventSystem.current && EventSystem.current.IsPointerOverGameObject())
+        
+        var screen = pointerPosition.action.ReadValue<Vector2>();
+        if (PointerOverToolkitUI(screen))
         {
             Debug.Log("[Input] over UI");
             return;
         }
-        
-        var screen = pointerPosition.action.ReadValue<Vector2>();
         if (!_mapper.TryScreenToBoard(screen, out var cell))
             return;
         
