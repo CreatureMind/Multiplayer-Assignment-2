@@ -77,4 +77,8 @@ MultiplayerRolesData:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4656111340782765190}
   m_GameObjectRolesMask: 3
-  m_ComponentsRolesMasks: []
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 9154657109218801968}
+    m_RolesMask: 1
+  - m_Object: {fileID: 334901924756375737}
+    m_RolesMask: 1

@@ -22,6 +22,12 @@ public class InGameUIView : MonoBehaviour
 
     private void Start()
     {
+        if (!_document)
+        {
+            Debug.LogError("UIDocument is null");
+            return;
+        }
+        
         InitializeUI(_document);
     }
 
@@ -49,6 +55,10 @@ public class InGameUIView : MonoBehaviour
                 _leaveGameButton.SetEnabled(false);
             };
         }
+        else
+        {
+            Debug.LogError("Leave button is null");
+        }
 
         if (_returnToLobbyButton != null)
         {
@@ -58,6 +68,10 @@ public class InGameUIView : MonoBehaviour
                 _returnToLobbyButton.text = "Returning...";
                 _returnToLobbyButton.SetEnabled(false);
             };
+        }
+        else
+        {
+            Debug.LogError("Return button is null");
         }
     }
 

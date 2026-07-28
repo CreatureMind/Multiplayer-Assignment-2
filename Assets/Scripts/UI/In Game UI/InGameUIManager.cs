@@ -5,22 +5,9 @@ using UnityEngine;
 public class InGameUIManager : MonoBehaviour
 {
     [SerializeField] private InGameUIView inGameView;
-    
-    public static InGameUIManager Instance { get; private set; }
 
     private InGameUIModel _model;
     private InGameUIPresenter _presenter;
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-    }
 
     private void Start()
     {
@@ -52,11 +39,6 @@ public class InGameUIManager : MonoBehaviour
         if (_presenter != null)
         {
             _presenter.UnsubscribeFromEvents();
-        }
-
-        if (Instance == this)
-        {
-            Instance = null;
         }
     }
 }

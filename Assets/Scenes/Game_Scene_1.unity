@@ -328,7 +328,9 @@ MultiplayerRolesData:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1828490691}
   m_GameObjectRolesMask: 1
-  m_ComponentsRolesMasks: []
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 1828490693}
+    m_RolesMask: 1
 --- !u!1001 &1331523350880862976
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -380,10 +382,6 @@ PrefabInstance:
     - target: {fileID: 4656111340782765190, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
       propertyPath: m_Name
       value: In_Game_View
-      objectReference: {fileID: 0}
-    - target: {fileID: 7744812446386418896, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
-      propertyPath: m_GameObjectRolesMask
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
