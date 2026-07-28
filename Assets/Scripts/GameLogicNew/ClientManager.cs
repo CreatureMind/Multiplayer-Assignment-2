@@ -50,8 +50,6 @@ public class ClientManager : NetworkBehaviour
     public static event Action<PlayerActionData> CurrentPlayingPlayerChanged;
     public static event Action<PlayerActionData> TurnChanged;
 
-    #region Lifecycle and Setup
-
     // Server-side setup, called by ServerGameManager right after spawn.
     public void InstantiateClientManager(ServerGameManager server, byte seatId)
     {
@@ -120,9 +118,7 @@ public class ClientManager : NetworkBehaviour
         _pendingDiffs.Clear();
     }
     
-    #endregion
-
-    #region Client to Server RPC
+    #region Client -> Server
     // Readiness handshake: decouples client init from server spawn ordering (no scene-context race).
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_ClientReady()
@@ -181,7 +177,7 @@ public class ClientManager : NetworkBehaviour
     
     #endregion
     
-    #region Server to Client RPC
+    #region Server -> This Client
     // One-shot bootstrap. GDD rules out reconnect/late-join, so a single init + diff stream is enough.
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_InitialiseClient(byte playerId, short width, short height)
@@ -351,8 +347,6 @@ public class ClientManager : NetworkBehaviour
     }
     #endregion
 
-    #region Local Event Hooks and Finalization
-
     private void OnRequestSubmitted(MoveRequest request)
     {
         GameTraceLogger.Move(TraceLogsEnabled, $"Local request submitted from {name}: intent={request.Intent}, cell={request.Cell}.");
@@ -394,6 +388,4 @@ public class ClientManager : NetworkBehaviour
             RPC_ClientInitFinished();
         }
     }
-
-    #endregion
 }

@@ -71,8 +71,6 @@ public class TurnManager : NetworkBehaviour
         }
     }
 
-    #region Lifecycle and Initialization
-
     private void CurrentTurnIndexChanged()
     {
         if (!_isInstantiated || _clientManagersByPlayerId.Count == 0)
@@ -86,6 +84,8 @@ public class TurnManager : NetworkBehaviour
 
         GameTraceLogger.Turn(TraceLogsEnabled, $"Turn changed to player {CurrentTurnIndex}.");
     }
+
+    #region Lifetime Methods
 
     public override void Spawned()
     {
@@ -155,7 +155,7 @@ public class TurnManager : NetworkBehaviour
     #endregion
 
     // Methods for checking the condition of actions, amounts, and turns. These are server-side only checks to ensure game rules are followed.
-    #region Turn Validation
+    #region Server Checks
 
     public bool ValidatePlayerTurn(int playerId)
     {
@@ -234,7 +234,7 @@ public class TurnManager : NetworkBehaviour
 
     // Methods for changing the actions and turn state. These are server-side only methods that modify the game state and notify clients of changes.
     // **note** do not call unless checked with the server checks above to ensure game rules are followed.
-    #region Turn Actions
+    #region Server Action Methods
 
     public ActionResult PlayerPlacedPawn(int playerId)
     {
@@ -314,7 +314,7 @@ public class TurnManager : NetworkBehaviour
 
     #endregion
     
-    #region Turn Progression
+    #region Server Turn Methods
     
     public void EndPlayerTurn(int playerId)
     {
@@ -356,15 +356,8 @@ public class TurnManager : NetworkBehaviour
         _turnDiffBroadcaster?.BroadcastTurnChanged(nextPlayerActionData);
         OnTurnChanged?.Invoke();
     }
-
-    public void EndGame(byte clientManagerPlayerId)
-    {
-        
-    }
     
     #endregion
-
-    #region State Sync and Accessors
 
     public bool TryGetPlayerActionData(int playerId, out PlayerActionData playerActionData)
     {
@@ -439,8 +432,11 @@ public class TurnManager : NetworkBehaviour
         PlayerActions.Set(playerIndex, playerActionData);
         OnPlayerActionChanged?.Invoke(playerActionData);
     }
-    
-    #endregion
+
+    public void EndGame(byte clientManagerPlayerId)
+    {
+        
+    }
 }
 
 public enum ActionResult
