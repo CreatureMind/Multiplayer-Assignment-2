@@ -90,10 +90,10 @@ public sealed class InputHandler : MonoBehaviour
 
     private void Update()
     {
-        if (primaryAction)
-            Debug.Log($"[Input] enabled={primaryAction.action.enabled} " +
-                      $"map={primaryAction.action.actionMap?.name} " +
-                      $"phase={primaryAction.action.phase}");
+        //if (primaryAction)
+            // Debug.Log($"[Input] enabled={primaryAction.action.enabled} " +
+            //           $"map={primaryAction.action.actionMap?.name} " +
+            //           $"phase={primaryAction.action.phase}");
         
         if (!_ready || !pointerPosition)
             return;
