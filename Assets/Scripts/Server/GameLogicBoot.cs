@@ -16,7 +16,7 @@ public class GameLogicBoot : MonoBehaviour//, INetworkRunnerCallbacks
     private void Awake()
     {
         
-#if !UNITY_SERVER
+#if !UNITY_SERVER //god knows why this doesnt work 
         Destroy(gameObject);
 #endif
 
@@ -25,7 +25,14 @@ public class GameLogicBoot : MonoBehaviour//, INetworkRunnerCallbacks
         {
             Debug.LogError($"[GameLogicBoot] Couldn't find NetworkRunner component.");
         }
-        
+
+        if (_runner.IsServer) // so i do this
+        {
+            Destroy(gameObject);
+            Destroy(gameObject);
+            Destroy(gameObject);
+        }
+
         var active = _runner.ActivePlayers;
 
         foreach (var player in active)
