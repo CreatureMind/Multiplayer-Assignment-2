@@ -309,6 +309,35 @@ public sealed class ServerGameManager : NetworkBehaviour
 
     private bool HandleMoveRequestCheckAndUpdate(ClientManager clientManager, Vector2Int cell, MoveIntent intent)
     {
+        if (!TryValidateMoveRequestInstances(clientManager, cell, intent, out var request))
+            return false;
+
+        var turnValidationResult = ValidateTurnAndIntentResources(request);
+        if (turnValidationResult == MovePipelineGateResult.Rejected)
+            return false;
+        if (turnValidationResult == MovePipelineGateResult.Completed)
+            return true;
+
+        if (!TryValidateBoardChange(ref request))
+            return false;
+
+        var changeSet = CreateMoveChangeSet(request);
+        if (!ApplyBoardChanges(request, changeSet))
+            return false;
+
+        BroadcastBoardChanges(request, changeSet);
+
+        if (!ApplyTurnAndGameChanges(request, changeSet))
+            return false;
+
+        BroadcastTurnChanges(request, changeSet);
+        return true;
+    }
+
+    private bool TryValidateMoveRequestInstances(ClientManager clientManager, Vector2Int cell, MoveIntent intent, out MoveRequestContext request)
+    {
+        request = default;
+
         if (!HasStateAuthority)
         {
             GameTraceLogger.Move(TraceLogsEnabled, "Rejected move: no state authority.");
@@ -333,157 +362,269 @@ public sealed class ServerGameManager : NetworkBehaviour
             return false;
         }
 
+        request = new MoveRequestContext(clientManager, cell, intent);
+        return true;
+    }
+
+    private MovePipelineGateResult ValidateTurnAndIntentResources(in MoveRequestContext request)
+    {
         // check turnManager first cause it's cheaper that the DFS checks in boardManager
-        var isValidTurn = _turnManagerInstance.ValidatePlayerTurn(clientManager.PlayerId);
-        GameTraceLogger.Move(TraceLogsEnabled, $"Turn validation P{clientManager.PlayerId}: {isValidTurn}.");
+        var isValidTurn = _turnManagerInstance.ValidatePlayerTurn(request.PlayerId);
+        GameTraceLogger.Move(TraceLogsEnabled, $"Turn validation P{request.PlayerId}: {isValidTurn}.");
         if (!isValidTurn)
         {
-            GameTraceLogger.Turn(TraceLogsEnabled, $"Rejected move P{clientManager.PlayerId}: not player's turn.");
-            return false;
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Rejected move P{request.PlayerId}: not player's turn.");
+            return MovePipelineGateResult.Rejected;
         }
 
-        if (intent == MoveIntent.Pass) // pass intent is always valid, no need to check board state
+        if (request.Intent == MoveIntent.Pass) // pass intent is always valid, no need to check board state
         {
-            GameTraceLogger.Move(TraceLogsEnabled, $"Pass intent accepted for P{clientManager.PlayerId}; ending turn.");
-            HandlePassIntent(clientManager);
-            return true;
+            GameTraceLogger.Move(TraceLogsEnabled, $"Pass intent accepted for P{request.PlayerId}; ending turn.");
+            HandlePassIntent(request.ClientManager);
+            return MovePipelineGateResult.Completed;
         }
 
-        var hasResourcesForIntent = _turnManagerInstance.ValidatePlayerIntent(clientManager.PlayerId, intent);
+        var hasResourcesForIntent = _turnManagerInstance.ValidatePlayerIntent(request.PlayerId, request.Intent);
         GameTraceLogger.Move(TraceLogsEnabled,
-            $"Intent validation P{clientManager.PlayerId}, intent={intent}: {hasResourcesForIntent}.");
+            $"Intent validation P{request.PlayerId}, intent={request.Intent}: {hasResourcesForIntent}.");
         if (!hasResourcesForIntent)
         {
-            GameTraceLogger.Turn(TraceLogsEnabled, $"Rejected move P{clientManager.PlayerId}: insufficient resources for intent {intent}.");
-            return false;
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Rejected move P{request.PlayerId}: insufficient resources for intent {request.Intent}.");
+            return MovePipelineGateResult.Rejected;
         }
 
-        var actionResult = ActionResult.Success;
+        return MovePipelineGateResult.Continue;
+    }
 
-        var boardValidationPassed = _boardManagerInstance.ValidateBoardChange(cell, clientManager.PlayerId, intent);
+    private bool TryValidateBoardChange(ref MoveRequestContext request)
+    {
+        request.BoardValidation = _boardManagerInstance.ValidateBoardChange(request.RequestedCell, request.PlayerId, request.Intent);
         GameTraceLogger.Move(TraceLogsEnabled,
-            $"Board validation P{clientManager.PlayerId}, intent={intent}, cell={cell}: {boardValidationPassed}.");
-        if (boardValidationPassed == ValidationType.False)
+            $"Board validation P{request.PlayerId}, intent={request.Intent}, cell={request.RequestedCell}: {request.BoardValidation}.");
+        if (request.BoardValidation == ValidationType.False)
         {
-            GameTraceLogger.Move(TraceLogsEnabled, $"Board validation failed for P{clientManager.PlayerId}, intent={intent}, cell={cell}.");
+            GameTraceLogger.Move(TraceLogsEnabled, $"Board validation failed for P{request.PlayerId}, intent={request.Intent}, cell={request.RequestedCell}.");
             return false;
         }
-        
-        if (boardValidationPassed == ValidationType.Bomb)
+
+        var mutationCell = request.RequestedCell;
+        if (request.Intent == MoveIntent.BuildBase)
         {
-            var explosionChangedCells = CascadingExplosionLogic(cell);
-            if (explosionChangedCells.Count > 0)
-            {
-                GameTraceLogger.Move(TraceLogsEnabled, $"Broadcasting {explosionChangedCells.Count} explosion cells for P{clientManager.PlayerId}.");
-                _boardDiffBroadcaster?.Broadcast(explosionChangedCells);
-            }
-
-            switch (intent)
-            {
-                case MoveIntent.MoveSoldier:
-                    actionResult = _turnManagerInstance.PlayerPlacedPawn(clientManager.PlayerId);
-                    break;
-                case MoveIntent.PlaceBomb:
-                    actionResult = _turnManagerInstance.PlayerPlacedBomb(clientManager.PlayerId);
-                    break;
-                default:
-                    GameTraceLogger.Move(TraceLogsEnabled, $"Bomb-triggered path received unsupported intent={intent} for P{clientManager.PlayerId}.");
-                    return false;
-            }
-
-            GameTraceLogger.Move(TraceLogsEnabled, $"Explosion action result for P{clientManager.PlayerId}, intent={intent}: {actionResult}.");
-            if (actionResult == ActionResult.NotStateAuthority)
-                return false;
-
-            if (actionResult == ActionResult.SuccessAndTurnEnded)
-            {
-                GameTraceLogger.Move(TraceLogsEnabled, $"Ending turn for P{clientManager.PlayerId} due to explosion action budget depletion.");
-                _turnManagerInstance.EndPlayerTurn(clientManager.PlayerId);
-            }
-
-            return true;
-        }
-        
-        Vector2Int bottomLeftCorner =  cell;
-        if (intent == MoveIntent.BuildBase)
-        {
-            if (!BoardUtilities.TryGetBottomLeftCornerOfBase4By4(cell, clientManager.PlayerId, out bottomLeftCorner))
+            if (!BoardUtilities.TryGetBottomLeftCornerOfBase4By4(request.RequestedCell, request.ClientManager.PlayerId, out mutationCell))
             {
                 GameTraceLogger.Move(TraceLogsEnabled,
-                    $"BuildBase ring validation failed for P{clientManager.PlayerId} at {cell}.");
+                    $"BuildBase ring validation failed for P{request.PlayerId} at {request.RequestedCell}.");
                 return false;
             }
         }
 
-        GameTraceLogger.Move(TraceLogsEnabled, $"Applying board mutation for P{clientManager.PlayerId}, intent={intent}, cell={cell}.");
-        _boardManagerInstance.SetTileServerOnly(bottomLeftCorner, clientManager.PlayerId, intent);
+        request.MutationCell = mutationCell;
+        return true;
+    }
 
-        var changedCells = new List<Vector2Int>();
-        if (intent == MoveIntent.BuildBase)
-            AddBuildBaseCoreCells(cell, changedCells);
-        else
-            changedCells.Add(cell);
+    private MoveChangeSet CreateMoveChangeSet(in MoveRequestContext request)
+    {
+        var changeSet = new MoveChangeSet(request.Intent, request.RequestedCell, request.MutationCell, request.BoardValidation == ValidationType.Bomb);
 
-        switch (intent)
+        if (!changeSet.IsExplosionPath)
         {
-            case MoveIntent.MoveSoldier:
-                actionResult = _turnManagerInstance.PlayerPlacedPawn(clientManager.PlayerId);
-                break;
-            case MoveIntent.PlaceBomb:
-                actionResult = _turnManagerInstance.PlayerPlacedBomb(clientManager.PlayerId);
-                break;
-            case MoveIntent.BuildBase:
-                actionResult = _turnManagerInstance.PlayerBuiltBase(clientManager.PlayerId);
-                break;
+            if (request.Intent == MoveIntent.BuildBase)
+                AddBuildBaseCoreCells(request.RequestedCell, changeSet.BoardChangedCells);
+            else
+                changeSet.BoardChangedCells.Add(request.RequestedCell);
         }
-        GameTraceLogger.Move(TraceLogsEnabled, $"Turn action result for P{clientManager.PlayerId}, intent={intent}: {actionResult}.");
-        if (actionResult == ActionResult.NotStateAuthority)
-            return false;
+
+        return changeSet;
+    }
+
+    private bool ApplyBoardChanges(in MoveRequestContext request, MoveChangeSet changeSet)
+    {
+        if (changeSet.IsExplosionPath)
+        {
+            var explosionChangedCells = CascadingExplosionLogic(request.RequestedCell);
+            changeSet.BoardChangedCells.AddRange(explosionChangedCells);
+            return true;
+        }
+
+        GameTraceLogger.Move(TraceLogsEnabled, $"Applying board mutation for P{request.PlayerId}, intent={request.Intent}, cell={request.RequestedCell}.");
+        _boardManagerInstance.SetTileServerOnly(request.MutationCell, request.PlayerId, request.Intent);
 
         var changedBases = _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState();
         GameTraceLogger.Move(TraceLogsEnabled, $"Conquered base updates after move: {changedBases.Count}.");
         foreach (var baseBottomLeft in changedBases)
         {
-            AddBaseCells(baseBottomLeft, changedCells);
+            AddBaseCells(baseBottomLeft, changeSet.BoardChangedCells);
             var ownerId = _boardManagerInstance.GetTileOwnerByIndex(baseBottomLeft);
-            GameTraceLogger.Move(TraceLogsEnabled, $"Applying base gain for owner P{ownerId} at {baseBottomLeft}.");
-            _turnManagerInstance.PlayerBuiltBase(ownerId);
+            changeSet.BaseGainOwners.Add(ownerId);
         }
 
-        GameTraceLogger.Move(TraceLogsEnabled, $"Check for base conquer P{clientManager.PlayerId} after intent={intent}.");
-        ServerBoardRules.ConqueredBasesByPawnPlacementCheck(_boardManagerInstance, clientManager.PlayerId, cell, out var conqueredBases);
+        GameTraceLogger.Move(TraceLogsEnabled, $"Check for base conquer P{request.PlayerId} after intent={request.Intent}.");
+        ServerBoardRules.ConqueredBasesByPawnPlacementCheck(_boardManagerInstance, request.ClientManager.PlayerId, request.RequestedCell, out var conqueredBases);
         if (conqueredBases.Count > 0)
         {
-            GameTraceLogger.Move(TraceLogsEnabled, $"Conquered bases by P{clientManager.PlayerId} after intent={intent}: {conqueredBases.Count}.");
+            GameTraceLogger.Move(TraceLogsEnabled, $"Conquered bases by P{request.PlayerId} after intent={request.Intent}: {conqueredBases.Count}.");
             foreach (var baseBottomLeft in conqueredBases)
             {
-                AddBaseCells(baseBottomLeft, changedCells);
-                GameTraceLogger.Move(TraceLogsEnabled, $"Applying base gain for owner P{clientManager.PlayerId} at {baseBottomLeft}.");
-                _turnManagerInstance.PlayerBuiltBase(clientManager.PlayerId);
+                AddBaseCells(baseBottomLeft, changeSet.BoardChangedCells);
+                changeSet.BaseGainOwners.Add(request.PlayerId);
             }
-        }   
-
-        GameTraceLogger.Move(TraceLogsEnabled, $"Broadcasting {changedCells.Count} changed cells.");
-        _boardDiffBroadcaster?.Broadcast(changedCells);
-
-        if (intent == MoveIntent.BuildBase || actionResult == ActionResult.SuccessAndTurnEnded)
-        {
-            GameTraceLogger.Move(TraceLogsEnabled, $"Ending turn for P{clientManager.PlayerId}. reason={(intent == MoveIntent.BuildBase ? "BuildBase intent" : "ActionResult.SuccessAndTurnEnded")}.");
-            _turnManagerInstance.EndPlayerTurn(clientManager.PlayerId);
-        }
-        else
-        {
-            GameTraceLogger.Move(TraceLogsEnabled, $"Turn remains with P{clientManager.PlayerId} after intent={intent}.");
-        }
-        
-        GameTraceLogger.Move(TraceLogsEnabled, $"Check for motherload conquer P{clientManager.PlayerId} after intent={intent}.");
-        if (ServerBoardRules.MotherloadConqueredWinConditionCheck(_boardManagerInstance, clientManager.PlayerId, cell))
-        {
-            GameTraceLogger.Move(TraceLogsEnabled, $"Motherload conquered by P{clientManager.PlayerId} after intent={intent}. Ending game.");
-            _turnManagerInstance.EndGame(clientManager.PlayerId);
         }
 
         return true;
+    }
+
+    private void BroadcastBoardChanges(in MoveRequestContext request, MoveChangeSet changeSet)
+    {
+        if (changeSet.IsExplosionPath)
+        {
+            if (changeSet.BoardChangedCells.Count > 0)
+            {
+                GameTraceLogger.Move(TraceLogsEnabled, $"Broadcasting {changeSet.BoardChangedCells.Count} explosion cells for P{request.PlayerId}.");
+                _boardDiffBroadcaster?.Broadcast(changeSet.BoardChangedCells);
+            }
+
+            return;
+        }
+
+        GameTraceLogger.Move(TraceLogsEnabled, $"Broadcasting {changeSet.BoardChangedCells.Count} changed cells.");
+        _boardDiffBroadcaster?.Broadcast(changeSet.BoardChangedCells);
+    }
+
+    private bool ApplyTurnAndGameChanges(in MoveRequestContext request, MoveChangeSet changeSet)
+    {
+        if (!TryApplyPrimaryTurnAction(request, out var actionResult))
+            return false;
+
+        changeSet.ActionResult = actionResult;
+        if (actionResult == ActionResult.NotStateAuthority)
+            return false;
+
+        if (changeSet.IsExplosionPath)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Explosion action result for P{request.PlayerId}, intent={request.Intent}: {actionResult}.");
+            if (actionResult == ActionResult.SuccessAndTurnEnded)
+                changeSet.ShouldEndTurn = true;
+        }
+        else
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Turn action result for P{request.PlayerId}, intent={request.Intent}: {actionResult}.");
+            foreach (var ownerId in changeSet.BaseGainOwners)
+            {
+                GameTraceLogger.Move(TraceLogsEnabled, $"Applying base gain for owner P{ownerId}.");
+                _turnManagerInstance.PlayerBuiltBase(ownerId);
+            }
+
+            GameTraceLogger.Move(TraceLogsEnabled, $"Check for motherload conquer P{request.PlayerId} after intent={request.Intent}.");
+            if (ServerBoardRules.MotherloadConqueredWinConditionCheck(_boardManagerInstance, request.ClientManager.PlayerId, request.RequestedCell))
+            {
+                GameTraceLogger.Move(TraceLogsEnabled, $"Motherload conquered by P{request.PlayerId} after intent={request.Intent}. Ending game.");
+                changeSet.ShouldEndGame = true;
+                _turnManagerInstance.EndGame((byte)request.PlayerId);
+            }
+
+            if (!changeSet.ShouldEndGame)
+            {
+                if (request.Intent == MoveIntent.BuildBase || actionResult == ActionResult.SuccessAndTurnEnded)
+                    changeSet.ShouldEndTurn = true;
+            }
+        }
+
+        if (changeSet.ShouldEndTurn)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Ending turn for P{request.PlayerId}.");
+            _turnManagerInstance.EndPlayerTurn(request.PlayerId);
+        }
+        else
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Turn remains with P{request.PlayerId} after intent={request.Intent}.");
+        }
+
+        return true;
+    }
+
+    private void BroadcastTurnChanges(in MoveRequestContext request, MoveChangeSet changeSet)
+    {
+        if (changeSet.ShouldEndGame)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Turn broadcast skipped because game ended for winner P{request.PlayerId}.");
+            return;
+        }
+
+        if (changeSet.ShouldEndTurn)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"Turn changed broadcast emitted after ending turn for P{request.PlayerId}.");
+            return;
+        }
+
+        GameTraceLogger.Move(TraceLogsEnabled, $"Turn-state updates already broadcast for active player P{request.PlayerId}.");
+    }
+
+    private bool TryApplyPrimaryTurnAction(in MoveRequestContext request, out ActionResult actionResult)
+    {
+        switch (request.Intent)
+        {
+            case MoveIntent.MoveSoldier:
+                actionResult = _turnManagerInstance.PlayerPlacedPawn(request.PlayerId);
+                return true;
+            case MoveIntent.PlaceBomb:
+                actionResult = _turnManagerInstance.PlayerPlacedBomb(request.PlayerId);
+                return true;
+            case MoveIntent.BuildBase:
+                actionResult = _turnManagerInstance.PlayerBuiltBase(request.PlayerId);
+                return true;
+            default:
+                actionResult = ActionResult.NotStateAuthority;
+                GameTraceLogger.Move(TraceLogsEnabled, $"Unsupported intent={request.Intent} for P{request.PlayerId} during turn action stage.");
+                return false;
+        }
+    }
+
+    private enum MovePipelineGateResult
+    {
+        Rejected,
+        Continue,
+        Completed
+    }
+
+    private struct MoveRequestContext
+    {
+        public MoveRequestContext(ClientManager clientManager, Vector2Int requestedCell, MoveIntent intent)
+        {
+            ClientManager = clientManager;
+            PlayerId = clientManager.PlayerId;
+            RequestedCell = requestedCell;
+            MutationCell = requestedCell;
+            Intent = intent;
+            BoardValidation = ValidationType.False;
+        }
+
+        public ClientManager ClientManager;
+        public int PlayerId;
+        public Vector2Int RequestedCell;
+        public Vector2Int MutationCell;
+        public MoveIntent Intent;
+        public ValidationType BoardValidation;
+    }
+
+    private sealed class MoveChangeSet
+    {
+        public MoveChangeSet(MoveIntent intent, Vector2Int requestedCell, Vector2Int mutationCell, bool isExplosionPath)
+        {
+            Intent = intent;
+            RequestedCell = requestedCell;
+            MutationCell = mutationCell;
+            IsExplosionPath = isExplosionPath;
+        }
+
+        public MoveIntent Intent { get; }
+        public Vector2Int RequestedCell { get; }
+        public Vector2Int MutationCell { get; }
+        public bool IsExplosionPath { get; }
+        public ActionResult ActionResult { get; set; }
+        public bool ShouldEndTurn { get; set; }
+        public bool ShouldEndGame { get; set; }
+        public List<Vector2Int> BoardChangedCells { get; } = new List<Vector2Int>();
+        public List<int> BaseGainOwners { get; } = new List<int>();
     }
 
     private List<Vector2Int> CascadingExplosionLogic(Vector2Int cell)
