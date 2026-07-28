@@ -20,7 +20,10 @@ public class InGameUIView : MonoBehaviour
     private void Awake()
     {
         _document = GetComponent<UIDocument>();
+    }
 
+    private void Start()
+    {
         InitializeUI(_document);
     }
 
