@@ -6,6 +6,9 @@
             <ui:TextField placeholder-text="Your name..." name="player-name-field" class="Lable name-entry unity-base-field__input text-field" style="font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
             <ui:Label text="" name="error-label" class="Lable" style="color: rgb(255, 80, 80); font-size: 24px; margin-top: 20px; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; height: 0;"/>
         </ui:VisualElement>
-        <ui:Button text="Confirm" name="confirm-button" style="font-size: 32px; align-self: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+        <ui:VisualElement style="flex-grow: 0; flex-direction: row; justify-content: space-between; width: 600px;">
+            <ui:Button text="Randomize" name="randomize-button" style="font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+            <ui:Button text="Confirm" name="confirm-button" style="font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
