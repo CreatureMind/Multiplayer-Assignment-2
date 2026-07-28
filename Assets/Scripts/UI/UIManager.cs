@@ -387,11 +387,11 @@ public class UIManager : MonoBehaviour
     
     private void UpdatePlayerCountInLobby(int totalPlayers)
     {
+        var activePlayers = totalPlayers + NetworkManager.Instance.GetAllPlayerCount();
         var playerCountLabel = _root.Q<Label>(UI_Rooms_List_View.online_label);                                              //online-label
-        if (playerCountLabel != null) playerCountLabel.text = $"Online Players: {totalPlayers}";
+        if (playerCountLabel != null) playerCountLabel.text = $"Online Players: {activePlayers}";
     }
-
-    // Assignment 3
+    
     private void ApplyRoomFilters()
     {
         if (!_cachedRoomData.HasValue) return;

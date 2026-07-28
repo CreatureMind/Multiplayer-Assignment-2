@@ -14,14 +14,14 @@
             </ui:DropdownField>
         </ui:VisualElement>
         <ui:ScrollView name="rooms-scroll-view" style="margin-right: 200px; margin-bottom: 200px; margin-left: 200px; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px; background-color: rgba(0, 0, 0, 0.5); border-top-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-bottom-left-radius: 0; height: 100%; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(128, 128, 128); border-right-color: rgb(128, 128, 128); border-top-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128);"/>
-        <ui:VisualElement name="bottom-container" style="flex-grow: 1; position: absolute; top: auto; left: 200px; right: 200px; bottom: 0; flex-direction: column; height: 200px; justify-content: flex-start; align-items: flex-start;">
+        <ui:VisualElement name="bottom-container" style="flex-grow: 1; position: absolute; top: auto; left: 200px; right: 200px; bottom: 0; flex-direction: column; height: 200px; justify-content: space-between; align-items: flex-start;">
             <ui:VisualElement name="" style="align-items: center; justify-content: space-between; align-self: stretch; flex-direction: row; margin-top: -2px;">
                 <ui:Button text="Leave" enabled="true" name="leave-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
                 <ui:Button text="Create a Room" enabled="true" name="create-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
                 <ui:Button text="Refresh" enabled="true" name="refresh-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
             </ui:VisualElement>
-            <ui:VisualElement name="" style="max-width: 171px;">
-                <ui:Label text="Players: 0" name="online-label" class="Lable" style="color: rgb(255, 255, 255); flex-shrink: 1; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&amp;guid=19184939772a7974a86fbd3229349203&amp;type=3#Geometos&quot;); -unity-text-align: middle-left; padding-top: 10px;"/>
+            <ui:VisualElement name="" style="align-self: center;">
+                <ui:Label text="Players: 0" name="online-label" class="Lable" style="color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&amp;guid=19184939772a7974a86fbd3229349203&amp;type=3#Geometos&quot;); -unity-text-align: middle-left; padding-top: 10px;"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

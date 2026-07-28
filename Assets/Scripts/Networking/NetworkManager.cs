@@ -106,12 +106,13 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void UnregisterPlayer(PlayerRef player)
     {
         if (!Application.isPlaying) return;
-        if (!_networkRunnerInstance || !_networkRunnerInstance.IsRunning) return;
-        if (_networkRunnerInstance.IsShutdown) return;
 
+        // Always drop the entry, even during shutdown, so a despawned PlayerData can't linger
+        // in the map (accessing its networked props later throws "not Spawned").
         Debug.Log($"Unregistering player: {player.ToString()}");
         _playerDataMap.Remove(player);
 
+        if (!_networkRunnerInstance || !_networkRunnerInstance.IsRunning || _networkRunnerInstance.IsShutdown) return;
         if (_playerDataMap.Count <= 0) return;
 
         EventBus.Raise(new PlayerListChangedEvent());
@@ -152,10 +153,13 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public bool CanKick() => IsRoomOwner();
     public bool CanStartGame() => IsRoomOwner();
 
-    public bool AreAllPlayersReady() =>
-        _playerDataMap.Count >= MIN_PLAYERS_TO_START && _playerDataMap.Values.All(p => p.IsReady);
+    // Only read IsReady on spawned objects; a PlayerData mid-transition would throw otherwise.
+    private static bool IsReadyAndValid(PlayerData p) => p && p.Object && p.Object.IsValid && p.IsReady;
 
-    public int GetReadyPlayerCount() => _playerDataMap.Values.Count(p => p.IsReady);
+    public bool AreAllPlayersReady() =>
+        _playerDataMap.Count >= MIN_PLAYERS_TO_START && _playerDataMap.Values.All(IsReadyAndValid);
+
+    public int GetReadyPlayerCount() => _playerDataMap.Values.Count(IsReadyAndValid);
 
     public void SetLocalPlayerReady(bool isReady)
     {
@@ -169,6 +173,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     #endregion
 
     #region Lobby (Hub) Logic
+    
+    public int GetAllPlayerCount() => _networkRunnerInstance.SessionInfo.PlayerCount;
 
     // Play Game -> connect to the server-hosted Lobby Hub as a client.
     public async Task ConnectToCustomLobby(string _ = null)
@@ -381,8 +387,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-
-    // In server mode clients no longer spawn anything; the server owns all spawns.
+    
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
