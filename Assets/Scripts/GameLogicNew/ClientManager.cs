@@ -15,8 +15,8 @@ public interface IBoardRenderer
 // Server->client is per-viewer projected diffs over RPC, never [Networked] board state.
 public class ClientManager : NetworkBehaviour
 {
-    // Cells per diff RPC; large blasts are split into sequential chunks. 64 * 8B = 512B, safely under the reliable RPC limit.
-    public const int MaxDiffsPerRpc = 64;
+    // Cells per diff RPC; keep payload conservative to stay below Fusion's reliable RPC byte limit after framing overhead.
+    public const int MaxDiffsPerRpc = 24;
     
     [Networked] public PlayerRef Player { get; private set; }
     [Networked] public byte PlayerId { get; private set; } // 1-based; 0 = no owner
@@ -28,6 +28,13 @@ public class ClientManager : NetworkBehaviour
     private IBoardRenderer _renderer;
     private InputHandler _inputHandler;
     private bool _clientReady;
+    private bool _bootstrapConfigured;
+    private bool _awaitingInitialBoard;
+    private bool _inputWired;
+    private byte _localPlayerId;
+    private bool _hasBufferedTurnState;
+    private bool _bufferedIsMyTurn;
+    private int _bufferedRemainingBudget;
     // Local mirror of all known player action payloads received from the authoritative turn broadcaster.
     private readonly Dictionary<int, PlayerActionData> _playerActionsById = new Dictionary<int, PlayerActionData>();
     // Cached current-playing-player payload to support UI and turn-state consumers.
@@ -74,10 +81,11 @@ public class ClientManager : NetworkBehaviour
     
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
-        if (_inputHandler)
+        if (_inputWired && _inputHandler)
         {
             _inputHandler.RequestSubmitted -= OnRequestSubmitted;
             _inputHandler.HoverChanged -= OnHoverChanged;
+            _inputWired = false;
         }
         if (_actions != null)
             _actions.HighlightsInvalidated -= OnHighlightsInvalidated;
@@ -85,8 +93,13 @@ public class ClientManager : NetworkBehaviour
             _board.Changed -= OnBoardChanged;
 
         _clientReady = false;
+        _bootstrapConfigured = false;
+        _awaitingInitialBoard = false;
+        _inputWired = false;
+        _hasBufferedTurnState = false;
         _server = null;
         _playerActionsById.Clear();
+        _pendingDiffs.Clear();
     }
     
     #region Client -> Server
@@ -129,7 +142,7 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_InitialiseClient(byte playerId, short width, short height)
     {
-        if (_clientReady)
+        if (_clientReady || _bootstrapConfigured)
         {
             Debug.LogWarning("[ClientManager] Duplicate RPC_InitialiseClient ignored.");
             return;
@@ -156,12 +169,10 @@ public class ClientManager : NetworkBehaviour
         _board.Changed += OnBoardChanged;
         _actions.HighlightsInvalidated += OnHighlightsInvalidated;
 
-        _inputHandler.Initialize(_mapper, _actions);
-        _inputHandler.RequestSubmitted += OnRequestSubmitted;
-        _inputHandler.HoverChanged += OnHoverChanged;
-
-        _renderer?.Initialise(_board, _mapper, playerId);
-        _clientReady = true;
+        _bootstrapConfigured = true;
+        _awaitingInitialBoard = true;
+        _localPlayerId = playerId;
+        _pendingDiffs.Clear();
     }
 
     // A chunk of this player's projected diff. Reliable + cumulative: a dropped chunk desyncs permanently.
@@ -174,7 +185,7 @@ public class ClientManager : NetworkBehaviour
             return;
         }
         
-        if (!_clientReady)
+        if (!_bootstrapConfigured)
         {
             Debug.LogWarning("[ClientManager] Diff before init; dropped.");
             return;
@@ -191,6 +202,12 @@ public class ClientManager : NetworkBehaviour
 
         _board.Apply(_pendingDiffs); // raises Changed once
         _pendingDiffs.Clear();
+
+        if (!_awaitingInitialBoard)
+            return;
+
+        _awaitingInitialBoard = false;
+        FinalizeClientBootstrap();
     }
 
     // Turn ownership + budget. Budget is MIRRORED, never computed locally (conquering a base grants +N mid-turn).
@@ -202,8 +219,18 @@ public class ClientManager : NetworkBehaviour
             Debug.LogWarning("[ClientManager] RPC_SetTurnState on a non-input-authority peer.");
             return;
         }
-        if (!_clientReady)
+
+        if (!_bootstrapConfigured)
             return;
+
+        if (!_clientReady)
+        {
+            _bufferedIsMyTurn = isMyTurn;
+            _bufferedRemainingBudget = remainingBudget;
+            _hasBufferedTurnState = true;
+            return;
+        }
+
         _actions.SetTurnState(isMyTurn, remainingBudget);
     }
     
@@ -276,4 +303,25 @@ public class ClientManager : NetworkBehaviour
         => _renderer?.SetHighlights(_actions.CurrentHighlights);
     private void OnHoverChanged(Vector2Int? cell)
         => _renderer?.SetHover(cell);
+
+    private void FinalizeClientBootstrap()
+    {
+        if (_clientReady || !_bootstrapConfigured || _awaitingInitialBoard || !_inputHandler || _actions == null || _board == null)
+            return;
+
+        _inputHandler.Initialize(_mapper, _actions);
+        _inputHandler.RequestSubmitted += OnRequestSubmitted;
+        _inputHandler.HoverChanged += OnHoverChanged;
+        _inputWired = true;
+
+        _renderer?.Initialise(_board, _mapper, _localPlayerId);
+
+        _clientReady = true;
+
+        if (_hasBufferedTurnState)
+        {
+            _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
+            _hasBufferedTurnState = false;
+        }
+    }
 }

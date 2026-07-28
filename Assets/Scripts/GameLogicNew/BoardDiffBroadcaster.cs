@@ -5,6 +5,8 @@ using UnityEngine;
 // No rules, no validation. Enemy bombs are hidden here by TileProjector, before serialization.
 public sealed class BoardDiffBroadcaster
 {
+    private const int FullBoardPulseSize = 16;
+
     private readonly BoardManager _board;
     private readonly IReadOnlyList<ClientManager> _clients; // reference to ServerGameManager's live list, populated after construction
 
@@ -30,11 +32,11 @@ public sealed class BoardDiffBroadcaster
         for (var y = 0; y < _board.Height; y++)
             for (var x = 0; x < _board.Width; x++)
                 all.Add(new Vector2Int(x, y));
-        SendCells(client, all);
+        SendCells(client, all, FullBoardPulseSize);
     }
     
     // Project first so chunk boundaries and the final flag are unambiguous.
-    private void SendCells(ClientManager client, IReadOnlyList<Vector2Int> cells)
+    private void SendCells(ClientManager client, IReadOnlyList<Vector2Int> cells, int maxPerRpc = ClientManager.MaxDiffsPerRpc)
     {
         var viewerId = client.PlayerId;
         var projected = new List<CellDiff>(cells.Count);
@@ -49,7 +51,7 @@ public sealed class BoardDiffBroadcaster
         if (projected.Count == 0)
             return;
 
-        const int max = ClientManager.MaxDiffsPerRpc;
+        var max = Mathf.Max(1, maxPerRpc);
         for (var start = 0; start < projected.Count; start += max)
         {
             var count = Mathf.Min(max, projected.Count - start);
