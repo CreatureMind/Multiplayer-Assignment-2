@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f82bef45c934bcea274627533144cd0, type: 3}
   m_Name: Btn_Hover_SFX
   m_EditorClassIdentifier: Assembly-CSharp::AudioSystem.SoundData
-  clip: {fileID: 8300000, guid: 1c29c1678ae64c44eab5cee4059f9284, type: 3}
+  clip: {fileID: 8300000, guid: 9fc95b6608bd04db3b9a34b9ef01db2a, type: 3}
   mixerGroup: {fileID: -3165942800488051908, guid: 12727e0891e931f4a95b8da5285afea9, type: 2}
   loop: 0
   playOnAwake: 0

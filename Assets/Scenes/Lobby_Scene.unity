@@ -431,6 +431,7 @@ GameObject:
   - component: {fileID: 824371409}
   - component: {fileID: 824371408}
   - component: {fileID: 824371410}
+  - component: {fileID: 824371411}
   m_Layer: 5
   m_Name: UI_Manager
   m_TagString: Untagged
@@ -498,6 +499,19 @@ MonoBehaviour:
   loadingScreenViewPrefab: {fileID: 1884518436683433154}
   chatViewPrefab: {fileID: 6575760504648723879, guid: 046a7adf8e10133479ecfb5dccccb912, type: 3}
   sessionsListData: {fileID: 11400000, guid: b04296e5e9812d24e9dc78829d32bb7b, type: 2}
+--- !u!114 &824371411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 824371407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4133b5b81950849178380bbe0121fcf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalButtonEventListener
+  debug: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
