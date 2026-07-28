@@ -16,21 +16,11 @@ public class GameLogicBoot : MonoBehaviour//, INetworkRunnerCallbacks
     private void Awake()
     {
         
-#if !UNITY_SERVER //god knows why this doesnt work 
-        Destroy(gameObject);
-#endif
-
+#if UNITY_SERVER 
         _runner = FindAnyObjectByType<NetworkRunner>();
         if (!_runner)
         {
             Debug.LogError($"[GameLogicBoot] Couldn't find NetworkRunner component.");
-        }
-
-        if (!_runner.IsServer) // so i do this
-        {
-            Destroy(gameObject);
-            Destroy(gameObject);
-            Destroy(gameObject);
         }
 
         var active = _runner.ActivePlayers;
@@ -41,6 +31,9 @@ public class GameLogicBoot : MonoBehaviour//, INetworkRunnerCallbacks
                 continue;
             OnPlayerJoined();
         }
+        return;
+#endif
+        Destroy(gameObject);
     }
 
     private void OnPlayerJoined()
@@ -79,6 +72,8 @@ public class GameLogicBoot : MonoBehaviour//, INetworkRunnerCallbacks
         }
         
         Debug.Log("[GameLogicBoot] ServerGameManager Spawned Hallelujah");
+        
+        Destroy(gameObject);
     }
 
     // #region Unused Callbacks
