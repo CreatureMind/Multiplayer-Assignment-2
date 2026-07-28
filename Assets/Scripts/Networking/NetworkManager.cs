@@ -15,7 +15,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public static NetworkManager Instance;
 
     [SerializeField] private NetworkRunner networkRunnerPrefab;
-    [SerializeField] private CharacterRegistry characterRegistry;
+    [SerializeField] private GameObject inGameUIPrefab;
 
     [Header("Dedicated Server")]
     [SerializeField] private string hubSessionName = "LobbyHub";
@@ -311,6 +311,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         if (flushDelay > 0f)
             await Task.Delay((int)(flushDelay * 1000));
 
+        // The in-game UI dies with the game scene on the MENU load below; allow the next
+        // match to unload the lobby and spawn a fresh UI again.
+        _inGameUIInstance = null;
+        _unloading = false;
+
         await ShutdownRunner();
 
         IsReturningFromMatch = true;
@@ -453,6 +458,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
     private bool _unloading = false;
+    private GameObject _inGameUIInstance;
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name}");
@@ -483,15 +489,26 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         yield return null; // let Fusion finish its scene merge before we touch scenes
 
         var lobby = SceneManager.GetSceneByBuildIndex((int)SceneDefs.MENU);
-        if (!lobby.IsValid() || !lobby.isLoaded) yield break;
-
-        if (SceneManager.GetActiveScene() == lobby)
+        if (lobby.IsValid() && lobby.isLoaded)
         {
-            var fallback = FindOtherLoadedScene(lobby);
-            if (fallback.IsValid()) SceneManager.SetActiveScene(fallback);
+            if (SceneManager.GetActiveScene() == lobby)
+            {
+                var fallback = FindOtherLoadedScene(lobby);
+                if (fallback.IsValid()) SceneManager.SetActiveScene(fallback);
+            }
+
+            yield return SceneManager.UnloadSceneAsync(lobby);
         }
 
-        yield return SceneManager.UnloadSceneAsync(lobby);
+        SpawnInGameUI();
+    }
+
+    // Instantiated locally on the client into the active game scene (never a networked/scene
+    // object), so the server never has it and it dies with the scene on return to lobby.
+    private void SpawnInGameUI()
+    {
+        if (!inGameUIPrefab || _inGameUIInstance) return;
+        _inGameUIInstance = Instantiate(inGameUIPrefab);
     }
 
     private static Scene FindOtherLoadedScene(Scene exclude)
