@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   networkRunnerPrefab: {fileID: 7706314431963058946, guid: 4f5377e4c5bfcbb4c86b84f4a299471d, type: 3}
-  inGameUIPrefab: {fileID: 4656111340782765190, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
+  inGameUIPrefab: {fileID: 6537145547553525139, guid: edb97dcb695961c499400e32c531c83b, type: 3}
   hubSessionName: LobbyHub
   hubLobbyName: TinySoldiersLobby
   hubNetSceneBuildIndex: 3
