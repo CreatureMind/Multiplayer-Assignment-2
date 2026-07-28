@@ -50,6 +50,7 @@ public class InGameUIView : MonoBehaviour
         {
             _leaveGameButton.clicked += () =>
             {
+                Debug.Log("<color=green>[UI VIEW] Leave Button Clicked!</color>");
                 OnLeaveButtonClicked?.Invoke();
                 _leaveGameButton.text = "Leaving...";
                 _leaveGameButton.SetEnabled(false);
@@ -64,6 +65,7 @@ public class InGameUIView : MonoBehaviour
         {
             _returnToLobbyButton.clicked += () =>
             {
+                Debug.Log("<color=green>[UI VIEW] Return Button Clicked!</color>");
                 OnReturnButtonClicked?.Invoke();
                 _returnToLobbyButton.text = "Returning...";
                 _returnToLobbyButton.SetEnabled(false);

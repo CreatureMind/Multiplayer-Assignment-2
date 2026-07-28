@@ -31,6 +31,7 @@ public class InGameUIPresenter
 
     private void ReturnToLobby()
     {
+        Debug.Log("<color=yellow>[UI PRESENTER] Catching leave event, calling model...</color>");
         _model.ReturnToLobby();
     }
 
