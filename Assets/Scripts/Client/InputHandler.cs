@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 // Converts pointer input into a MoveRequest and raises it.
 // It never validates and never mutates.
@@ -23,8 +22,6 @@ public sealed class InputHandler : MonoBehaviour
     private PlayerActionController _actions;
     private Vector2Int? _lastHover;
     private bool _ready;
-    
-    private UIDocument _document;
     
     // Called once by ClientManager after the board dimensions are known
     public void Initialize(BoardCoordinateMapper mapper, PlayerActionController actions)
@@ -76,9 +73,6 @@ public sealed class InputHandler : MonoBehaviour
                       $"map={primaryAction.action.actionMap?.name} " +
                       $"phase={primaryAction.action.phase}");
         
-        if (!_document)
-            _document = GetComponent<UIDocument>();
-        
         if (!_ready || !pointerPosition)
             return;
         
@@ -109,17 +103,6 @@ public sealed class InputHandler : MonoBehaviour
         }
         
         var screen = pointerPosition.action.ReadValue<Vector2>();
-
-        var toolkitScreen = screen;
-        toolkitScreen.y = Screen.height - toolkitScreen.y;
-
-        var pickedElement = _document.rootVisualElement.panel.Pick(toolkitScreen);
-
-        if (pickedElement is { pickingMode: PickingMode.Position })
-        {
-            return;
-        }
-        
         if (!_mapper.TryScreenToBoard(screen, out var cell))
             return;
         
