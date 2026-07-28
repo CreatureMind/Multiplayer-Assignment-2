@@ -75,6 +75,8 @@ public class RoomRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
         TryAssignPendingOwner();
     }
 
+    public bool IsMatchStarted => _roomController && _roomController.MatchStarted;
+
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         if (!runner.IsServer) return;
@@ -149,8 +151,9 @@ public class RoomRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        Debug.Log($"[Server] Room '{_sessionName}' OnSceneLoadDone: {runner.SceneManager.MainRunnerScene.name}.");
-        _manager.TryBeginPostGameSceneBootstrap(_roomId, runner);
+        var isPostMatchLoad = IsMatchStarted;
+        Debug.Log($"[Server] Room '{_sessionName}' OnSceneLoadDone: {runner.SceneManager.MainRunnerScene.name}, postMatchLoad={isPostMatchLoad}.");
+        _manager.TryBeginPostGameSceneBootstrap(_roomId, runner, isPostMatchLoad);
     }
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)

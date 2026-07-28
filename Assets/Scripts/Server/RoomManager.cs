@@ -229,10 +229,12 @@ public class RoomManager : MonoBehaviour
         return cleaned.Length > 16 ? cleaned[..16] : cleaned;
     }
     
-    public void TryBeginPostGameSceneBootstrap(int roomId, NetworkRunner runner)
+    public void TryBeginPostGameSceneBootstrap(int roomId, NetworkRunner runner, bool isPostMatchLoad)
     {
         if (!_rooms.TryGetValue(roomId, out var room)) return;
         if (!runner || room.Runner != runner) return;
+        if (!isPostMatchLoad)
+            return;
         if (room.BootstrapStarted || room.BootstrapDone) return;
 
         room.BootstrapStarted = true;
@@ -246,57 +248,7 @@ public class RoomManager : MonoBehaviour
             room.BootstrapStarted = false;
             yield break;
         }
-        Debug.Log($"[Server] Room '{room.Runner.SessionInfo.Name}' bootstrap gate opened. Waiting for Clean_Game_Scene to settle...");
-
-        GameObject requiredComponents;
-        SceneRef loadedScene;
-        INetworkSceneManager sceneManager = room.Runner.SceneManager;
-        var timeoutAt = Time.realtimeSinceStartup + 15f;
-        while (Time.realtimeSinceStartup < timeoutAt)
-        {
-            if (!room.Runner || room.Runner.IsShutdown)
-            {
-                room.BootstrapStarted = false;
-                yield break;
-            }
-            requiredComponents = FindAnyObjectByType<ClientSceneContext>()?.gameObject;
-            if (!requiredComponents)
-                break;
-
-            sceneManager = room.Runner.SceneManager;
-            if (sceneManager ==  null)
-                break;
-
-            loadedScene = sceneManager.GetSceneRef(requiredComponents);
-            if (loadedScene.IsValid)
-                break;
-
-            yield return null;
-        }
-        requiredComponents = FindAnyObjectByType<ClientSceneContext>()?.gameObject;
-        if (!requiredComponents)
-        {
-            room.BootstrapStarted = false;
-            Debug.Log("[Server] Room bootstrap gate timed out haven't found RequiredComponents.");
-            yield break;
-        }
-        
-        sceneManager = room.Runner.SceneManager;
-        if (sceneManager ==  null)
-        {
-            room.BootstrapStarted = false;
-            Debug.Log("[Server] Room bootstrap gate timed out sceneManager is null.");
-            yield break;
-        }
-
-        loadedScene = sceneManager.GetSceneRef(requiredComponents);
-        
-        if (!loadedScene.IsValid)
-        {
-            room.BootstrapStarted = false;
-            Debug.LogWarning($"[Server] Room '{room.Runner.SessionInfo.Name}' bootstrap gate timed out waiting for Clean_Game_Scene. Will retry on next scene load callback.");
-            yield break;
-        }
+        Debug.Log($"[Server] Room '{room.Runner.SessionInfo.Name}' bootstrap gate opened after post-match scene load.");
 
         // Defer one frame so post-load objects and runner bookkeeping settle before spawning authoritative game logic.
         yield return null;
