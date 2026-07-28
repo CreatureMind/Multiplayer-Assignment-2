@@ -12,6 +12,7 @@ public static class BoardUtilities
     {
         Manager = boardManager;
         Tiles = tiles;
+        Debug.Log("Instantiated board utilities.");
     }
     
     public static bool PawnElegabiltyCheckDFS([NotNull] TileState tileState, Vector2Int tileIndex, int playerId)

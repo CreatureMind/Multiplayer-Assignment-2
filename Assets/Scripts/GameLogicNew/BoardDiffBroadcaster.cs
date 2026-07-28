@@ -19,6 +19,8 @@ public sealed class BoardDiffBroadcaster
     // Send a set of changed cells to every client, each viewer projected independently.
     public void Broadcast(IReadOnlyList<Vector2Int> changedCells)
     {
+        Debug.Log($"Attempting to broadcast {changedCells.Count} cells to {_board.Width}x{_board.Height}...");
+        
         if (changedCells == null || changedCells.Count == 0)
             return;
         foreach (var client in _clients)
@@ -28,6 +30,8 @@ public sealed class BoardDiffBroadcaster
     // Send the entire authored board to one client (used on bootstrap).
     public void SendFullBoard(ClientManager client)
     {
+        Debug.Log("Attempting to send full board utilities...");
+        
         var all = new List<Vector2Int>(_board.TileCount);
         for (var y = 0; y < _board.Height; y++)
             for (var x = 0; x < _board.Width; x++)

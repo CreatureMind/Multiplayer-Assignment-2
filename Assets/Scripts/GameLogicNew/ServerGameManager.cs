@@ -33,6 +33,8 @@ public sealed class ServerGameManager : NetworkBehaviour
 
     private void SpawnTurnManager()
     {
+        Debug.Log("Attempting to spawn turn manager...");
+        
         if (!HasStateAuthority) return;
 
         if (!data.TurnManagerPrefab)
@@ -58,10 +60,13 @@ public sealed class ServerGameManager : NetworkBehaviour
         _turnManagerInstance.InstantiateTurnManager(_clientManagers, data.TurnStats, _turnDiffBroadcaster);
         _TurnManagerSpawned = true;
         
+        Debug.Log("Successfully spawned turn manager.");
     }
 
     private void InstantiateClientManagers()
     {
+        Debug.Log("Attempting to spawn client managers...");
+        
         if (!HasStateAuthority) return;
 
         var players = Runner.ActivePlayers;
@@ -72,6 +77,8 @@ public sealed class ServerGameManager : NetworkBehaviour
             if(player.PlayerId == -1) continue;
             _currentPlayerCount++;
         }
+        
+        Debug.Log($"Received {_currentPlayerCount} players...");
 
         //enforcement of minimum players 
         if (!data.ValidatePlayerCount(_currentPlayerCount))
@@ -87,24 +94,35 @@ public sealed class ServerGameManager : NetworkBehaviour
             var clientManager = Runner.Spawn(data.ClientManagerPrefab, Vector3.zero, Quaternion.identity, player);
             clientManager.InstantiateClientManager(this, (byte)player.PlayerId);
             _clientManagers.Add(clientManager);
+
+            Debug.Log($"Spawned Client Manager for {player.PlayerId}...");
         }
 
         if (_clientManagers.Count != _currentPlayerCount) return;
         
         _ClientManagerSpawned = true;
+        
+        Debug.Log("Successfully spawned all client managers.");
+        
         SpawnTurnManager();
     }
 
 
     private void SpawnBoardManager()
     {
+        Debug.Log("Attempting to spawn board manager...");
+        
         if (!HasStateAuthority) return;
         
         StartCoroutine(SpawnBoardManagerRoutine());
+        
+        Debug.Log("Successfully spawned board manager.");
     }
 
     private IEnumerator SpawnBoardManagerRoutine()
     {
+        Debug.Log("Starting board spawning routine...");
+        
         if (_boardManagerSpawned)
             yield break;
 
@@ -119,10 +137,15 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         _boardManagerInstance = Runner.Spawn(data.BoardManagerPrefab, Vector3.zero, Quaternion.identity);
         _boardManagerSpawned = true;
+        
+        Debug.Log("Spawned board manager...");
+        
         _boardManagerInstance.InitializeBoardWithMadeMap_ServerOnly(data.StartingPosition);
         _boardDiffBroadcaster = new BoardDiffBroadcaster(_boardManagerInstance, _clientManagers);
-        TryInitialiseReadyClients();
         
+        Debug.Log("Spawned board diff broadcaster...");
+        
+        TryInitialiseReadyClients();
         
         yield return new WaitUntil(() => _turnManagerInstance && _TurnManagerSpawned);
         
@@ -130,6 +153,9 @@ public sealed class ServerGameManager : NetworkBehaviour
         var setupDiffCells = new List<Vector2Int>();
         foreach (var baseBottomLeft in changedBases)
             AddBaseCells(baseBottomLeft, setupDiffCells);
+        
+        Debug.Log($"Added {changedBases.Count} bases...");
+        
         _boardDiffBroadcaster?.Broadcast(setupDiffCells);
 
         int successCounter = 0;
@@ -140,6 +166,7 @@ public sealed class ServerGameManager : NetworkBehaviour
             if (result == ActionResult.Success)
             {
                 successCounter++;
+                Debug.Log("Successfully built base: " + cb);
             }
         }
         
@@ -151,15 +178,17 @@ public sealed class ServerGameManager : NetworkBehaviour
 
     public void HandleMoveRequest(ClientManager clientManager, Vector2Int cell, MoveIntent intent)
     {
+        Debug.Log("Attempting to execute move request...");
+        
         if (!HasStateAuthority) return;
 
         if (HandleMoveRequestCheckAndUpdate(clientManager, cell, intent))
         {
-            // success, everything had already been updated in HandleMoveRequestCheckAndUpdate
+            Debug.Log("Executed move request.");
         }
         else
         {
-            //failed to do action
+            Debug.Log("Failed to execute move request.");
         }
     }
 
@@ -259,17 +288,25 @@ public sealed class ServerGameManager : NetworkBehaviour
 
     private static void AddBaseCells(Vector2Int bottomLeft, List<Vector2Int> changedCells)
     {
+        Debug.Log($"Attempting to add base cells for base at ({bottomLeft.x}, {bottomLeft.y})");
+        
         changedCells.Add(bottomLeft);
         changedCells.Add(new Vector2Int(bottomLeft.x + 1, bottomLeft.y));
         changedCells.Add(new Vector2Int(bottomLeft.x, bottomLeft.y + 1));
         changedCells.Add(new Vector2Int(bottomLeft.x + 1, bottomLeft.y + 1));
+
+        Debug.Log("Added base cells.");
     }
 
     private static void AddBuildBaseCoreCells(Vector2Int buildWindowOrigin, List<Vector2Int> changedCells)
     {
+        Debug.Log($"Attempting to add base cells for base at ({buildWindowOrigin.x}, {buildWindowOrigin.y})");
+        
         changedCells.Add(new Vector2Int(buildWindowOrigin.x + 1, buildWindowOrigin.y + 1));
         changedCells.Add(new Vector2Int(buildWindowOrigin.x + 2, buildWindowOrigin.y + 1));
         changedCells.Add(new Vector2Int(buildWindowOrigin.x + 1, buildWindowOrigin.y + 2));
         changedCells.Add(new Vector2Int(buildWindowOrigin.x + 2, buildWindowOrigin.y + 2));
+        
+        Debug.Log("Added motherload cells.");
     }
 }
