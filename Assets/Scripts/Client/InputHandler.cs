@@ -31,8 +31,10 @@ public sealed class InputHandler : MonoBehaviour
         _ready = true;
     }
 
-    private void Start()
+    private void OnEnable()
     {
+        InputSystem.onActionChange += OnAnyActionChange;
+        
         Debug.Log($"[Input] OnEnable ran, primaryAction={(primaryAction ? primaryAction.name : "NULL")}");
         
         if (pointerPosition)
@@ -45,8 +47,16 @@ public sealed class InputHandler : MonoBehaviour
         }
     }
 
+    private static void OnAnyActionChange(object obj, InputActionChange change)
+    {
+        if (change == InputActionChange.ActionDisabled)
+            Debug.Log($"[Input] DISABLED: {obj}\n{Environment.StackTrace}");
+    }
+
     private void OnDisable()
     {
+        InputSystem.onActionChange += OnAnyActionChange;
+        
         if (primaryAction)
         {
             primaryAction.action.performed -= OnPrimaryPerformed;
