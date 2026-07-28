@@ -31,7 +31,7 @@
         "EnableAdaptivePacketFragmentation": false
     },
     "Network": {
-        "ConnectionTimeout": 300000.0,
+        "ConnectionTimeout": 10000.0,
         "ConnectionShutdownTime": 1.0,
         "ReliableDataTransferModes": 3
     },

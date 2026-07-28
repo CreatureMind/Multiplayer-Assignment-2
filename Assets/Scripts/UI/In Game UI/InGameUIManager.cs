@@ -1,3 +1,4 @@
+using System;
 using Events;
 using UnityEngine;
 
@@ -19,18 +20,11 @@ public class InGameUIManager : MonoBehaviour
         }
 
         Instance = this;
+    }
 
+    private void Start()
+    {
         InitializeMVP();
-    }
-
-    private void OnEnable()
-    {
-        EventBus.Subscribe<PlayerListChangedEvent>(OnPlayerListChanged);
-    }
-
-    private void OnDisable()
-    {
-        EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
     }
 
     private void InitializeMVP()
@@ -43,29 +37,14 @@ public class InGameUIManager : MonoBehaviour
 
         _model = new InGameUIModel();
         _presenter = new InGameUIPresenter(_model, inGameView);
-
-        _presenter.Initialize();
     }
 
-    private void OnPlayerListChanged(PlayerListChangedEvent e)
-    {
-        if (_presenter != null)
-        {
-            _presenter.CheckForMasterClientChange();
-        }
-    }
-
-    public void OnGameEnded(bool isMasterClient)
+    public void OnGameEnded()
     {
         if (_model != null)
         {
-            _model.NotifyGameEnded(isMasterClient);
+            _model.NotifyGameEnded();
         }
-    }
-    
-    public void NotifyMasterClientMightHaveChanged()
-    {
-        _presenter?.CheckForMasterClientChange();
     }
 
     private void OnDestroy()

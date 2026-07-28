@@ -15,66 +15,27 @@ public class InGameUIPresenter
 
     private void SubscribeToEvents()
     {
-        _view.OnEndGameButtonClicked += HandleEndGameButtonClicked;
-        _view.OnLeaveButtonClicked += HandleLeaveButtonClicked;
-        _view.OnReturnToLobbyClicked += HandleReturnToLobbyClicked;
+        _view.OnLeaveButtonClicked += ReturnToLobby;
+        _view.OnReturnButtonClicked += ReturnToLobby;
 
-        _model.OnMasterClientChanged += UpdateButtonVisibility;
-        _model.OnGameEndedByMaster += HandleGameEnded;
+        _model.OnGameEnded += HandleGameEnded;
     }
 
     public void UnsubscribeFromEvents()
     {
-        _view.OnEndGameButtonClicked -= HandleEndGameButtonClicked;
-        _view.OnLeaveButtonClicked -= HandleLeaveButtonClicked;
-        _view.OnReturnToLobbyClicked -= HandleReturnToLobbyClicked;
-
-        _model.OnMasterClientChanged -= UpdateButtonVisibility;
-        _model.OnGameEndedByMaster -= HandleGameEnded;
+        _view.OnLeaveButtonClicked -= ReturnToLobby;
+        _view.OnReturnButtonClicked -= ReturnToLobby;
+        
+        _model.OnGameEnded -= HandleGameEnded;
     }
 
-    public void Initialize()
-    {
-        UpdateButtonVisibility();
-    }
-
-    private void HandleEndGameButtonClicked()
-    {
-        if (!_model.IsMasterClient()) return;
-
-        if (GameSessionManager.Instance)
-        {
-            GameSessionManager.Instance.EndGameSession();
-        }
-    }
-
-    private void HandleLeaveButtonClicked()
+    private void ReturnToLobby()
     {
         _model.ReturnToLobby();
     }
 
-    private void HandleReturnToLobbyClicked()
+    private void HandleGameEnded()
     {
-        _model.ReturnToLobby();
-    }
-
-    private void UpdateButtonVisibility()
-    {
-        var isMasterClient = _model.IsMasterClient();
-        _view.SetEndGameButtonVisible(isMasterClient);
-        _view.SetLeaveButtonVisible(true);
-    }
-
-    private void HandleGameEnded(bool isMasterClient)
-    {
-        if (isMasterClient)
-            _model.ReturnToLobby(0.3f); // delay so the end signal reaches others first
-        else
-            _view.ShowEndGamePopup();
-    }
-
-    public void CheckForMasterClientChange()
-    {
-        _model.CheckMasterClientStatus();
+        _view.ShowEndGamePopup();
     }
 }

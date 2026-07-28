@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Events;
@@ -20,8 +21,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private string hubSessionName = "LobbyHub";
     [SerializeField] private string hubLobbyName = "TinySoldiersLobby";
     [SerializeField] private int hubNetSceneBuildIndex = (int)SceneDefs.HUB_NET;
-
-    public ReadyManager ReadyManagerInstance { get; set; }
+    
     public ChatNetworkManager ChatNetworkManager { get; private set; }
 
     private const int MIN_PLAYERS_TO_START = 1;
@@ -31,7 +31,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private string _currentLobbyId;
     public string CurrentLobbyId => _currentLobbyId;
-    public CharacterRegistry CharacterRegistry => characterRegistry;
 
     public bool IsReturningFromMatch { get; private set; }
     public string LocalConfirmedName { get; set; }
@@ -71,13 +70,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     private void OnEnable()
     {
         EventBus.Subscribe<RoomListChangedEvent>(CacheRoomList);
-        EventBus.Subscribe<MatchStartedEvent>(UnloadScene);
     }
 
     private void OnDisable()
     {
         EventBus.Unsubscribe<RoomListChangedEvent>(CacheRoomList);
-        EventBus.Unsubscribe<MatchStartedEvent>(UnloadScene);
     }
 
     private void CacheRoomList(RoomListChangedEvent e) => _cachedRoomList = e;
@@ -387,8 +384,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         EventBus.Raise(new PlayerLeftEvent { Player = player });
         _playerDataMap.Remove(player);
-        if (CharacterSelectionManager.Instance)
-            CharacterSelectionManager.Instance.OnPlayerLeft(player);
+
         EventBus.Raise(new PlayerListChangedEvent());
     }
 
@@ -456,19 +452,56 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
-    private Scene _currentScene;
-    private int playerCount = 0;
+    private bool _unloading = false;
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        playerCount++;
-        Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name} player_{playerCount}");
-        _currentScene = SceneManager.GetActiveScene();
+        Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name}");
         EventBus.Raise(new SceneLoadDoneEvent());
+
+        // In Multiple-Peer mode the game scene merges into Fusion's scene, so the
+        // local lobby scene must be unloaded explicitly once the game scene loads.
+        if (IsGameSceneLoaded(runner) && !IsReturningFromMatch && !_unloading)
+        {
+            _unloading = true;
+            StartCoroutine(UnloadLobbySceneNextFrame());
+        }
     }
 
-    private void UnloadScene(MatchStartedEvent e)
+    private static bool IsGameSceneLoaded(NetworkRunner runner)
     {
-        SceneManager.UnloadSceneAsync(_currentScene);
+        if (!runner || !runner.TryGetSceneInfo(out var sceneInfo)) return false;
+
+        var game = SceneRef.FromIndex((int)SceneDefs.GAME);
+        for (int i = 0; i < sceneInfo.SceneCount; i++)
+            if (sceneInfo.Scenes[i] == game) return true;
+
+        return false;
+    }
+
+    private IEnumerator UnloadLobbySceneNextFrame()
+    {
+        yield return null; // let Fusion finish its scene merge before we touch scenes
+
+        var lobby = SceneManager.GetSceneByBuildIndex((int)SceneDefs.MENU);
+        if (!lobby.IsValid() || !lobby.isLoaded) yield break;
+
+        if (SceneManager.GetActiveScene() == lobby)
+        {
+            var fallback = FindOtherLoadedScene(lobby);
+            if (fallback.IsValid()) SceneManager.SetActiveScene(fallback);
+        }
+
+        yield return SceneManager.UnloadSceneAsync(lobby);
+    }
+
+    private static Scene FindOtherLoadedScene(Scene exclude)
+    {
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            var scene = SceneManager.GetSceneAt(i);
+            if (scene.isLoaded && scene != exclude) return scene;
+        }
+        return default;
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
