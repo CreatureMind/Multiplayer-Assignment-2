@@ -692,12 +692,12 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (!_readyClientIds.Contains(clientManager.PlayerId) || _initialisedClientIds.Contains(clientManager.PlayerId))
             return;
 
+        _initialisedClientIds.Add(clientManager.PlayerId);
         _diffHandshakeClientIds.Remove(clientManager.PlayerId);
         _loggedSkippedLiveDiffClientIds.Remove(clientManager.PlayerId);
         clientManager.RPC_InitialiseClient(clientManager.PlayerId, (short)_boardManagerInstance.Width, (short)_boardManagerInstance.Height);
         _boardDiffBroadcaster.SendFullBoard(clientManager);
         _turnManagerInstance?.SyncClientTurnState(clientManager);
-        _initialisedClientIds.Add(clientManager.PlayerId);
     }
 
     private bool CanReceiveLiveDiffs(ClientManager clientManager)
