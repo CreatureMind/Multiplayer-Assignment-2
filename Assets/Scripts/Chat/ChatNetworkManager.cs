@@ -307,7 +307,11 @@ public class ChatNetworkManager : MonoBehaviour
 
     private string GetLocalPlayerName()
     {
-        var data = NetworkManager.Instance ? NetworkManager.Instance.GetLocalPlayerData() : null;
+        if (!NetworkManager.Instance) return string.Empty;
+        // Prefer the plain confirmed name: it survives scene changes, unlike the networked PlayerData.
+        if (!string.IsNullOrEmpty(NetworkManager.Instance.LocalConfirmedName))
+            return NetworkManager.Instance.LocalConfirmedName;
+        var data = NetworkManager.Instance.GetLocalPlayerData();
         return data ? data.DisplayName.ToString() : string.Empty;
     }
 

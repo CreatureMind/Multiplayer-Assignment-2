@@ -5,21 +5,18 @@ using UnityEngine;
 public class InGameUIManager : MonoBehaviour
 {
     [SerializeField] private InGameUIView inGameView;
-    
-    public static InGameUIManager Instance { get; private set; }
 
     private InGameUIModel _model;
     private InGameUIPresenter _presenter;
 
-    private void Awake()
+    private NetworkManager _networkManager;
+    public NetworkManager NetworkManager
     {
-        if (Instance != null && Instance != this)
+        get => _networkManager;
+        set
         {
-            Destroy(gameObject);
-            return;
+            _networkManager = value;
         }
-
-        Instance = this;
     }
 
     private void Start()
@@ -35,7 +32,7 @@ public class InGameUIManager : MonoBehaviour
             return;
         }
 
-        _model = new InGameUIModel();
+        _model = new InGameUIModel(_networkManager);
         _presenter = new InGameUIPresenter(_model, inGameView);
     }
 
@@ -52,11 +49,6 @@ public class InGameUIManager : MonoBehaviour
         if (_presenter != null)
         {
             _presenter.UnsubscribeFromEvents();
-        }
-
-        if (Instance == this)
-        {
-            Instance = null;
         }
     }
 }
