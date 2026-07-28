@@ -288,9 +288,16 @@ public class TurnManager : NetworkBehaviour
 
         GameTraceLogger.Turn(TraceLogsEnabled, $"EndPlayerTurn processing for player={playerId}, currentTurnIndex={CurrentTurnIndex}.");
 
-        CurrentTurnIndex = CurrentTurnIndex + 1;
+        CurrentTurnIndex++;
 
-        var nextPlayerId = _clientManagers[CurrentTurnIndex].PlayerId;
+        var correctIndex = 0;
+        for (correctIndex = 0; correctIndex < _clientManagers.Count; correctIndex++)
+        {
+            if (_clientManagers[correctIndex].PlayerId == CurrentTurnIndex)
+                break;
+        }
+
+        var nextPlayerId = _clientManagers[correctIndex].PlayerId;
         if (!TryReadPlayerActionData(nextPlayerId, out var nextPlayerIndex, out var nextPlayerActionData))
         {
             GameTraceLogger.Turn(TraceLogsEnabled, $"EndPlayerTurn failed: could not read action data for next player={nextPlayerId}.");
