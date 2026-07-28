@@ -17,6 +17,8 @@ public class ClientManager : NetworkBehaviour
 {
     // Cells per diff RPC; keep payload conservative to stay below Fusion's reliable RPC byte limit after framing overhead.
     public const int MaxDiffsPerRpc = 24;
+    private const string ReadyLogPrefix = "<color=#4DD0E1>[ClientHandshake]</color>";
+    private const string RpcLogPrefix = "<color=#FFD166>[ClientRPC]</color>";
     
     [Networked] public PlayerRef Player { get; private set; }
     [Networked] public byte PlayerId { get; private set; } // 1-based; 0 = no owner
@@ -35,6 +37,7 @@ public class ClientManager : NetworkBehaviour
     private bool _hasBufferedTurnState;
     private bool _bufferedIsMyTurn;
     private int _bufferedRemainingBudget;
+    private bool _initFinishedHandshakeSent;
     // Local mirror of all known player action payloads received from the authoritative turn broadcaster.
     private readonly Dictionary<int, PlayerActionData> _playerActionsById = new Dictionary<int, PlayerActionData>();
     // Cached current-playing-player payload to support UI and turn-state consumers.
@@ -80,6 +83,7 @@ public class ClientManager : NetworkBehaviour
         _inputHandler = context.InputHandler;
 
         // Rig cached -> tell the server we're ready. The server replies with init + the full board once it exists.
+        Debug.Log($"{ReadyLogPrefix} Sending RPC_ClientReady from {name}.");
         RPC_ClientReady();
     }
     
@@ -101,6 +105,7 @@ public class ClientManager : NetworkBehaviour
         _awaitingInitialBoard = false;
         _inputWired = false;
         _hasBufferedTurnState = false;
+        _initFinishedHandshakeSent = false;
         _server = null;
         _playerActionsById.Clear();
         _pendingDiffs.Clear();
@@ -111,6 +116,8 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_ClientReady()
     {
+        Debug.Log($"{ReadyLogPrefix} Server received RPC_ClientReady from {name} (P{PlayerId}).");
+
         if (!_server)
         {
             Debug.LogError("[ClientManager] RPC_ClientReady on a peer with no ServerGameManager.");
@@ -118,6 +125,26 @@ public class ClientManager : NetworkBehaviour
         }
         // Hands readiness back to server so it can initialise this client and stream the full board diff.
         _server.OnClientReady(this);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+    public void RPC_ClientInitFinished()
+    {
+        Debug.Log($"{ReadyLogPrefix} Server received RPC_ClientInitFinished from {name} (P{PlayerId}).");
+
+        if (!HasStateAuthority)
+        {
+            Debug.LogWarning("[ClientManager] RPC_ClientInitFinished on a non-authoritative peer.");
+            return;
+        }
+
+        if (!_server)
+        {
+            Debug.LogError("[ClientManager] RPC_ClientInitFinished on a peer with no ServerGameManager.");
+            return;
+        }
+
+        _server.OnClientInitFinished(this);
     }
     
     // Carries an INTENT, not a target type: move-into-empty and capture both yield Soldier, and BuildBase carries a window origin.
@@ -146,6 +173,8 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_InitialiseClient(byte playerId, short width, short height)
     {
+        Debug.Log($"{RpcLogPrefix} RPC_InitialiseClient for {name} (P{playerId}) {width}x{height}.");
+
         if (_clientReady || _bootstrapConfigured)
         {
             Debug.LogWarning("[ClientManager] Duplicate RPC_InitialiseClient ignored.");
@@ -183,6 +212,8 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_ApplyDiffs(CellDiff[] diffs, int count, NetworkBool isFinalChunk)
     {
+        Debug.Log($"{RpcLogPrefix} RPC_ApplyDiffs for {name} count={count}, final={isFinalChunk}.");
+
         if (!HasInputAuthority)
         {
             Debug.LogWarning("[ClientManager] RPC_ApplyDiffs on a non-input-authority peer.");
@@ -218,6 +249,8 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_SetTurnState(NetworkBool isMyTurn, int remainingBudget)
     {
+        Debug.Log($"{RpcLogPrefix} RPC_SetTurnState for {name} isMyTurn={isMyTurn}, remainingBudget={remainingBudget}.");
+
         if (!HasInputAuthority)
         {
             Debug.LogWarning("[ClientManager] RPC_SetTurnState on a non-input-authority peer.");
@@ -241,6 +274,8 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_InitialisePlayerActions(PlayerActionData[] playerActions, int count)
     {
+        Debug.Log($"{RpcLogPrefix} RPC_InitialisePlayerActions for {name} count={count}.");
+
         // Seeds the local mirror with the authoritative PlayerActionData snapshot for all players.
         if (!HasInputAuthority)
         {
@@ -271,6 +306,8 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_CurrentPlayingPlayerChanged(PlayerActionData currentPlayingPlayer)
     {
+        Debug.Log($"{RpcLogPrefix} RPC_CurrentPlayingPlayerChanged for {name} playerId={currentPlayingPlayer.PlayerId}.");
+
         // Applies authoritative "current active player" updates during the active turn.
         if (!HasInputAuthority)
         {
@@ -286,6 +323,8 @@ public class ClientManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_TurnChanged(PlayerActionData upcomingPlayer)
     {
+        Debug.Log($"{RpcLogPrefix} RPC_TurnChanged for {name} upcomingPlayerId={upcomingPlayer.PlayerId}.");
+
         // Applies authoritative "next player turn started" updates at end-turn transition.
         if (!HasInputAuthority)
         {
@@ -326,6 +365,13 @@ public class ClientManager : NetworkBehaviour
         {
             _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
             _hasBufferedTurnState = false;
+        }
+
+        if (!_initFinishedHandshakeSent && HasInputAuthority)
+        {
+            _initFinishedHandshakeSent = true;
+            Debug.Log($"{ReadyLogPrefix} Sending RPC_ClientInitFinished from {name}.");
+            RPC_ClientInitFinished();
         }
     }
 }

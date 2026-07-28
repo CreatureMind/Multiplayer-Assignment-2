@@ -7,6 +7,8 @@ using UnityEngine;
 
 public sealed class ServerGameManager : NetworkBehaviour
 {
+    private const string HandshakeLogPrefix = "<color=#4DD0E1>[ClientHandshake]</color>";
+
     [SerializeField] private GameDataSO data;
     private BoardManager _boardManagerInstance;
     private BoardDiffBroadcaster _boardDiffBroadcaster;
@@ -21,6 +23,8 @@ public sealed class ServerGameManager : NetworkBehaviour
     private int _currentPlayerCount;
     private readonly HashSet<byte> _readyClientIds = new HashSet<byte>();
     private readonly HashSet<byte> _initialisedClientIds = new HashSet<byte>();
+    private readonly HashSet<byte> _diffHandshakeClientIds = new HashSet<byte>();
+    private readonly HashSet<byte> _loggedSkippedLiveDiffClientIds = new HashSet<byte>();
 
     public void RequestInstantiation()
     {
@@ -41,6 +45,10 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         if (!HasStateAuthority) return;
         _initRequested = true;
+        _readyClientIds.Clear();
+        _initialisedClientIds.Clear();
+        _diffHandshakeClientIds.Clear();
+        _loggedSkippedLiveDiffClientIds.Clear();
         
         await InstantiateClientManagers();
         await SpawnBoardManager();
@@ -207,7 +215,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         Debug.Log("Instantiated board manager...");
 
-        _boardDiffBroadcaster = new BoardDiffBroadcaster(_boardManagerInstance, _clientManagers);
+        _boardDiffBroadcaster = new BoardDiffBroadcaster(_boardManagerInstance, _clientManagers, CanReceiveLiveDiffs, OnLiveDiffSkipped);
         
         Debug.Log("Spawned board diff broadcaster...");
         
@@ -334,7 +342,26 @@ public sealed class ServerGameManager : NetworkBehaviour
             return;
 
         _readyClientIds.Add(clientManager.PlayerId);
+        Debug.Log($"{HandshakeLogPrefix} Server accepted readiness for P{clientManager.PlayerId}.");
         TryInitialiseReadyClient(clientManager);
+    }
+
+    public void OnClientInitFinished(ClientManager clientManager)
+    {
+        if (!HasStateAuthority || !clientManager)
+            return;
+
+        if (!_initialisedClientIds.Contains(clientManager.PlayerId))
+        {
+            Debug.LogWarning($"{HandshakeLogPrefix} Ignoring RPC_ClientInitFinished from P{clientManager.PlayerId} before init was sent.");
+            return;
+        }
+
+        if (_diffHandshakeClientIds.Add(clientManager.PlayerId))
+        {
+            _loggedSkippedLiveDiffClientIds.Remove(clientManager.PlayerId);
+            Debug.Log($"{HandshakeLogPrefix} Server marked P{clientManager.PlayerId} as live-diff enabled.");
+        }
     }
 
     private void TryInitialiseReadyClients()
@@ -351,10 +378,27 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (!_readyClientIds.Contains(clientManager.PlayerId) || _initialisedClientIds.Contains(clientManager.PlayerId))
             return;
 
+        _diffHandshakeClientIds.Remove(clientManager.PlayerId);
+        _loggedSkippedLiveDiffClientIds.Remove(clientManager.PlayerId);
         clientManager.RPC_InitialiseClient(clientManager.PlayerId, (short)_boardManagerInstance.Width, (short)_boardManagerInstance.Height);
         _boardDiffBroadcaster.SendFullBoard(clientManager);
         _turnManagerInstance?.SyncClientTurnState(clientManager);
         _initialisedClientIds.Add(clientManager.PlayerId);
+    }
+
+    private bool CanReceiveLiveDiffs(ClientManager clientManager)
+    {
+        return clientManager && _diffHandshakeClientIds.Contains(clientManager.PlayerId);
+    }
+
+    private void OnLiveDiffSkipped(ClientManager clientManager)
+    {
+        if (!clientManager)
+            return;
+
+        var playerId = clientManager.PlayerId;
+        if (_loggedSkippedLiveDiffClientIds.Add(playerId))
+            Debug.LogWarning($"{HandshakeLogPrefix} Skipping live diff broadcast for P{playerId} until RPC_ClientInitFinished arrives.");
     }
 
     private static void AddBaseCells(Vector2Int bottomLeft, List<Vector2Int> changedCells)

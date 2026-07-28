@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,11 +10,19 @@ public sealed class BoardDiffBroadcaster
 
     private readonly BoardManager _board;
     private readonly IReadOnlyList<ClientManager> _clients; // reference to ServerGameManager's live list, populated after construction
+    private readonly Func<ClientManager, bool> _canReceiveLiveDiffs;
+    private readonly Action<ClientManager> _onLiveDiffSkipped;
 
-    public BoardDiffBroadcaster(BoardManager board, IReadOnlyList<ClientManager> clients)
+    public BoardDiffBroadcaster(
+        BoardManager board,
+        IReadOnlyList<ClientManager> clients,
+        Func<ClientManager, bool> canReceiveLiveDiffs = null,
+        Action<ClientManager> onLiveDiffSkipped = null)
     {
         _board = board;
         _clients = clients;
+        _canReceiveLiveDiffs = canReceiveLiveDiffs;
+        _onLiveDiffSkipped = onLiveDiffSkipped;
     }
     
     // Send a set of changed cells to every client, each viewer projected independently.
@@ -23,8 +32,17 @@ public sealed class BoardDiffBroadcaster
         
         if (changedCells == null || changedCells.Count == 0)
             return;
+
         foreach (var client in _clients)
+        {
+            if (_canReceiveLiveDiffs != null && !_canReceiveLiveDiffs(client))
+            {
+                _onLiveDiffSkipped?.Invoke(client);
+                continue;
+            }
+
             SendCells(client, changedCells);
+        }
     }
     
     // Send the entire authored board to one client (used on bootstrap).
