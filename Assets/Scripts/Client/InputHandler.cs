@@ -33,6 +33,8 @@ public sealed class InputHandler : MonoBehaviour
 
     private void OnEnable()
     {
+        Debug.Log($"[Input] OnEnable ran, primaryAction={(primaryAction ? primaryAction.name : "NULL")}");
+        
         if (pointerPosition)
             pointerPosition.action.Enable();
         if (primaryAction)
@@ -55,6 +57,11 @@ public sealed class InputHandler : MonoBehaviour
 
     private void Update()
     {
+        if (primaryAction)
+            Debug.Log($"[Input] enabled={primaryAction.action.enabled} " +
+                      $"map={primaryAction.action.actionMap?.name} " +
+                      $"phase={primaryAction.action.phase}");
+        
         if (!_ready || !pointerPosition)
             return;
         
@@ -71,11 +78,18 @@ public sealed class InputHandler : MonoBehaviour
 
     private void OnPrimaryPerformed(InputAction.CallbackContext _)
     {
+        Debug.Log("[Input] primary performed");
         if (!_ready || !pointerPosition)
+        {
+            Debug.Log("[Input] not ready");
             return;
+        }
 
         if (EventSystem.current && EventSystem.current.IsPointerOverGameObject())
+        {
+            Debug.Log("[Input] over UI");
             return;
+        }
         
         var screen = pointerPosition.action.ReadValue<Vector2>();
         if (!_mapper.TryScreenToBoard(screen, out var cell))

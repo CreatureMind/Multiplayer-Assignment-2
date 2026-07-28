@@ -361,9 +361,11 @@ public class ClientManager : NetworkBehaviour
 
     private void FinalizeClientBootstrap()
     {
+        Debug.Log("Finalizing client bootstrap.");
         if (_clientReady || !_bootstrapConfigured || _awaitingInitialBoard || !_inputHandler || _actions == null || _board == null)
             return;
 
+        Debug.Log("Initializing input handler.");
         _inputHandler.Initialize(_mapper, _actions);
         _inputHandler.RequestSubmitted += OnRequestSubmitted;
         _inputHandler.HoverChanged += OnHoverChanged;

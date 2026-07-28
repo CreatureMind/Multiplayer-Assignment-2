@@ -40,7 +40,7 @@
                 {
                     "name": "",
                     "id": "3973e3a9-030a-41a3-9279-b4f639604492",
-                    "path": "<Mouse>/position",
+                    "path": "<Pointer>/position",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
