@@ -186,6 +186,7 @@ public class RoomManager : MonoBehaviour
                 gM.name = $"ServerGameManager_{sessionName}";
                 // One relay serves the room for its whole life (lobby + match), so keep it
                 // out of the scene that the Single game-scene load unloads.
+                gM.transform.SetParent(null, true);
                 runner.MakeDontDestroyOnLoad(gM.gameObject);
             }
         }

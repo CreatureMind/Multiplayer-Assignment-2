@@ -1,6 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Events;
 using Fusion;
 using UnityEngine;
@@ -33,7 +33,7 @@ public sealed class ServerGameManager : NetworkBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    private void RPC_RequestInstantiationFromScene()
+    private async void RPC_RequestInstantiationFromScene()
     {
         if (_initRequested) return;
         
@@ -42,12 +42,35 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (!HasStateAuthority) return;
         _initRequested = true;
         
-        InstantiateClientManagers();
-        SpawnBoardManager();
+        await InstantiateClientManagers();
+        await SpawnBoardManager();
     }
 
+    private static async Task<T> SpawnAndWaitAsync<T>(
+        NetworkRunner runner,
+        T prefab,
+        Vector3 position,
+        Quaternion rotation,
+        PlayerRef? inputAuthority = null,
+        float timeoutSeconds = 3f)
+        where T : NetworkBehaviour
+    {
+        var tcs = new TaskCompletionSource<T>();
 
-    private void SpawnTurnManager()
+        runner.Spawn(
+            prefab,
+            position,
+            rotation,
+            inputAuthority,
+            onBeforeSpawned: (_, obj) => tcs.TrySetResult(obj.GetComponent<T>()));
+
+        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeoutSeconds));
+        var finished = await Task.WhenAny(tcs.Task, timeoutTask);
+
+        return finished == tcs.Task ? tcs.Task.Result : null;
+    }
+
+    private async Task SpawnTurnManager()
     {
         Debug.Log("Attempting to spawn turn manager...");
         
@@ -71,7 +94,18 @@ public sealed class ServerGameManager : NetworkBehaviour
             return;
         }
 
-        _turnManagerInstance = Runner.Spawn(data.TurnManagerPrefab, Vector3.zero, Quaternion.identity);
+        _turnManagerInstance = await SpawnAndWaitAsync(
+            Runner,
+            data.TurnManagerPrefab,
+            Vector3.zero,
+            Quaternion.identity);
+
+        if (!_turnManagerInstance)
+        {
+            Debug.LogWarning("TurnManager spawn timed out or failed.");
+            return;
+        }
+
         _turnDiffBroadcaster = new TurnDiffBroadcaster(_turnManagerInstance, _clientManagers);
         _turnManagerInstance.InstantiateTurnManager(_clientManagers, data.TurnStats, _turnDiffBroadcaster);
         _TurnManagerSpawned = true;
@@ -79,7 +113,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         Debug.Log("Successfully spawned turn manager.");
     }
 
-    private void InstantiateClientManagers()
+    private async Task InstantiateClientManagers()
     {
         Debug.Log("Attempting to spawn client managers...");
         
@@ -107,7 +141,19 @@ public sealed class ServerGameManager : NetworkBehaviour
         foreach (var player in players)
         {
             if(player.PlayerId == -1) continue;
-            var clientManager = Runner.Spawn(data.ClientManagerPrefab, Vector3.zero, Quaternion.identity, player);
+            var clientManager = await SpawnAndWaitAsync(
+                Runner,
+                data.ClientManagerPrefab,
+                Vector3.zero,
+                Quaternion.identity,
+                player);
+
+            if (!clientManager)
+            {
+                Debug.LogWarning($"ClientManager spawn timed out or failed for {player.PlayerId}.");
+                continue;
+            }
+
             clientManager.InstantiateClientManager(this, (byte)player.PlayerId);
             _clientManagers.Add(clientManager);
 
@@ -120,38 +166,40 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         Debug.Log("Successfully spawned all client managers.");
         
-        SpawnTurnManager();
+        await SpawnTurnManager();
     }
 
 
-    private void SpawnBoardManager()
+    private async Task SpawnBoardManager()
     {
         Debug.Log("Attempting to spawn board manager...");
         
         if (!HasStateAuthority) return;
         
-        StartCoroutine(SpawnBoardManagerRoutine());
-        
-        Debug.Log("Successfully spawned board manager.");
-    }
-
-    private IEnumerator SpawnBoardManagerRoutine()
-    {
-        Debug.Log("Starting board spawning routine...");
-        
         if (_boardManagerSpawned)
-            yield break;
+            return;
 
         if (!data.BoardManagerPrefab)
         {
             Debug.LogWarning("BoardManager prefab is not assigned.");
-            yield break;
+            return;
         }
 
         if (!HasStateAuthority)
-            yield break;
+            return;
 
-        _boardManagerInstance = Runner.Spawn(data.BoardManagerPrefab, Vector3.zero, Quaternion.identity);
+        _boardManagerInstance = await SpawnAndWaitAsync(
+            Runner,
+            data.BoardManagerPrefab,
+            Vector3.zero,
+            Quaternion.identity);
+
+        if (!_boardManagerInstance)
+        {
+            Debug.LogWarning("BoardManager spawn timed out or failed.");
+            return;
+        }
+
         _boardManagerSpawned = true;
         
         
@@ -165,7 +213,10 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         TryInitialiseReadyClients();
         
-        yield return new WaitUntil(() => _turnManagerInstance && _TurnManagerSpawned);
+        while (!_turnManagerInstance || !_TurnManagerSpawned)
+        {
+            await Task.Yield();
+        }
         
         var changedBases= _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState();
         var setupDiffCells = new List<Vector2Int>();
@@ -192,6 +243,8 @@ public sealed class ServerGameManager : NetworkBehaviour
         {
             Debug.Log("All players have successfully instantiated first bases.");
         }
+
+        Debug.Log("Successfully spawned board manager.");
     }
 
     public void HandleMoveRequest(ClientManager clientManager, Vector2Int cell, MoveIntent intent)
