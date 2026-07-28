@@ -174,7 +174,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     #region Lobby (Hub) Logic
     
-    public int GetAllPlayerCount() => _networkRunnerInstance.SessionInfo.PlayerCount;
+    public int GetAllPlayerCount() => _networkRunnerInstance.CommittedPlayers.Count();
 
     // Play Game -> connect to the server-hosted Lobby Hub as a client.
     public async Task ConnectToCustomLobby(string _ = null)
