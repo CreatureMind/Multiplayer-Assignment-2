@@ -84,6 +84,10 @@ public class RoomRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
 
         var playerData = runner.Spawn(_playerDataPrefab, inputAuthority: player);
         playerData.ServerInitialize(displayName);
+        // Keep player identities alive across the Single game-scene load so names and whisper
+        // targets stay available in-match (same reason/pattern as the room chat relay).
+        playerData.transform.SetParent(null, true);
+        runner.MakeDontDestroyOnLoad(playerData.gameObject);
         _players[player] = playerData;
 
         _announcer?.AnnounceJoined(displayName);
