@@ -7,7 +7,6 @@ using UnityEngine;
 
 public sealed class ServerGameManager : NetworkBehaviour
 {
-
     [SerializeField] private GameDataSO data;
     private BoardManager _boardManagerInstance;
     private BoardDiffBroadcaster _boardDiffBroadcaster;
@@ -18,18 +17,35 @@ public sealed class ServerGameManager : NetworkBehaviour
     private bool _boardManagerSpawned;
     private bool _TurnManagerSpawned;
     private bool _ClientManagerSpawned;
+    private NetworkBool _initRequested;
     private int _currentPlayerCount;
     private readonly HashSet<byte> _readyClientIds = new HashSet<byte>();
     private readonly HashSet<byte> _initialisedClientIds = new HashSet<byte>();
 
-    public override void Spawned()
+    public void RequestInstantiation()
     {
-        base.Spawned();
-        if (!HasStateAuthority) return;
+        Debug.Log("Requesting instantiation of game managers...");
 
+        if (_initRequested) return;
+        
+        RPC_RequestInstantiationFromScene();
+        
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_RequestInstantiationFromScene()
+    {
+        if (_initRequested) return;
+        
+        Debug.Log("RPC received: Requesting instantiation of game managers...");
+        
+        if (!HasStateAuthority) return;
+        _initRequested = true;
+        
         InstantiateClientManagers();
         SpawnBoardManager();
     }
+
 
     private void SpawnTurnManager()
     {

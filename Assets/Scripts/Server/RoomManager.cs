@@ -168,6 +168,8 @@ public class RoomManager : MonoBehaviour
             announcer.SetRelay(relay);
             callbacks.SetAnnouncer(announcer);
         }
+        
+        
 
         var info = new RoomInfo
         {
@@ -227,57 +229,6 @@ public class RoomManager : MonoBehaviour
         if (string.IsNullOrWhiteSpace(raw)) return "Room";
         var cleaned = raw.Trim().Replace(" ", "_");
         return cleaned.Length > 16 ? cleaned[..16] : cleaned;
-    }
-    
-    public void TryBeginPostGameSceneBootstrap(int roomId, NetworkRunner runner, bool isPostMatchLoad)
-    {
-        if (!_rooms.TryGetValue(roomId, out var room)) return;
-        if (!runner || room.Runner != runner) return;
-        if (!isPostMatchLoad)
-            return;
-        if (room.BootstrapStarted || room.BootstrapDone) return;
-
-        room.BootstrapStarted = true;
-        StartCoroutine(BootstrapAfterSceneLoadRoutine(room));
-    }
-
-    private IEnumerator BootstrapAfterSceneLoadRoutine(RoomRuntime room)
-    {
-        if (!room.Runner || room.Runner.IsShutdown)
-        {
-            room.BootstrapStarted = false;
-            yield break;
-        }
-        Debug.Log($"[Server] Room '{room.Runner.SessionInfo.Name}' bootstrap gate opened after post-match scene load.");
-
-        // Defer one frame so post-load objects and runner bookkeeping settle before spawning authoritative game logic.
-        yield return null;
-
-        if (!room.Runner || room.Runner.IsShutdown)
-        {
-            room.BootstrapStarted = false;
-            yield break;
-        }
-
-        if (room.BootstrapDone)
-            yield break;
-
-        room.BootstrapDone = true;
-        Debug.Log($"[Server] Room '{room.Runner.SessionInfo.Name}' bootstrap gate passed. Spawning ServerGameManager...");
-        BootServerGameManager(room.Runner);
-    }
-public void BootServerGameManager(NetworkRunner runner)
-    {
-        if (!runner) return;
-
-        if (!serverGameManagerPrefab)
-        {
-            Debug.LogWarning($"[Server] Room '{runner.SessionInfo.Name}': serverGameManagerPrefab not assigned; game logic will be unavailable.");
-        }
-        else
-        {
-            runner.Spawn(serverGameManagerPrefab);
-        }
     }
     
 }
