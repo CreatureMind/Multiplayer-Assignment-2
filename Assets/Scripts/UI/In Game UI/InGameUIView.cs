@@ -41,6 +41,8 @@ public class InGameUIView : MonoBehaviour
         _returnToLobbyButton = _root.Q<Button>(UI_In_Game_View.return_button);
 
         SetupButtonCallbacks();
+        _leaveGameButton.RegisterCallback<PointerDownEvent>(_ => Debug.Log("<color=cyan>[PTR] DOWN on leave</color>"), TrickleDown.TrickleDown);
+        _leaveGameButton.RegisterCallback<PointerUpEvent>(_ => Debug.Log("<color=cyan>[PTR] UP on leave</color>"), TrickleDown.TrickleDown);
     }
 
     private void SetupButtonCallbacks()
