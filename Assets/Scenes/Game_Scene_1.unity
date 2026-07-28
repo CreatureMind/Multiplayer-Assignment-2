@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 330585546}
   - component: {fileID: 330585545}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -247,6 +248,15 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!1652712579 &330585548
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks: []
 --- !u!4 &744229900 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2310888521266419612, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
@@ -257,7 +267,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 334901924756375737, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
   m_PrefabInstance: {fileID: 1331523350880862976}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1331523350880862977}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e32874d772ae54ef08991f05c19ccf6b, type: 3}
@@ -273,6 +283,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1828490692}
   - component: {fileID: 1828490693}
+  - component: {fileID: 1828490694}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
@@ -309,6 +320,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameUIManager
   inGameView: {fileID: 744229902}
+--- !u!1652712579 &1828490694
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1828490691}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks: []
 --- !u!1001 &1331523350880862976
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -364,8 +384,25 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4656111340782765190, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1331523350880862978}
   m_SourcePrefab: {fileID: 100100000, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
+--- !u!1 &1331523350880862977 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4656111340782765190, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
+  m_PrefabInstance: {fileID: 1331523350880862976}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1652712579 &1331523350880862978
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1331523350880862977}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
