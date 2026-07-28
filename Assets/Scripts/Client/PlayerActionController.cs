@@ -72,7 +72,7 @@ public sealed class PlayerActionController
     public bool TryHandleClick(Vector2Int cell, out MoveRequest request)
     {
         request = default;
-        if (!IsMyTurn || _current == null)
+        if (_current == null)
             return false;
         return _current.IsAffordable(RemainingBudget) && _current.TryCreateRequest(cell, out request);
     }
