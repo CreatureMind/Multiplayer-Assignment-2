@@ -156,7 +156,12 @@ public class RoomManager : MonoBehaviour
         {
             var relay = runner.Spawn(chatRelayPrefab);
             if (relay)
+            {
                 relay.name = $"ChatRelay_{sessionName}";
+                // One relay serves the room for its whole life (lobby + match), so keep it
+                // out of the scene that the Single game-scene load unloads.
+                runner.MakeDontDestroyOnLoad(relay.gameObject);
+            }
 
             var announcer = runner.GetComponent<RunnerChatAnnouncer>();
             if (!announcer) announcer = runner.gameObject.AddComponent<RunnerChatAnnouncer>();

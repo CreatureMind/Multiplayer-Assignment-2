@@ -34,6 +34,9 @@ public class InGameUIView : MonoBehaviour
     private void InitializeUI(UIDocument document)
     {
         _root = document.rootVisualElement;
+        // This document shares a panel with the chat; a full-screen root with the default
+        // Position picking would swallow clicks meant for the other document.
+        _root.pickingMode = PickingMode.Ignore;
 
         _endGamePopup = _root.Q<VisualElement>(UI_In_Game_View.ended_popup);
         _uiContainer = _root.Q<VisualElement>(UI_In_Game_View.ui_container);
@@ -41,8 +44,6 @@ public class InGameUIView : MonoBehaviour
         _returnToLobbyButton = _root.Q<Button>(UI_In_Game_View.return_button);
 
         SetupButtonCallbacks();
-        _leaveGameButton.RegisterCallback<PointerDownEvent>(_ => Debug.Log("<color=cyan>[PTR] DOWN on leave</color>"), TrickleDown.TrickleDown);
-        _leaveGameButton.RegisterCallback<PointerUpEvent>(_ => Debug.Log("<color=cyan>[PTR] UP on leave</color>"), TrickleDown.TrickleDown);
     }
 
     private void SetupButtonCallbacks()
