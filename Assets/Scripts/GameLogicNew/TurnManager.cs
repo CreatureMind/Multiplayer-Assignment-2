@@ -63,8 +63,21 @@ public class TurnManager : NetworkBehaviour
         Instance = this;
     }
 
-    public void InstantiateTurnManager(List<ClientManager> clientManagers, TurnStatsSO turnStats, TurnDiffBroadcaster turnDiffBroadcaster)
+    public bool InstantiateTurnManager(List<ClientManager> clientManagers, TurnStatsSO turnStats, TurnDiffBroadcaster turnDiffBroadcaster)
     {
+        if (!HasStateAuthority)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, "Turn manager instantiation rejected: no state authority.");
+            return false;
+        }
+
+        if (!ValidateClientManagers(clientManagers, out var validationError))
+        {
+            Debug.LogError($"[TurnManager] Invalid client manager list: {validationError}");
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Turn manager instantiation rejected: {validationError}");
+            return false;
+        }
+
         // Injects broadcaster and emits initial turn snapshot once setup is complete.
         _clientManagers = clientManagers;
         _turnStats = turnStats;
@@ -85,6 +98,60 @@ public class TurnManager : NetworkBehaviour
 
         if (TryGetCurrentPlayerActionData(out var currentPlayingPlayer))
             _turnDiffBroadcaster?.BroadcastInstantiation(GetPlayerActionsSnapshot(), currentPlayingPlayer);
+        return true;
+    }
+
+    private bool ValidateClientManagers(IReadOnlyList<ClientManager> clientManagers, out string error)
+    {
+        if (clientManagers == null)
+        {
+            error = "client manager list was null.";
+            return false;
+        }
+
+        if (clientManagers.Count == 0)
+        {
+            error = "client manager list was empty.";
+            return false;
+        }
+
+        if (clientManagers.Count > maxPlayers)
+        {
+            error = $"client manager count {clientManagers.Count} exceeds maxPlayers {maxPlayers}.";
+            return false;
+        }
+
+        var seenPlayerIds = new HashSet<byte>();
+        for (var i = 0; i < clientManagers.Count; i++)
+        {
+            var client = clientManagers[i];
+            if (client == null)
+            {
+                error = $"client manager at index {i} was null.";
+                return false;
+            }
+
+            if (!client.Object || !client.Object.HasInputAuthority)
+            {
+                error = $"client manager P{client.PlayerId} at index {i} has no valid input authority.";
+                return false;
+            }
+
+            if (client.PlayerId == 0)
+            {
+                error = $"client manager at index {i} had PlayerId=0 (reserved for no owner/server).";
+                return false;
+            }
+
+            if (!seenPlayerIds.Add(client.PlayerId))
+            {
+                error = $"duplicate player id {client.PlayerId} in client manager list.";
+                return false;
+            }
+        }
+
+        error = string.Empty;
+        return true;
     }
 
     private void RandomizeTurnOrder()

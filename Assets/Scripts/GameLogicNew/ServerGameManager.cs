@@ -144,7 +144,11 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         _turnDiffBroadcaster = new TurnDiffBroadcaster(_turnManagerInstance, _clientManagers);
         _turnManagerInstance.SetTraceLoggingEnabled(TraceLogsEnabled);
-        _turnManagerInstance.InstantiateTurnManager(_clientManagers, data.TurnStats, _turnDiffBroadcaster);
+        if (!_turnManagerInstance.InstantiateTurnManager(_clientManagers, data.TurnStats, _turnDiffBroadcaster))
+        {
+            Debug.LogWarning("TurnManager rejected client list; turn manager was not initialized.");
+            return;
+        }
         _TurnManagerSpawned = true;
         
         Debug.Log("Successfully spawned turn manager.");
@@ -156,14 +160,21 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         if (!HasStateAuthority) return;
 
-        var players = Runner.ActivePlayers;
+        _clientManagers.Clear();
+        _currentPlayerCount = 0;
 
-        //count all players for future reference and enforcement of minimum players 
-        foreach (var player in players)
+        var eligiblePlayers = new List<PlayerRef>();
+        var seenPlayerIds = new HashSet<int>();
+        foreach (var player in Runner.ActivePlayers)
         {
-            if(player.PlayerId == -1) continue;
-            _currentPlayerCount++;
+            if (!IsEligibleGameplayClient(player, seenPlayerIds, out var reason))
+            {
+                Debug.Log($"Skipping player {player.PlayerId} during client registration: {reason}");
+                continue;
+            }
+            eligiblePlayers.Add(player);
         }
+        _currentPlayerCount = eligiblePlayers.Count;
         
         Debug.Log($"Received {_currentPlayerCount} players...");
 
@@ -175,9 +186,8 @@ public sealed class ServerGameManager : NetworkBehaviour
         }
 
         // create client manager per player
-        foreach (var player in players)
+        foreach (var player in eligiblePlayers)
         {
-            if(player.PlayerId == -1) continue;
             var clientManager = await SpawnAndWaitAsync(
                 Runner,
                 data.ClientManagerPrefab,
@@ -191,7 +201,20 @@ public sealed class ServerGameManager : NetworkBehaviour
                 continue;
             }
 
-            clientManager.InstantiateClientManager(this, (byte)player.PlayerId);
+            if (!clientManager.InstantiateClientManager(this, (byte)player.PlayerId))
+            {
+                Debug.LogWarning($"ClientManager rejected initialisation for player {player.PlayerId}; despawning instance.");
+                Runner.Despawn(clientManager.Object);
+                continue;
+            }
+
+            if (_clientManagers.Exists(existing => existing && existing.PlayerId == clientManager.PlayerId))
+            {
+                Debug.LogWarning($"ClientManager duplicate detected for player {clientManager.PlayerId}; despawning duplicate.");
+                Runner.Despawn(clientManager.Object);
+                continue;
+            }
+
             clientManager.SetTraceLoggingEnabled(TraceLogsEnabled);
             _clientManagers.Add(clientManager);
 
@@ -205,6 +228,31 @@ public sealed class ServerGameManager : NetworkBehaviour
         Debug.Log("Successfully spawned all client managers.");
         
         await SpawnTurnManager();
+    }
+
+    private bool IsEligibleGameplayClient(PlayerRef player, HashSet<int> seenPlayerIds, out string reason)
+    {
+        var playerId = player.PlayerId;
+        if (playerId <= 0)
+        {
+            reason = "non-client/system player id.";
+            return false;
+        }
+
+        if (player == Runner.LocalPlayer)
+        {
+            reason = "server participant is excluded from ClientManager registration.";
+            return false;
+        }
+
+        if (!seenPlayerIds.Add(playerId))
+        {
+            reason = "duplicate player id.";
+            return false;
+        }
+
+        reason = string.Empty;
+        return true;
     }
 
 
