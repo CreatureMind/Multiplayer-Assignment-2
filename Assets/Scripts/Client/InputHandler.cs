@@ -40,6 +40,7 @@ public sealed class InputHandler : MonoBehaviour
         if (primaryAction)
         {
             primaryAction.action.Enable();
+            Debug.Log($"[Input] right after Enable: {primaryAction.action.enabled}");   // <-- add this
             primaryAction.action.performed += OnPrimaryPerformed;
         }
     }
