@@ -473,6 +473,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         // local lobby scene must be unloaded explicitly once the game scene loads.
         if (IsGameSceneLoaded(runner) && !IsReturningFromMatch && !_unloading)
         {
+            EventBus.Raise(new GameSceneLoadedEvent());
             _unloading = true;
             StartCoroutine(UnloadLobbySceneNextFrame());
         }

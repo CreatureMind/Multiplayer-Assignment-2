@@ -8,25 +8,17 @@ namespace Events
     public struct RoomCreatedEvent
     {
         public string RoomName;
-        //Assignment 3
         public string ModeName;
         public string MapName;
     }
 
-    public struct SessionDataRefreshedEvent
-    {
-        public List<SessionInfo> Sessions;
-        public int TotalPlayers;
-    }
-
-    // Server-driven room list (replaces SessionDataRefreshedEvent as the lobby data source).
     public struct RoomListChangedEvent
     {
         public List<RoomInfo> Rooms;
         public int TotalPlayers;
     }
 
-    // Raised on the requesting client when the server refuses a create/join.
+    // Raised on the requesting client when the server refuses a creation/join.
     public struct RoomJoinRejectedEvent
     {
         public string Reason;
@@ -55,6 +47,7 @@ namespace Events
     
     public struct MatchStartedEvent { }
 
+    public struct GameSceneLoadedEvent { }
 
     public struct SceneLoadStartedEvent { }
     
@@ -91,31 +84,14 @@ namespace Events
     
     public struct OnChatRelayDespawnedEvent{}
     
-    public struct CharacterClaimedEvent
-    {
-        public int CharacterId;
-        public PlayerRef ClaimedBy;
-    }
-
-    public struct CharacterReleasedEvent
-    {
-        public int CharacterId;
-    }
-
-    public struct CharacterSelectionConfirmedEvent
-    {
-        public int CharacterId;
-    }
-
-    public struct CharacterSelectionDeniedEvent
-    {
-        public int CharacterId;
-    }
 
     public struct PlayerNameConfirmedEvent
     {
         public string PlayerName;
     }
     
-    public struct CharacterSelectionManagerReadyEvent { }
+    public struct PlaySoundEvent
+    {
+        public SoundEffectEnum SoundName;
+    }
 }

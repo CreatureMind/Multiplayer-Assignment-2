@@ -1,0 +1,132 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2061933999244943973
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3124596392004042243}
+  - component: {fileID: 7819381871111231773}
+  - component: {fileID: 5474679731267697007}
+  - component: {fileID: -6479740474982098188}
+  m_Layer: 0
+  m_Name: Sound_Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3124596392004042243
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061933999244943973}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7819381871111231773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061933999244943973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3a6f7fee90847f8a6abe3fa2964e45b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioSystem.SoundManager
+  AutoUnparentOnAwake: 1
+  soundEmitterPrefab: {fileID: 8394576150634004667, guid: c8256f59b9bec134a87152184f1fd902, type: 3}
+  collectionCheck: 1
+  defaultCapacity: 10
+  maxPoolSize: 100
+  maxSoundInstances: 30
+--- !u!114 &5474679731267697007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061933999244943973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f92d4fec6dbb8432eafd92f1fd7f5805, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  btnHoverSound:
+    data: {fileID: 11400000, guid: fb34a1aea3cd78a4eac0e49c61d388e4, type: 2}
+    randomPitch: 0
+    pitchVariation: 0
+    followPositionSource: 0
+  btnClickSound:
+    data: {fileID: 11400000, guid: b14e1c9a2c57b4a9eabbdf84b5d64fdc, type: 2}
+    randomPitch: 1
+    pitchVariation: 0.1
+    followPositionSource: 0
+  loadingSound:
+    data: {fileID: 11400000, guid: 6329fa35124bf4525b0e4c253df2fe3b, type: 2}
+    randomPitch: 0
+    pitchVariation: 0
+    followPositionSource: 0
+  pawnSpawnSound:
+    data: {fileID: 11400000, guid: 2ac4de67e718a0348a70f257111fd2b2, type: 2}
+    randomPitch: 1
+    pitchVariation: 0.1
+    followPositionSource: 0
+  pawnExplosionSound:
+    data: {fileID: 11400000, guid: 436a1cece69fd5346b6d30923b828671, type: 2}
+    randomPitch: 1
+    pitchVariation: 0.15
+    followPositionSource: 0
+  pawnEatenSound:
+    data: {fileID: 11400000, guid: d187a1334e8815943a1d455a176f1b01, type: 2}
+    randomPitch: 1
+    pitchVariation: 0.1
+    followPositionSource: 0
+  basePlacementSound:
+    data: {fileID: 11400000, guid: 30d3e49871bedc14a9f0f56e717a2258, type: 2}
+    randomPitch: 0
+    pitchVariation: 0
+    followPositionSource: 0
+  yourBaseConqueredSound:
+    data: {fileID: 11400000, guid: 42390d84656714546b1a1c7c129df228, type: 2}
+    randomPitch: 0
+    pitchVariation: 0
+    followPositionSource: 0
+  enemyBaseConqueredSound:
+    data: {fileID: 11400000, guid: c2be24884de951f4e9b00cb7d60fd628, type: 2}
+    randomPitch: 0
+    pitchVariation: 0.1
+    followPositionSource: 0
+  loseSound:
+    data: {fileID: 11400000, guid: 455c411a4c2ed42a3857f6bdce5ad177, type: 2}
+    randomPitch: 0
+    pitchVariation: 0
+    followPositionSource: 0
+  winSound:
+    data: {fileID: 11400000, guid: 8fb7240081cde4683bc6f83f7ff084b3, type: 2}
+    randomPitch: 0
+    pitchVariation: 0
+    followPositionSource: 0
+  lobbyThemeMusic: {fileID: 8300000, guid: 2a8da9ca6f939db4cb7caf8c54f85e0a, type: 3}
+  gameThemeMusic: {fileID: 8300000, guid: c97096e11a1cb524581002deeff486aa, type: 3}
+  musicManager: {fileID: 0}
+--- !u!81 &-6479740474982098188
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061933999244943973}
+  m_Enabled: 1

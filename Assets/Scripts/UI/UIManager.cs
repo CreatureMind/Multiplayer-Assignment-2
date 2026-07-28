@@ -627,6 +627,8 @@ public class UIManager : MonoBehaviour
     {
         loadingScreenViewPrefab.gameObject.SetActive(true);
         
+        EventBus.Raise(new PlaySoundEvent() {SoundName = SoundEffectEnum.LOADING_START});
+        
         var root = loadingScreenViewPrefab.rootVisualElement;
         
         var loadingSpinner = root.Q<VisualElement>(UI_Loading_View.loading_spinner);                                     //loading-spinner
@@ -654,6 +656,7 @@ public class UIManager : MonoBehaviour
     {
         loadingScreenViewPrefab.gameObject.SetActive(false);
         _canSpin = false;
+        EventBus.Raise(new PlaySoundEvent() {SoundName = SoundEffectEnum.LOADING_END});
     }
 
     // Server refused a create/join. Surface it and return the player to the rooms list.
