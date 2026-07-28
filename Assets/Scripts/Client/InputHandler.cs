@@ -83,6 +83,8 @@ public sealed class InputHandler : MonoBehaviour
         
         if (_actions.TryHandleClick(cell, out var request))
             RequestSubmitted?.Invoke(request);
+        
+        Debug.Log($"Cell: {cell.x},{cell.y}, Request:{request.ToString()}");
     }
     
     public void SubmitPass() => RequestSubmitted?.Invoke(MoveRequest.Pass);
