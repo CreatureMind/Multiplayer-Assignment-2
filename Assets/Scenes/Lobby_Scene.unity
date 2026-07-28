@@ -162,7 +162,6 @@ GameObject:
   m_Component:
   - component: {fileID: 330585546}
   - component: {fileID: 330585545}
-  - component: {fileID: 330585544}
   - component: {fileID: 330585547}
   - component: {fileID: 330585548}
   m_Layer: 0
@@ -172,14 +171,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &330585544
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 330585543}
-  m_Enabled: 1
 --- !u!20 &330585545
 Camera:
   m_ObjectHideFlags: 0
@@ -511,7 +502,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4133b5b81950849178380bbe0121fcf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlobalButtonEventListener
-  debug: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0

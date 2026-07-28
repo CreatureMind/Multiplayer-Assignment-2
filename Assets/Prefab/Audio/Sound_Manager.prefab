@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3124596392004042243}
   - component: {fileID: 7819381871111231773}
   - component: {fileID: 5474679731267697007}
+  - component: {fileID: -6479740474982098188}
   m_Layer: 0
   m_Name: Sound_Manager
   m_TagString: Untagged
@@ -121,3 +122,11 @@ MonoBehaviour:
   lobbyThemeMusic: {fileID: 8300000, guid: 2a8da9ca6f939db4cb7caf8c54f85e0a, type: 3}
   gameThemeMusic: {fileID: 8300000, guid: c97096e11a1cb524581002deeff486aa, type: 3}
   musicManager: {fileID: 0}
+--- !u!81 &-6479740474982098188
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061933999244943973}
+  m_Enabled: 1
