@@ -452,16 +452,30 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
+    private bool _unloading = false;
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name}");
         EventBus.Raise(new SceneLoadDoneEvent());
 
-        // Once the match has started, the only Fusion scene load is the game scene.
-        // In Multiple-Peer mode it merges into Fusion's scene, so the local lobby
-        // scene must be unloaded explicitly here.
-        if (RoomController.Instance && RoomController.Instance.MatchStarted)
+        // In Multiple-Peer mode the game scene merges into Fusion's scene, so the
+        // local lobby scene must be unloaded explicitly once the game scene loads.
+        if (IsGameSceneLoaded(runner) && !IsReturningFromMatch && !_unloading)
+        {
+            _unloading = true;
             StartCoroutine(UnloadLobbySceneNextFrame());
+        }
+    }
+
+    private static bool IsGameSceneLoaded(NetworkRunner runner)
+    {
+        if (!runner || !runner.TryGetSceneInfo(out var sceneInfo)) return false;
+
+        var game = SceneRef.FromIndex((int)SceneDefs.GAME);
+        for (int i = 0; i < sceneInfo.SceneCount; i++)
+            if (sceneInfo.Scenes[i] == game) return true;
+
+        return false;
     }
 
     private IEnumerator UnloadLobbySceneNextFrame()
