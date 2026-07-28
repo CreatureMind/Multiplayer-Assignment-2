@@ -267,7 +267,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 334901924756375737, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
   m_PrefabInstance: {fileID: 1331523350880862976}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1331523350880862977}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e32874d772ae54ef08991f05c19ccf6b, type: 3}
@@ -381,28 +381,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: In_Game_View
       objectReference: {fileID: 0}
+    - target: {fileID: 7744812446386418896, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
+      propertyPath: m_GameObjectRolesMask
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4656111340782765190, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1331523350880862978}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
---- !u!1 &1331523350880862977 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4656111340782765190, guid: 4d3b290bc64cc421ba6d7a8d3ceb2003, type: 3}
-  m_PrefabInstance: {fileID: 1331523350880862976}
-  m_PrefabAsset: {fileID: 0}
---- !u!1652712579 &1331523350880862978
-MultiplayerRolesData:
-  m_ObjectHideFlags: 2
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1331523350880862977}
-  m_GameObjectRolesMask: 1
-  m_ComponentsRolesMasks: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

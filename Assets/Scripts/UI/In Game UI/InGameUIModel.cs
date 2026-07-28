@@ -2,42 +2,30 @@ using System;
 using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Utils;
 
 public class InGameUIModel
 {
-    public event Action OnMasterClientChanged;
-    public event Action<bool> OnGameEndedByMaster;
-
-    private const string LOBBY_SCENE = "Lobby_Scene";
-
-    public bool IsMasterClient()
-    {
-        if (!NetworkManager.Instance) return false;
-        return NetworkManager.Instance.CanStartGame();
-    }
+    public event Action OnGameEnded;
 
     public void ReturnToLobby(float flushDelay = 0f)
     {
-        Debug.Log("[InGameUI] Returning to lobby.");
+        Debug.Log("[InGameUI] Returning to lobby...");
+        
         if (NetworkManager.Instance)
         {
-            Debug.Log("[InGameUI] Returning to lobby.");
+            Debug.Log("[InGameUI] Returning to lobby through network manager.");
             _ = NetworkManager.Instance.ReturnToLobbyAsync(flushDelay);
         }
         else
         {
             Debug.Log("[InGameUI] Returning to lobby (no network manager).");
-            SceneManager.LoadScene(LOBBY_SCENE);
+            SceneManager.LoadScene((int)SceneDefs.MENU, LoadSceneMode.Single);
         }
     }
 
-    public void CheckMasterClientStatus()
+    public void NotifyGameEnded()
     {
-        OnMasterClientChanged?.Invoke();
-    }
-
-    public void NotifyGameEnded(bool isMasterClient)
-    {
-        OnGameEndedByMaster?.Invoke(isMasterClient);
+        OnGameEnded?.Invoke();
     }
 }
