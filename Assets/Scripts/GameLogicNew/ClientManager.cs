@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Fusion;
+using Unity.VisualScripting;
 using UnityEngine;
 
 // Implemented by BoardView. Interface so ClientManager compiles before the renderer and is mockable in tests.
@@ -44,7 +45,7 @@ public class ClientManager : NetworkBehaviour
     private readonly List<CellDiff> _pendingDiffs = new(MaxDiffsPerRpc);
     
     // Server-side setup, called by ServerGameManager right after spawn.
-    public void InstantiateClientManager(ServerGameManager server, byte playerId)
+    public void InstantiateClientManager(ServerGameManager server, byte playerId, short  width, short height)
     {
         Debug.Log("Attempting to instantiate a client manager...");
         
@@ -56,6 +57,8 @@ public class ClientManager : NetworkBehaviour
         name = $"ClientManager_P{playerId}";
 
         Debug.Log($"Instantiated client manager at {name}.");
+        
+        RPC_InitialiseClientOnClientSide(playerId, width, height);
     }
 
     public void SetTraceLoggingEnabled(NetworkBool enabled)
@@ -129,37 +132,37 @@ public class ClientManager : NetworkBehaviour
     #region Server -> This Client
     // One-shot bootstrap. GDD rules out reconnect/late-join, so a single init + diff stream is enough.
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
-    public void RPC_InitialiseClient(byte playerId, short width, short height)
+    public void RPC_InitialiseClientOnClientSide(byte playerId, short width, short height)
     {
         GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_InitialiseClient for {name} (P{playerId}) {width}x{height}.");
-
+        
         if (_clientReady)
         {
             Debug.LogWarning("[ClientManager] Duplicate RPC_InitialiseClient ignored.");
             return;
         }
-
+        
         var context = ClientSceneContext.Instance;
         if (!context || !_inputHandler)
         {
             Debug.LogError("[ClientManager] Scene context missing at init time.");
             return;
         }
-
+        
         _mapper = new BoardCoordinateMapper(context.Grid, context.BoardCamera, context.BoardOriginCell, width, height);
         _board = new ClientBoardCache(width, height);
-
+        
         var legal = new LegalMoveCalculator(_board, playerId);
         var scanner = new BaseFormationScanner(_board, playerId);
-
+        
         _actions = new PlayerActionController(
             new SoldierMoveMode(legal),
             new BombPlacementMode(legal),
             new BaseBuildMode(scanner));
-
+        
         _board.Changed += OnBoardChanged;
         _actions.HighlightsInvalidated += OnHighlightsInvalidated;
-
+        
         _localPlayerId = playerId;
         _pendingDiffs.Clear();
         

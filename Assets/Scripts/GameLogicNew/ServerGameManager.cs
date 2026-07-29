@@ -183,7 +183,7 @@ public sealed class ServerGameManager : NetworkBehaviour
                 continue;
             }
 
-            clientManager.InstantiateClientManager(this, (byte)player.PlayerId);
+            clientManager.InstantiateClientManager(this, (byte)player.PlayerId, (short)data.StartingPosition.Width, (short)data.StartingPosition.Height);
             
             clientManager.SetTraceLoggingEnabled(TraceLogsEnabled);
             _clientManagers.Add(clientManager);
@@ -666,12 +666,12 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (!clientManager || !_boardManagerSpawned || !_boardManagerInstance || _boardDiffBroadcaster == null)
             return;
 
-        clientManager.RPC_InitialiseClient(clientManager.PlayerId, (short)_boardManagerInstance.Width, (short)_boardManagerInstance.Height);
-        while (!clientManager.IsReadyForBoardDiffs)
-        {
-            // Yields back to the main thread until the next frame
-            await Task.Yield();
-        }
+        // clientManager.RPC_InitialiseClientOnClientSide(clientManager.PlayerId, (short)_boardManagerInstance.Width, (short)_boardManagerInstance.Height);
+        // while (!clientManager.IsReadyForBoardDiffs)
+        // {
+        //     // Yields back to the main thread until the next frame
+        //     await Task.Yield();
+        // }
 
         _boardDiffBroadcaster.SendFullBoard(clientManager);
     }
