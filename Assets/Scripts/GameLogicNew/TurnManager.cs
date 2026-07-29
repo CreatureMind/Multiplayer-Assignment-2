@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using Fusion;
-using Unity.VisualScripting;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class TurnManager : NetworkBehaviour
 {
@@ -12,21 +9,21 @@ public class TurnManager : NetworkBehaviour
     [Networked] public NetworkBool TraceLogsEnabled { get; private set; }
     private TurnStatsSO _turnStats;
     private List<ClientManager> _clientManagers = new List<ClientManager>();
-    private readonly Dictionary<int, ClientManager> _clientManagersByPlayerId = new Dictionary<int, ClientManager>();
-    private int _highestPlayerId;
+    private readonly Dictionary<byte, ClientManager> _clientManagersByPlayerId = new Dictionary<byte, ClientManager>();
+    private byte _highestPlayerId;
     // Authoritative transport for turn/action diffs via per-client input-authority RPCs.
     private TurnDiffBroadcaster _turnDiffBroadcaster;
 
     private const int maxPlayers = 8;
     [Networked, Capacity(maxPlayers)] private NetworkArray<PlayerActionData> PlayerActions => default;
 
-    private int _currentTurnKey;
-
     // Guards render-change callbacks from firing before turn dependencies are fully wired.
     private bool _isInstantiated;
-
+    private bool _isBeforeBaseCount = true;
+    
+    private byte _currentTurnKey;
     [Networked, OnChangedRender(nameof(CurrentTurnKeyChanged))]
-    private int CurrentTurnKey
+    private byte CurrentTurnKey
     {
         get => _currentTurnKey;
         set
@@ -50,26 +47,27 @@ public class TurnManager : NetworkBehaviour
                 return;
             }
 
-            var candidate = value < 0 ? 0 : value;
+            var candidate =value;
 
             for (var playerId = candidate; playerId <= _highestPlayerId; playerId++)
             {
                 if (_clientManagersByPlayerId.ContainsKey(playerId))
                 {
-                    if (!DoesPlayerIdHaveSufficientActionToPlay(playerId))
+                    if (!DoesPlayerIdHaveSufficientActionToPlay(playerId) && !_isBeforeBaseCount)
                     {
                         continue;
                     }
+                    _isBeforeBaseCount = false;
                     _currentTurnKey = playerId;
                     return;
                 }
             }
 
-            for (var playerId = 0; playerId <= _highestPlayerId; playerId++)
+            for (byte playerId = 0; playerId <= _highestPlayerId; playerId++)
             {
                 if (_clientManagersByPlayerId.ContainsKey(playerId))
                 {
-                    if (DoesPlayerIdHaveSufficientActionToPlay(playerId))
+                    if (DoesPlayerIdHaveSufficientActionToPlay(playerId) && !_isBeforeBaseCount)
                     {
                         _currentTurnKey = playerId;
                         break;
@@ -80,7 +78,7 @@ public class TurnManager : NetworkBehaviour
             if (initialTurnKey == _currentTurnKey && initialTurnKey != 0)
             {
                 GameTraceLogger.Turn(TraceLogsEnabled, $"The only valid player key that can play is {value}.");
-                _serverGameManager.EndGame((byte)initialTurnKey);
+                _serverGameManager.EndGame(initialTurnKey);
             }
 
             _currentTurnKey = 0;
@@ -148,7 +146,6 @@ public class TurnManager : NetworkBehaviour
                 _highestPlayerId = playerId;
         }
         
-        Debug.Log($"Instantiated turn manager with {clientManagers.Count} players.");
         GameTraceLogger.Turn(TraceLogsEnabled, $"Turn manager instantiated with {clientManagers.Count} clients.");
 
         _isInstantiated = true;
@@ -383,18 +380,6 @@ public class TurnManager : NetworkBehaviour
         return TryReadPlayerActionData(playerId, out _, out playerActionData);
     }
 
-    public void SyncClientTurnState(ClientManager clientManager)
-    {
-        if (!HasStateAuthority || !clientManager)
-            return;
-
-        if (!TryGetCurrentPlayerActionData(out var currentPlayingPlayer))
-            return;
-
-        GameTraceLogger.Turn(TraceLogsEnabled, $"SyncClientTurnState -> client P{clientManager.PlayerId}, current player P{currentPlayingPlayer.PlayerId}.");
-        _turnDiffBroadcaster?.SendInstantiationToClient(clientManager, GetPlayerActionsSnapshot(), currentPlayingPlayer);
-    }
-
     private bool TryGetCurrentPlayerActionData(out PlayerActionData currentPlayingPlayer)
     {
         // Returns the authoritative action payload for whichever player currently owns the turn.
@@ -465,7 +450,7 @@ public class TurnManager : NetworkBehaviour
         var keyList = new List<byte>(_clientManagers.Count);
         for (var i = 0; i < _clientManagers.Count; i++)
         {
-            keyList.Add((byte)_clientManagers[i].PlayerId);
+            keyList.Add(_clientManagers[i].PlayerId);
         }
         return keyList;
     }
