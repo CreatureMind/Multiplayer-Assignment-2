@@ -192,7 +192,6 @@ public class ClientManager : NetworkBehaviour
 
         _board.Apply(_pendingDiffs); // raises Changed once
         _pendingDiffs.Clear();
-
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]

@@ -34,15 +34,14 @@ public class BoardView : MonoBehaviour, IBoardRenderer
 
     public void Initialise(ClientBoardCache board, BoardCoordinateMapper mapper, byte localPlayerId)
     {
-        if (_board != null)
-            _board.Changed -= OnBoardChanged;
-        
         _board = board;
         _mapper = mapper;
         _localPlayerId = localPlayerId;
 
-        _board.Changed += OnBoardChanged;
-
+        if (_board != null)
+        {
+            _board.Changed += OnBoardChanged;
+        }
 
         RepaintAll(); // the cache may already hold data received before this call
     }
