@@ -709,7 +709,6 @@ public sealed class ServerGameManager : NetworkBehaviour
         _loggedSkippedLiveDiffClientIds.Remove(clientManager.PlayerId);
         clientManager.RPC_InitialiseClient(clientManager.PlayerId, (short)_boardManagerInstance.Width, (short)_boardManagerInstance.Height);
         _boardDiffBroadcaster.SendFullBoard(clientManager);
-        _turnManagerInstance?.SyncClientTurnState(clientManager);
     }
 
     private bool CanReceiveLiveDiffs(ClientManager clientManager)

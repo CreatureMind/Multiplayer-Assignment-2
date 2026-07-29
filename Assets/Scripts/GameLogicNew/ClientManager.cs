@@ -251,32 +251,6 @@ public class ClientManager : NetworkBehaviour
         _awaitingInitialBoard = false;
         FinalizeClientBootstrap();
     }
-
-    // Turn ownership + budget. Budget is MIRRORED, never computed locally (conquering a base grants +N mid-turn).
-    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
-    public void RPC_SetTurnState(NetworkBool isMyTurn, int remainingBudget)
-    {
-        GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_SetTurnState for {name} isMyTurn={isMyTurn}, remainingBudget={remainingBudget}.");
-
-        if (!HasInputAuthority)
-        {
-            Debug.LogWarning("[ClientManager] RPC_SetTurnState on a non-input-authority peer.");
-            return;
-        }
-
-        if (!_bootstrapConfigured)
-            return;
-
-        if (!_clientReady)
-        {
-            _bufferedIsMyTurn = isMyTurn;
-            _bufferedRemainingBudget = remainingBudget;
-            _hasBufferedTurnState = true;
-            return;
-        }
-
-        _actions.SetTurnState(isMyTurn, remainingBudget);
-    }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
     public void RPC_InitialisePlayerActions(PlayerActionData[] playerActions, int count)

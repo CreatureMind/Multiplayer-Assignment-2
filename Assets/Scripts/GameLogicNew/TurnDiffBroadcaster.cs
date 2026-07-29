@@ -32,8 +32,6 @@ public sealed class TurnDiffBroadcaster
             payload[i] = allPlayerActions[i];
 
         client.RPC_InitialisePlayerActions(payload, payload.Length);
-        client.RPC_CurrentPlayingPlayerChanged(currentPlayingPlayer);
-        SendTurnState(client, currentPlayingPlayer);
     }
 
     public void BroadcastCurrentPlayingPlayer(PlayerActionData currentPlayingPlayer)
@@ -44,7 +42,6 @@ public sealed class TurnDiffBroadcaster
             if (!client)
                 continue;
             client.RPC_CurrentPlayingPlayerChanged(currentPlayingPlayer);
-            SendTurnState(client, currentPlayingPlayer);
         }
     }
 
@@ -53,21 +50,9 @@ public sealed class TurnDiffBroadcaster
         // Broadcasts end-turn/start-turn transition using the next player's authoritative action data.
         foreach (var client in _clients)
         {
-            if (client == null)
+            if (!client)
                 continue;
             client.RPC_TurnChanged(upcomingPlayer);
-            SendTurnState(client, upcomingPlayer);
         }
-    }
-
-    private void SendTurnState(ClientManager client, in PlayerActionData activePlayer)
-    {
-        // Keeps each client's local turn-ownership and remaining budget mirror in sync.
-        if (!_turnManager.TryGetPlayerActionData(client.PlayerId, out var playerActionData))
-            return;
-
-        var isMyTurn = client.PlayerId == activePlayer.PlayerId;
-        var remainingBudget = isMyTurn ? activePlayer.CurrentActionAmount : playerActionData.CurrentActionAmount;
-        client.RPC_SetTurnState(isMyTurn, remainingBudget);
     }
 }
