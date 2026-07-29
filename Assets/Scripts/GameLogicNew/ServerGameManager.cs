@@ -23,10 +23,6 @@ public sealed class ServerGameManager : NetworkBehaviour
     private NetworkBool _initRequested;
     [Networked] public NetworkBool TraceLogsEnabled { get; private set; }
     private int _currentPlayerCount;
-    private readonly HashSet<byte> _readyClientIds = new HashSet<byte>();
-    private readonly HashSet<byte> _initialisedClientIds = new HashSet<byte>();
-    private readonly HashSet<byte> _diffHandshakeClientIds = new HashSet<byte>();
-    private readonly HashSet<byte> _loggedSkippedLiveDiffClientIds = new HashSet<byte>();
 
     public override void Spawned()
     {
@@ -73,10 +69,6 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (!HasStateAuthority) return;
         _initRequested = true;
         TraceLogsEnabled = _traceLogsEnabledAtStart;
-        _readyClientIds.Clear();
-        _initialisedClientIds.Clear();
-        _diffHandshakeClientIds.Clear();
-        _loggedSkippedLiveDiffClientIds.Clear();
         
         await InstantiateClientManagers();
         await SpawnBoardManager();
@@ -224,9 +216,11 @@ public sealed class ServerGameManager : NetworkBehaviour
             Debug.LogWarning("BoardManager prefab is not assigned.");
             return;
         }
-
-        if (!HasStateAuthority)
-            return;
+        
+        while (!_turnManagerInstance || !_TurnManagerSpawned)
+        {
+            await Task.Yield();
+        }
 
         _boardManagerInstance = await SpawnAndWaitAsync(
             Runner,
@@ -242,22 +236,18 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         _boardManagerSpawned = true;
         _boardManagerInstance.SetTraceLoggingEnabled(TraceLogsEnabled);
+
+        var keyList = _turnManagerInstance.GetKeyList();
         
-        
-        _boardManagerInstance.InitializeBoardWithMadeMap_ServerOnly(data.StartingPosition);
+        _boardManagerInstance.InitializeBoardWithMadeMap_ServerOnly(data.StartingPosition, keyList);
         
         Debug.Log("Instantiated board manager...");
 
-        _boardDiffBroadcaster = new BoardDiffBroadcaster(_boardManagerInstance, _clientManagers, CanReceiveLiveDiffs, OnLiveDiffSkipped);
+        _boardDiffBroadcaster = new BoardDiffBroadcaster(_boardManagerInstance, _clientManagers);
         
         Debug.Log("Spawned board diff broadcaster...");
         
-        TrySendFirstBoardUpdatesToAllClients();
-        
-        while (!_turnManagerInstance || !_TurnManagerSpawned)
-        {
-            await Task.Yield();
-        }
+        await TrySendFirstBoardUpdatesToAllClients();
         
         var changedBases= _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState();
         var setupDiffCells = new List<Vector2Int>();
@@ -270,13 +260,13 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         int successCounter = 0;
         
-        foreach (var cb in changedBases)
+        foreach (var changedBasePos in changedBases)
         {
-            var result = _turnManagerInstance.PlayerBuiltBase(_boardManagerInstance.GetTileOwnerByIndex(cb));
+            var result = _turnManagerInstance.PlayerBuiltBase(_boardManagerInstance.GetTileOwnerByIndex(changedBasePos));
             if (result == ActionResult.Success)
             {
                 successCounter++;
-                Debug.Log("Successfully built base: " + cb);
+                Debug.Log("Successfully built base: " + changedBasePos);
             }
         }
         
@@ -663,68 +653,30 @@ public sealed class ServerGameManager : NetworkBehaviour
         _turnManagerInstance.EndPlayerTurn(clientManager.PlayerId);
     }
 
-    public void OnClientReady(ClientManager clientManager)
-    {
-        if (!HasStateAuthority || !clientManager)
-            return;
+    
 
-        _readyClientIds.Add(clientManager.PlayerId);
-        GameTraceLogger.Handshake(TraceLogsEnabled, $"Server accepted readiness for P{clientManager.PlayerId}.");
-    }
-
-    public void OnClientInitFinished(ClientManager clientManager)
-    {
-        if (!HasStateAuthority || !clientManager)
-            return;
-
-        if (!_initialisedClientIds.Contains(clientManager.PlayerId))
-        {
-            Debug.LogWarning($"[ServerGameManager] Ignoring RPC_ClientInitFinished from P{clientManager.PlayerId} before init was sent.");
-            return;
-        }
-
-        if (_diffHandshakeClientIds.Add(clientManager.PlayerId))
-        {
-            _loggedSkippedLiveDiffClientIds.Remove(clientManager.PlayerId);
-            GameTraceLogger.Handshake(TraceLogsEnabled, $"Server marked P{clientManager.PlayerId} as live-diff enabled.");
-        }
-    }
-
-    private void TrySendFirstBoardUpdatesToAllClients()
+    private async Task TrySendFirstBoardUpdatesToAllClients()
     {
         foreach (var clientManager in _clientManagers)
-            TrySendFirstBoardUpdates(clientManager);
+            await TrySendFirstBoardUpdates(clientManager);
     }
 
-    private void TrySendFirstBoardUpdates(ClientManager clientManager)
+    private async Task TrySendFirstBoardUpdates(ClientManager clientManager)
     {
         if (!clientManager || !_boardManagerSpawned || !_boardManagerInstance || _boardDiffBroadcaster == null)
             return;
 
-        if (!_readyClientIds.Contains(clientManager.PlayerId) || _initialisedClientIds.Contains(clientManager.PlayerId))
-            return;
-
-        _initialisedClientIds.Add(clientManager.PlayerId);
-        _diffHandshakeClientIds.Remove(clientManager.PlayerId);
-        _loggedSkippedLiveDiffClientIds.Remove(clientManager.PlayerId);
         clientManager.RPC_InitialiseClient(clientManager.PlayerId, (short)_boardManagerInstance.Width, (short)_boardManagerInstance.Height);
+        await clientManager.WaitForClientReadyAsync();
+        while (!clientManager.IsReadyForBoardDiffs)
+        {
+            // Yields back to the main thread until the next frame
+            await Task.Yield();
+        }
+
         _boardDiffBroadcaster.SendFullBoard(clientManager);
     }
-
-    private bool CanReceiveLiveDiffs(ClientManager clientManager)
-    {
-        return clientManager && _diffHandshakeClientIds.Contains(clientManager.PlayerId);
-    }
-
-    private void OnLiveDiffSkipped(ClientManager clientManager)
-    {
-        if (!clientManager)
-            return;
-
-        var playerId = clientManager.PlayerId;
-        if (_loggedSkippedLiveDiffClientIds.Add(playerId))
-            GameTraceLogger.Handshake(TraceLogsEnabled, $"Skipping live diff broadcast for P{playerId} until RPC_ClientInitFinished arrives.");
-    }
+    
 
     private void SyncTraceLoggingToManagers()
     {

@@ -110,7 +110,7 @@ public class BoardManager : NetworkBehaviour
         TraceLogsEnabled = enabled;
     }
 
-    public void InitializeBoardWithMadeMap_ServerOnly(StartingPositionSO startingPosition)
+    public void InitializeBoardWithMadeMap_ServerOnly(StartingPositionSO startingPosition, List<byte> keyList)
     {
         // size 
         var size = ValidateBoardDimensions(startingPosition.Width, startingPosition.Height);
@@ -118,6 +118,7 @@ public class BoardManager : NetworkBehaviour
         Height = size.y;
         
         var tempBaseCache = new HashSet<Vector2Int>();
+        var keyCount = keyList?.Count ?? 0;
         
         // copy the map 
         for (int y = 0; y < Height; y++)
@@ -126,17 +127,22 @@ public class BoardManager : NetworkBehaviour
             {
                 var index = ToIndex(x, y);
                 var tileState = startingPosition.GetTileState(x, y);
-                Tiles.Set(index, tileState);
 
                 switch (tileState.Type)
                 {
                     case TileType.Base when !tempBaseCache.Contains(new Vector2Int(x, y)):
                         tempBaseCache.Add(new Vector2Int(x, y));
-                        continue;
+                        break;
                     case TileType.Motherload when !_motherloadCache.Contains(new Vector2Int(x, y)):
                         _motherloadCache.Add(new Vector2Int(x, y));
-                        continue;
+                        break;
+                    case TileType.Soldier:
+                    case TileType.Bomb:
+                        tileState = RemapAuthoredUnitOwnerOrEmpty(tileState, keyList, keyCount);
+                        break;
                 }
+
+                Tiles.Set(index, tileState);
             }
         }
         
@@ -144,6 +150,29 @@ public class BoardManager : NetworkBehaviour
         CompileAndCacheAllBases(tempBaseCache);
         
         BoardUtilities.InstantiateBoardData(this, Tiles);
+    }
+
+    private static TileState RemapAuthoredUnitOwnerOrEmpty(TileState tileState, IReadOnlyList<byte> keyList, int keyCount)
+    {
+        if (!TryMapAuthoredOwnerToRuntimePlayerId(tileState.OwnerId, keyList, keyCount, out var runtimePlayerId))
+            return TileState.Empty;
+
+        return tileState.WithOwner(runtimePlayerId);
+    }
+
+    private static bool TryMapAuthoredOwnerToRuntimePlayerId(byte authoredOwnerId, IReadOnlyList<byte> keyList, int keyCount, out byte runtimePlayerId)
+    {
+        runtimePlayerId = TileState.NoOwner;
+
+        if (authoredOwnerId == TileState.NoOwner || keyList == null || keyCount <= 0)
+            return false;
+
+        var authoredIndex = authoredOwnerId - 1;
+        if (authoredIndex < 0 || authoredIndex >= keyCount)
+            return false;
+
+        runtimePlayerId = keyList[authoredIndex];
+        return runtimePlayerId != TileState.NoOwner;
     }
     
 

@@ -459,6 +459,16 @@ public class TurnManager : NetworkBehaviour
     {
         PlayerActions.Set(playerIndex, playerActionData);
     }
+
+    public List<byte> GetKeyList()
+    {
+        var keyList = new List<byte>(_clientManagers.Count);
+        for (var i = 0; i < _clientManagers.Count; i++)
+        {
+            keyList.Add((byte)_clientManagers[i].PlayerId);
+        }
+        return keyList;
+    }
 }
 
 public enum ActionResult

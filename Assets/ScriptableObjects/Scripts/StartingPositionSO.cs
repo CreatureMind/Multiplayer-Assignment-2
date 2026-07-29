@@ -24,10 +24,12 @@ public class StartingPositionSO : ScriptableObject
 {
     [SerializeField] private int width;
     [SerializeField] private int height;
+    [SerializeField, Min(1)] private int maxPlayers = 4;
     [SerializeField] private AuthoredTile[] startingPosition;
 
     public int Width => width;
     public int Height => height;
+    public int MaxPlayers => maxPlayers;
     
     public TileState[] BuildTileStates()
     {

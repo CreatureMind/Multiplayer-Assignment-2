@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Fusion;
 using UnityEngine;
 
@@ -28,27 +29,20 @@ public class ClientManager : NetworkBehaviour
     private IBoardRenderer _renderer;
     private InputHandler _inputHandler;
     private bool _clientReady;
-    private bool _bootstrapConfigured;
-    private bool _awaitingInitialBoard;
     private bool _inputWired;
     private byte _localPlayerId;
     private bool _hasBufferedTurnState;
     private bool _bufferedIsMyTurn;
     private int _bufferedRemainingBudget;
     private bool _initFinishedHandshakeSent;
+    [Networked] public NetworkBool IsReadyForBoardDiffs { get; private set; }
     // Local mirror of all known player action payloads received from the authoritative turn broadcaster.
     private readonly Dictionary<int, PlayerActionData> _playerActionsById = new Dictionary<int, PlayerActionData>();
     // Cached current-playing-player payload to support UI and turn-state consumers.
-    private PlayerActionData _currentPlayingPlayer;
     
     // Diffs accumulate until the final chunk, so a multi-chunk blast is ONE cache update + recompute.
     private readonly List<CellDiff> _pendingDiffs = new(MaxDiffsPerRpc);
     
-    // Client-side turn events raised from authoritative Server->InputAuthority RPC updates.
-    public static event Action<PlayerActionData[]> PlayerActionsInitialised;
-    public static event Action<PlayerActionData> CurrentPlayingPlayerChanged;
-    public static event Action<PlayerActionData> TurnChanged;
-
     // Server-side setup, called by ServerGameManager right after spawn.
     public void InstantiateClientManager(ServerGameManager server, byte playerId)
     {
@@ -86,10 +80,6 @@ public class ClientManager : NetworkBehaviour
 
         _renderer = context.Renderer;
         _inputHandler = context.InputHandler;
-
-        // Rig cached -> tell the server we're ready. The server replies with init + the full board once it exists.
-        GameTraceLogger.Handshake(TraceLogsEnabled, $"Sending RPC_ClientReady from {name}.");
-        RPC_ClientReady();
     }
     
     public override void Despawned(NetworkRunner runner, bool hasState)
@@ -106,8 +96,6 @@ public class ClientManager : NetworkBehaviour
             _board.Changed -= OnBoardChanged;
 
         _clientReady = false;
-        _bootstrapConfigured = false;
-        _awaitingInitialBoard = false;
         _inputWired = false;
         _hasBufferedTurnState = false;
         _initFinishedHandshakeSent = false;
@@ -116,41 +104,6 @@ public class ClientManager : NetworkBehaviour
         _pendingDiffs.Clear();
     }
     
-    #region Client -> Server
-    // Readiness handshake: decouples client init from server spawn ordering (no scene-context race).
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
-    public void RPC_ClientReady()
-    {
-        GameTraceLogger.Handshake(TraceLogsEnabled, $"Server received RPC_ClientReady from {name} (P{PlayerId}).");
-
-        if (!_server)
-        {
-            Debug.LogError("[ClientManager] RPC_ClientReady on a peer with no ServerGameManager.");
-            return;
-        }
-        // Hands readiness back to server so it can initialise this client and stream the full board diff.
-        _server.OnClientReady(this);
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
-    public void RPC_ClientInitFinished()
-    {
-        GameTraceLogger.Handshake(TraceLogsEnabled, $"Server received RPC_ClientInitFinished from {name} (P{PlayerId}).");
-
-        if (!HasStateAuthority)
-        {
-            Debug.LogWarning("[ClientManager] RPC_ClientInitFinished on a non-authoritative peer.");
-            return;
-        }
-
-        if (!_server)
-        {
-            Debug.LogError("[ClientManager] RPC_ClientInitFinished on a peer with no ServerGameManager.");
-            return;
-        }
-
-        _server.OnClientInitFinished(this);
-    }
     
     // Carries an INTENT, not a target type: move-into-empty and capture both yield Soldier, and BuildBase carries a window origin.
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
@@ -173,8 +126,6 @@ public class ClientManager : NetworkBehaviour
         _server.HandleMoveRequest(this, cell, intent); // authoritative path; client-side filtering is UX only
     }
     
-    #endregion
-    
     #region Server -> This Client
     // One-shot bootstrap. GDD rules out reconnect/late-join, so a single init + diff stream is enough.
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
@@ -182,7 +133,7 @@ public class ClientManager : NetworkBehaviour
     {
         GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_InitialiseClient for {name} (P{playerId}) {width}x{height}.");
 
-        if (_clientReady || _bootstrapConfigured)
+        if (_clientReady)
         {
             Debug.LogWarning("[ClientManager] Duplicate RPC_InitialiseClient ignored.");
             return;
@@ -209,10 +160,10 @@ public class ClientManager : NetworkBehaviour
         _board.Changed += OnBoardChanged;
         _actions.HighlightsInvalidated += OnHighlightsInvalidated;
 
-        _bootstrapConfigured = true;
-        _awaitingInitialBoard = true;
         _localPlayerId = playerId;
         _pendingDiffs.Clear();
+        
+        IsReadyForBoardDiffs = true;
     }
 
     // A chunk of this player's projected diff. Reliable + cumulative: a dropped chunk desyncs permanently.
@@ -224,12 +175,6 @@ public class ClientManager : NetworkBehaviour
         if (!HasInputAuthority)
         {
             Debug.LogWarning("[ClientManager] RPC_ApplyDiffs on a non-input-authority peer.");
-            return;
-        }
-        
-        if (!_bootstrapConfigured)
-        {
-            Debug.LogWarning("[ClientManager] Diff before init; dropped.");
             return;
         }
 
@@ -245,11 +190,6 @@ public class ClientManager : NetworkBehaviour
         _board.Apply(_pendingDiffs); // raises Changed once
         _pendingDiffs.Clear();
 
-        if (!_awaitingInitialBoard)
-            return;
-
-        _awaitingInitialBoard = false;
-        FinalizeClientBootstrap();
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
@@ -280,8 +220,6 @@ public class ClientManager : NetworkBehaviour
             payload[i] = actionData;
             _playerActionsById[actionData.PlayerId] = actionData;
         }
-
-        PlayerActionsInitialised?.Invoke(payload);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
@@ -295,10 +233,7 @@ public class ClientManager : NetworkBehaviour
             Debug.LogWarning("[ClientManager] RPC_CurrentPlayingPlayerChanged on a non-input-authority peer.");
             return;
         }
-
-        _currentPlayingPlayer = currentPlayingPlayer;
         _playerActionsById[currentPlayingPlayer.PlayerId] = currentPlayingPlayer;
-        CurrentPlayingPlayerChanged?.Invoke(currentPlayingPlayer);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
@@ -312,10 +247,8 @@ public class ClientManager : NetworkBehaviour
             Debug.LogWarning("[ClientManager] RPC_TurnChanged on a non-input-authority peer.");
             return;
         }
-
-        _currentPlayingPlayer = upcomingPlayer;
+        
         _playerActionsById[upcomingPlayer.PlayerId] = upcomingPlayer;
-        TurnChanged?.Invoke(upcomingPlayer);
     }
     #endregion
 
@@ -334,7 +267,7 @@ public class ClientManager : NetworkBehaviour
     private void FinalizeClientBootstrap()
     {
         Debug.Log("Finalizing client bootstrap.");
-        if (_clientReady || !_bootstrapConfigured || _awaitingInitialBoard || !_inputHandler || _actions == null || _board == null)
+        if (_clientReady || !_inputHandler || _actions == null || _board == null)
             return;
 
         Debug.Log("Initializing input handler.");
@@ -357,7 +290,11 @@ public class ClientManager : NetworkBehaviour
         {
             _initFinishedHandshakeSent = true;
             GameTraceLogger.Handshake(TraceLogsEnabled, $"Sending RPC_ClientInitFinished from {name}.");
-            RPC_ClientInitFinished();
         }
+    }
+
+    public async Task WaitForClientReadyAsync()
+    {
+        
     }
 }
