@@ -30,7 +30,7 @@ public sealed class ServerGameManager : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (Instance != null && Instance != this)
+        if (Instance && Instance != this)
             return;
 
         Instance = this;
@@ -144,7 +144,7 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         _turnDiffBroadcaster = new TurnDiffBroadcaster(_turnManagerInstance, _clientManagers);
         _turnManagerInstance.SetTraceLoggingEnabled(TraceLogsEnabled);
-        _turnManagerInstance.InstantiateTurnManager(_clientManagers, data.TurnStats, _turnDiffBroadcaster);
+        _turnManagerInstance.InstantiateTurnManager(this, _clientManagers, data.TurnStats, _turnDiffBroadcaster);
         _TurnManagerSpawned = true;
         
         Debug.Log("Successfully spawned turn manager.");
@@ -192,13 +192,15 @@ public sealed class ServerGameManager : NetworkBehaviour
             }
 
             clientManager.InstantiateClientManager(this, (byte)player.PlayerId);
+            
             clientManager.SetTraceLoggingEnabled(TraceLogsEnabled);
             _clientManagers.Add(clientManager);
 
             Debug.Log($"Spawned Client Manager for {player.PlayerId}...");
         }
 
-        if (_clientManagers.Count != _currentPlayerCount) return;
+        if (_clientManagers.Count != _currentPlayerCount) throw new InvalidOperationException(
+            $"Mismatch in spawned client managers ({_clientManagers.Count}) and expected player count ({_currentPlayerCount}).");
         
         _ClientManagerSpawned = true;
         
@@ -250,7 +252,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         Debug.Log("Spawned board diff broadcaster...");
         
-        TryInitialiseReadyClients();
+        TrySendFirstBoardUpdatesToAllClients();
         
         while (!_turnManagerInstance || !_TurnManagerSpawned)
         {
@@ -519,7 +521,7 @@ public sealed class ServerGameManager : NetworkBehaviour
             {
                 GameTraceLogger.Move(TraceLogsEnabled, $"Motherload conquered by P{request.PlayerId} after intent={request.Intent}. Ending game.");
                 changeSet.ShouldEndGame = true;
-                _turnManagerInstance.EndGame((byte)request.PlayerId);
+                EndGame((byte)request.PlayerId);
             }
 
             if (!changeSet.ShouldEndGame)
@@ -540,6 +542,17 @@ public sealed class ServerGameManager : NetworkBehaviour
         }
 
         return true;
+    }
+
+    public void EndGame(byte requestPlayerId)
+    {
+        if (!HasStateAuthority)
+        {
+            GameTraceLogger.Move(TraceLogsEnabled, $"EndGame called without state authority for P{requestPlayerId}.");
+            return;
+        }
+
+        GameTraceLogger.Move(TraceLogsEnabled, $"Game ended for winner P{requestPlayerId}.");
     }
 
     private void BroadcastTurnChanges(in MoveRequestContext request, MoveChangeSet changeSet)
@@ -657,7 +670,6 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         _readyClientIds.Add(clientManager.PlayerId);
         GameTraceLogger.Handshake(TraceLogsEnabled, $"Server accepted readiness for P{clientManager.PlayerId}.");
-        TryInitialiseReadyClient(clientManager);
     }
 
     public void OnClientInitFinished(ClientManager clientManager)
@@ -678,13 +690,13 @@ public sealed class ServerGameManager : NetworkBehaviour
         }
     }
 
-    private void TryInitialiseReadyClients()
+    private void TrySendFirstBoardUpdatesToAllClients()
     {
         foreach (var clientManager in _clientManagers)
-            TryInitialiseReadyClient(clientManager);
+            TrySendFirstBoardUpdates(clientManager);
     }
 
-    private void TryInitialiseReadyClient(ClientManager clientManager)
+    private void TrySendFirstBoardUpdates(ClientManager clientManager)
     {
         if (!clientManager || !_boardManagerSpawned || !_boardManagerInstance || _boardDiffBroadcaster == null)
             return;

@@ -24,7 +24,7 @@ public sealed class TurnDiffBroadcaster
 
     public void SendInstantiationToClient(ClientManager client, IReadOnlyList<PlayerActionData> allPlayerActions, PlayerActionData currentPlayingPlayer)
     {
-        if (_turnManager == null || client == null || allPlayerActions == null || allPlayerActions.Count == 0)
+        if (!_turnManager || !client || allPlayerActions == null || allPlayerActions.Count == 0)
             return;
 
         var payload = new PlayerActionData[allPlayerActions.Count];
@@ -41,7 +41,7 @@ public sealed class TurnDiffBroadcaster
         // Mirrors action-budget changes for the currently active player to every client.
         foreach (var client in _clients)
         {
-            if (client == null)
+            if (!client)
                 continue;
             client.RPC_CurrentPlayingPlayerChanged(currentPlayingPlayer);
             SendTurnState(client, currentPlayingPlayer);

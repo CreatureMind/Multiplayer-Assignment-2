@@ -18,7 +18,6 @@ public class ClientManager : NetworkBehaviour
     // Cells per diff RPC; keep payload conservative to stay below Fusion's reliable RPC byte limit after framing overhead.
     public const int MaxDiffsPerRpc = 24;
     
-    [Networked] public PlayerRef Player { get; private set; }
     [Networked] public byte PlayerId { get; private set; } // 1-based; 0 = no owner
     [Networked] public NetworkBool TraceLogsEnabled { get; private set; }
     
@@ -51,7 +50,7 @@ public class ClientManager : NetworkBehaviour
     public static event Action<PlayerActionData> TurnChanged;
 
     // Server-side setup, called by ServerGameManager right after spawn.
-    public void InstantiateClientManager(ServerGameManager server, byte seatId)
+    public void InstantiateClientManager(ServerGameManager server, byte playerId)
     {
         Debug.Log("Attempting to instantiate a client manager...");
         
@@ -59,9 +58,8 @@ public class ClientManager : NetworkBehaviour
             return;
         
         _server = server ?? throw new ArgumentNullException(nameof(server));
-        Player = Object.InputAuthority;
-        PlayerId = seatId;
-        name = $"ClientManager_P{seatId}";
+        PlayerId = playerId;
+        name = $"ClientManager_P{playerId}";
 
         Debug.Log($"Instantiated client manager at {name}.");
     }
