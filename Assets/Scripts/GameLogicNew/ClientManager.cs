@@ -32,10 +32,8 @@ public class ClientManager : NetworkBehaviour
     private bool _clientReady;
     private bool _inputWired;
     private byte _localPlayerId;
-    private bool _hasBufferedTurnState;
     private bool _bufferedIsMyTurn;
     private int _bufferedRemainingBudget;
-    private bool _initFinishedHandshakeSent;
     [Networked] public NetworkBool IsReadyForBoardDiffs { get; private set; }
     // Local mirror of all known player action payloads received from the authoritative turn broadcaster.
     private readonly Dictionary<int, PlayerActionData> _playerActionsById = new Dictionary<int, PlayerActionData>();
@@ -100,8 +98,6 @@ public class ClientManager : NetworkBehaviour
 
         _clientReady = false;
         _inputWired = false;
-        _hasBufferedTurnState = false;
-        _initFinishedHandshakeSent = false;
         _server = null;
         _playerActionsById.Clear();
         _pendingDiffs.Clear();
@@ -167,6 +163,23 @@ public class ClientManager : NetworkBehaviour
         _pendingDiffs.Clear();
         
         IsReadyForBoardDiffs = true;
+        
+        Debug.Log("Finalizing client bootstrap.");
+        if (_clientReady || !_inputHandler || _actions == null || _board == null)
+            return;
+
+        Debug.Log("Initializing input handler.");
+        _inputHandler.Initialize(_mapper, _actions);
+        _inputHandler.RequestSubmitted += OnRequestSubmitted;
+        _inputHandler.HoverChanged += OnHoverChanged;
+        _inputWired = true;
+
+        _renderer?.Initialise(_board, _mapper, _localPlayerId);
+
+        _clientReady = true;
+        
+        _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
+
     }
 
     // A chunk of this player's projected diff. Reliable + cumulative: a dropped chunk desyncs permanently.
@@ -282,16 +295,7 @@ public class ClientManager : NetworkBehaviour
 
         _clientReady = true;
 
-        if (_hasBufferedTurnState)
-        {
-            _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
-            _hasBufferedTurnState = false;
-        }
+        _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
 
-        if (!_initFinishedHandshakeSent && HasInputAuthority)
-        {
-            _initFinishedHandshakeSent = true;
-            GameTraceLogger.Handshake(TraceLogsEnabled, $"Sending RPC_ClientInitFinished from {name}.");
-        }
     }
 }
