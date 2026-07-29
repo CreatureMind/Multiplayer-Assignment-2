@@ -292,9 +292,4 @@ public class ClientManager : NetworkBehaviour
             GameTraceLogger.Handshake(TraceLogsEnabled, $"Sending RPC_ClientInitFinished from {name}.");
         }
     }
-
-    public async Task WaitForClientReadyAsync()
-    {
-        
-    }
 }

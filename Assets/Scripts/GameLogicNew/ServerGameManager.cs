@@ -667,7 +667,6 @@ public sealed class ServerGameManager : NetworkBehaviour
             return;
 
         clientManager.RPC_InitialiseClient(clientManager.PlayerId, (short)_boardManagerInstance.Width, (short)_boardManagerInstance.Height);
-        await clientManager.WaitForClientReadyAsync();
         while (!clientManager.IsReadyForBoardDiffs)
         {
             // Yields back to the main thread until the next frame
