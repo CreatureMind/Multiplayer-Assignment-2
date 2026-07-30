@@ -248,8 +248,20 @@ public class ClientManager : NetworkBehaviour
             Debug.LogWarning("[ClientManager] RPC_CurrentPlayingPlayerChanged on a non-input-authority peer.");
             return;
         }
+
         _playerActionsById[currentPlayingPlayer.PlayerId] = currentPlayingPlayer;
+        if (currentPlayingPlayer.PlayerId == _localPlayerId)
+        {
+            _bufferedIsMyTurn = true;
+            _bufferedRemainingBudget = currentPlayingPlayer.CurrentActionAmount;
+        }
+        else
+        {
+            _bufferedIsMyTurn = false;
+        }
         _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
+        GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_CurrentPlayingPlayerChanged for {name} playerId={currentPlayingPlayer.PlayerId} current budget={_bufferedRemainingBudget}, is my turn={_bufferedIsMyTurn}.");
+
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
@@ -265,6 +277,8 @@ public class ClientManager : NetworkBehaviour
         }
         
         _playerActionsById[upcomingPlayer.PlayerId] = upcomingPlayer;
+        _bufferedIsMyTurn = upcomingPlayer.PlayerId == _localPlayerId;
+        _bufferedRemainingBudget = upcomingPlayer.CurrentActionAmount;
         _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
     }
     #endregion
