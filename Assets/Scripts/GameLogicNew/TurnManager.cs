@@ -19,7 +19,7 @@ public class TurnManager : NetworkBehaviour
 
     // Guards render-change callbacks from firing before turn dependencies are fully wired.
     private bool _isInstantiated;
-    private bool _isBeforeBaseCount = true;
+    private bool _gameBegun;
     
     private byte _currentTurnKey;
     [Networked, OnChangedRender(nameof(CurrentTurnKeyChanged))]
@@ -28,81 +28,114 @@ public class TurnManager : NetworkBehaviour
         get => _currentTurnKey;
         set
         {
-            var initialTurnKey = _currentTurnKey;
-            // Stores turn owner by player id and resolves to the next valid id (with wrap) when needed.
             if (_clientManagersByPlayerId.Count == 0)
             {
                 _currentTurnKey = 0;
                 return;
             }
 
-            if (value == initialTurnKey)
+            if (value == _currentTurnKey)
                 return;
 
-            if (_clientManagersByPlayerId.ContainsKey(value))
+            if (value == 0)
             {
-                DoesPlayerIdHaveSufficientActionToPlay(value);
-
-                _currentTurnKey = value;
+                _currentTurnKey = 0;
                 return;
             }
 
-            var candidate =value;
-
-            for (var playerId = candidate; playerId <= _highestPlayerId; playerId++)
-            {
-                if (_clientManagersByPlayerId.ContainsKey(playerId))
-                {
-                    if (!DoesPlayerIdHaveSufficientActionToPlay(playerId) && !_isBeforeBaseCount)
-                    {
-                        continue;
-                    }
-                    _isBeforeBaseCount = false;
-                    _currentTurnKey = playerId;
-                    return;
-                }
-            }
-
-            for (byte playerId = 0; playerId <= _highestPlayerId; playerId++)
-            {
-                if (_clientManagersByPlayerId.ContainsKey(playerId))
-                {
-                    if (DoesPlayerIdHaveSufficientActionToPlay(playerId) && !_isBeforeBaseCount)
-                    {
-                        _currentTurnKey = playerId;
-                        break;
-                    }
-                }
-            }
-
-            if (initialTurnKey == _currentTurnKey && initialTurnKey != 0)
-            {
-                GameTraceLogger.Turn(TraceLogsEnabled, $"The only valid player key that can play is {value}.");
-                _serverGameManager.EndGame(initialTurnKey);
-            }
-
-            _currentTurnKey = 0;
-            GameTraceLogger.Turn(TraceLogsEnabled, $"CurrentTurnKey fallback applied: no valid player id found up to highest id {_highestPlayerId}.");
-            GameTraceLogger.Turn(TraceLogsEnabled, $"Initial turn key was {initialTurnKey}.");
+            _currentTurnKey = IsPlayerEligibleForTurn(value) ? value : (byte)0;
+            if (_currentTurnKey != 0)
+                _gameBegun = true;
         }
     }
 
-    private bool DoesPlayerIdHaveSufficientActionToPlay(int playerId)
+    private bool IsPlayerEligibleForTurn(int playerId)
     {
-        if (TryGetPlayerActionData(playerId, out var currentPlayingPlayer))
+        if (!_clientManagersByPlayerId.ContainsKey((byte)playerId))
+            return false;
+
+        if (!TryGetPlayerActionData(playerId, out var currentPlayingPlayer))
+            return false;
+
+        return currentPlayingPlayer.CurrentActionAmount > 0;
+    }
+
+    private bool TryGetNextEligiblePlayerId(byte startExclusive, out byte nextPlayerId)
+    {
+        nextPlayerId = 0;
+        if (_clientManagersByPlayerId.Count == 0 || _highestPlayerId == 0)
+            return false;
+
+        var firstCandidate = Mathf.Clamp(startExclusive + 1, 1, _highestPlayerId + 1);
+        for (var playerId = firstCandidate; playerId <= _highestPlayerId; playerId++)
         {
-            if (currentPlayingPlayer.MaxActionAmountPerTurn > 0)
+            if (IsPlayerEligibleForTurn(playerId))
             {
+                nextPlayerId = (byte)playerId;
                 return true;
             }
         }
+
+        for (var playerId = 1; playerId < firstCandidate; playerId++)
+        {
+            if (IsPlayerEligibleForTurn(playerId))
+            {
+                nextPlayerId = (byte)playerId;
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    private bool TryGetSoleEligiblePlayerId(out byte playerId)
+    {
+        playerId = 0;
+        var eligibleCount = 0;
+        foreach (var entry in _clientManagersByPlayerId)
+        {
+            if (!IsPlayerEligibleForTurn(entry.Key))
+                continue;
+
+            eligibleCount++;
+            playerId = entry.Key;
+            if (eligibleCount > 1)
+                return false;
+        }
+
+        return eligibleCount == 1;
+    }
+
+    private void AdvanceTurnKeyFrom(byte startExclusive)
+    {
+        if (_gameBegun && TryGetSoleEligiblePlayerId(out var soleEligiblePlayerId))
+        {
+            CurrentTurnKey = 0;
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Only one eligible player remains after game start: P{soleEligiblePlayerId}. Ending game.");
+            _serverGameManager?.EndGame(soleEligiblePlayerId);
+            return;
+        }
+
+        if (TryGetNextEligiblePlayerId(startExclusive, out var nextPlayerId))
+        {
+            CurrentTurnKey = nextPlayerId;
+            return;
+        }
+
+        CurrentTurnKey = 0;
+        GameTraceLogger.Turn(TraceLogsEnabled, $"No eligible player found after key {startExclusive}. CurrentTurnKey set to 0.");
     }
 
     private void CurrentTurnKeyChanged()
     {
         if (!_isInstantiated || _clientManagersByPlayerId.Count == 0)
             return;
+
+        if (CurrentTurnKey == 0)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, "Turn has no active player yet (CurrentTurnKey=0).");
+            return;
+        }
 
         if (!_clientManagersByPlayerId.ContainsKey(CurrentTurnKey))
         {
@@ -150,14 +183,12 @@ public class TurnManager : NetworkBehaviour
 
         _isInstantiated = true;
         NextTurnKey();
-
-        if (TryGetCurrentPlayerActionData(out var currentPlayingPlayer))
-            _turnDiffBroadcaster?.BroadcastInstantiation(GetPlayerActionsSnapshot(), currentPlayingPlayer);
+        _turnDiffBroadcaster?.BroadcastInstantiation(GetPlayerActionsSnapshot(), default);
     }
 
     private void NextTurnKey()
     {
-        CurrentTurnKey++;
+        AdvanceTurnKeyFrom(CurrentTurnKey);
     }
 
     public void SetTraceLoggingEnabled(NetworkBool enabled)
@@ -296,6 +327,18 @@ public class TurnManager : NetworkBehaviour
         // Mirrors base gain adjustments (max/remaining actions) from authoritative state.
         if (IsCurrentTurnPlayer(playerActionData.PlayerId))
             _turnDiffBroadcaster?.BroadcastCurrentPlayingPlayer(playerActionData);
+
+        if (CurrentTurnKey == 0 || !IsPlayerEligibleForTurn(CurrentTurnKey))
+        {
+            var previousTurnKey = CurrentTurnKey;
+            NextTurnKey();
+            if (CurrentTurnKey != 0 &&
+                CurrentTurnKey != previousTurnKey &&
+                TryGetCurrentPlayerActionData(out var currentPlayingPlayer))
+            {
+                _turnDiffBroadcaster?.BroadcastTurnChanged(currentPlayingPlayer);
+            }
+        }
         
         if (playerActionData.TurnEnded())
             return ActionResult.SuccessAndTurnEnded;
