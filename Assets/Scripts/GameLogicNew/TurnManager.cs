@@ -497,6 +497,21 @@ public class TurnManager : NetworkBehaviour
         }
         return keyList;
     }
+
+    public PlayerActionData GetCurrentPlayingPlayer()
+    {
+        if (!HasStateAuthority)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"GetCurrentPlayingPlayer failed: no state authority.");
+            return default;
+        }
+        
+        if (TryGetCurrentPlayerActionData(out var currentPlayingPlayer))
+        {
+            return currentPlayingPlayer;
+        }
+        return default;
+    }
 }
 
 public enum ActionResult

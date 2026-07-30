@@ -273,6 +273,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (successCounter == _currentPlayerCount)
         {
             Debug.Log("All players have successfully instantiated first bases.");
+            _turnDiffBroadcaster.BroadcastCurrentPlayingPlayer(_turnManagerInstance.GetCurrentPlayingPlayer());
         }
 
         Debug.Log("Successfully spawned board manager.");
