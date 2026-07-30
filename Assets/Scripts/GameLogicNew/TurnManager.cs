@@ -43,13 +43,13 @@ public class TurnManager : NetworkBehaviour
                 return;
             }
 
-            _currentTurnKey = IsPlayerEligibleForTurn(value) ? value : (byte)0;
+            _currentTurnKey = IsPlayerTurnSelectable(value) ? value : (byte)0;
             if (_currentTurnKey != 0)
                 _gameBegun = true;
         }
     }
 
-    private bool IsPlayerEligibleForTurn(int playerId)
+    private bool IsPlayerTurnSelectable(int playerId)
     {
         if (!_clientManagersByPlayerId.ContainsKey((byte)playerId))
             return false;
@@ -57,10 +57,10 @@ public class TurnManager : NetworkBehaviour
         if (!TryGetPlayerActionData(playerId, out var currentPlayingPlayer))
             return false;
 
-        return currentPlayingPlayer.CurrentActionAmount > 0;
+        return currentPlayingPlayer.MaxActionAmountPerTurn > 0;
     }
 
-    private bool TryGetNextEligiblePlayerId(byte startExclusive, out byte nextPlayerId)
+    private bool TryGetNextTurnPlayerId(byte startExclusive, out byte nextPlayerId)
     {
         nextPlayerId = 0;
         if (_clientManagersByPlayerId.Count == 0 || _highestPlayerId == 0)
@@ -69,7 +69,7 @@ public class TurnManager : NetworkBehaviour
         var firstCandidate = Mathf.Clamp(startExclusive + 1, 1, _highestPlayerId + 1);
         for (var playerId = firstCandidate; playerId <= _highestPlayerId; playerId++)
         {
-            if (IsPlayerEligibleForTurn(playerId))
+            if (IsPlayerTurnSelectable(playerId))
             {
                 nextPlayerId = (byte)playerId;
                 return true;
@@ -78,7 +78,7 @@ public class TurnManager : NetworkBehaviour
 
         for (var playerId = 1; playerId < firstCandidate; playerId++)
         {
-            if (IsPlayerEligibleForTurn(playerId))
+            if (IsPlayerTurnSelectable(playerId))
             {
                 nextPlayerId = (byte)playerId;
                 return true;
@@ -88,42 +88,42 @@ public class TurnManager : NetworkBehaviour
         return false;
     }
 
-    private bool TryGetSoleEligiblePlayerId(out byte playerId)
+    private bool TryGetSoleSelectablePlayerId(out byte playerId)
     {
         playerId = 0;
-        var eligibleCount = 0;
+        var selectableCount = 0;
         foreach (var entry in _clientManagersByPlayerId)
         {
-            if (!IsPlayerEligibleForTurn(entry.Key))
+            if (!IsPlayerTurnSelectable(entry.Key))
                 continue;
 
-            eligibleCount++;
+            selectableCount++;
             playerId = entry.Key;
-            if (eligibleCount > 1)
+            if (selectableCount > 1)
                 return false;
         }
 
-        return eligibleCount == 1;
+        return selectableCount == 1;
     }
 
     private void AdvanceTurnKeyFrom(byte startExclusive)
     {
-        if (_gameBegun && TryGetSoleEligiblePlayerId(out var soleEligiblePlayerId))
+        if (_gameBegun && TryGetSoleSelectablePlayerId(out var soleSelectablePlayerId))
         {
             CurrentTurnKey = 0;
-            GameTraceLogger.Turn(TraceLogsEnabled, $"Only one eligible player remains after game start: P{soleEligiblePlayerId}. Ending game.");
-            _serverGameManager?.EndGame(soleEligiblePlayerId);
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Only one selectable player remains after game start: P{soleSelectablePlayerId}. Ending game.");
+            _serverGameManager?.EndGame(soleSelectablePlayerId);
             return;
         }
 
-        if (TryGetNextEligiblePlayerId(startExclusive, out var nextPlayerId))
+        if (TryGetNextTurnPlayerId(startExclusive, out var nextPlayerId))
         {
             CurrentTurnKey = nextPlayerId;
             return;
         }
 
         CurrentTurnKey = 0;
-        GameTraceLogger.Turn(TraceLogsEnabled, $"No eligible player found after key {startExclusive}. CurrentTurnKey set to 0.");
+        GameTraceLogger.Turn(TraceLogsEnabled, $"No selectable player found after key {startExclusive}. CurrentTurnKey set to 0.");
     }
 
     private void CurrentTurnKeyChanged()
@@ -328,7 +328,7 @@ public class TurnManager : NetworkBehaviour
         if (IsCurrentTurnPlayer(playerActionData.PlayerId))
             _turnDiffBroadcaster?.BroadcastCurrentPlayingPlayer(playerActionData);
 
-        if (CurrentTurnKey == 0 || !IsPlayerEligibleForTurn(CurrentTurnKey))
+        if (CurrentTurnKey == 0 || !IsPlayerTurnSelectable(CurrentTurnKey))
         {
             var previousTurnKey = CurrentTurnKey;
             NextTurnKey();
@@ -401,6 +401,12 @@ public class TurnManager : NetworkBehaviour
         NextTurnKey();
 
         var nextPlayerId = CurrentTurnKey;
+        if (nextPlayerId == 0)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"EndPlayerTurn finished for player={playerId}: no selectable next player.");
+            return;
+        }
+
         if (!TryReadPlayerActionData(nextPlayerId, out var nextPlayerIndex, out var nextPlayerActionData))
         {
             GameTraceLogger.Turn(TraceLogsEnabled, $"EndPlayerTurn failed: could not read action data for next player={nextPlayerId}.");
