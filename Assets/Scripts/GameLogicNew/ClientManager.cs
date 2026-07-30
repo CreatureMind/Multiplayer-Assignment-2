@@ -249,6 +249,7 @@ public class ClientManager : NetworkBehaviour
             return;
         }
         _playerActionsById[currentPlayingPlayer.PlayerId] = currentPlayingPlayer;
+        _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
@@ -264,6 +265,7 @@ public class ClientManager : NetworkBehaviour
         }
         
         _playerActionsById[upcomingPlayer.PlayerId] = upcomingPlayer;
+        _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
     }
     #endregion
 
