@@ -151,11 +151,7 @@ namespace UI
         
         private void OnJoinedLobbyHub(JoinedLobbyEvent e) => _nameEntryPresenter.Initialize();
 
-        private void OnPlayerNameConfirmed(PlayerNameConfirmedEvent e)
-        {
-            Debug.Log($"[NameEntryUIPresenter] Player name confirmed: {e.PlayerName}");
-            ShowScreen(LobbyScreen.RoomsList);
-        }
+        private void OnPlayerNameConfirmed(PlayerNameConfirmedEvent e) => ShowScreen(LobbyScreen.RoomsList);
 
         private void OnJoinedRoom(JoinedRoomEvent e) => ShowScreen(LobbyScreen.RoomLobby);
 

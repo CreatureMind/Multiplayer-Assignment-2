@@ -51,7 +51,7 @@ namespace UI.RoomsList
         public int GetTotalActivePlayers(int lobbyPlayerCount)
         {
             var manager = _networkManager ? _networkManager : NetworkManager.Instance;
-            int additionalCount = manager ? manager.GetAllPlayerCount() : 0;
+            var additionalCount = manager ? manager.GetAllPlayerCount() : 0;
             return lobbyPlayerCount + additionalCount;
         }
 
@@ -61,7 +61,6 @@ namespace UI.RoomsList
             if (manager)
             {
                 _ = manager.ConnectToCustomLobby(lobbyId);
-                Debug.Log($"Refresh Button clicked");
             }
         }
 

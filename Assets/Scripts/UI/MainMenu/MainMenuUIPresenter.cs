@@ -44,8 +44,8 @@ namespace UI.MainMenu
 
         private void HandlePlayClicked()
         {
-            _model.EnterGlobalLobby();
             _onPlayRequested?.Invoke();
+            _model.EnterGlobalLobby();
         }
 
         private void HandleOptionsClicked()

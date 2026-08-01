@@ -39,7 +39,6 @@ namespace UI.NameEntry
                 _model.TryApplyConfirmedName(_confirmedName);
                 _view.Hide();
                 
-                Debug.Log($"[NameEntryUIPresenter] Applying saved name: {_confirmedName}]");
                 EventBus.Raise(new PlayerNameConfirmedEvent { PlayerName = _confirmedName });
                 return;
             }
