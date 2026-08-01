@@ -20,13 +20,15 @@ public class ServerBootstrap : MonoBehaviour
     [SerializeField] private string hubLobbyName = "TinySoldiersLobby";
     [SerializeField] private int maxLobbyPlayers = 200;
     [SerializeField] private int hubNetSceneBuildIndex = (int)SceneDefs.HUB_NET;
+    [SerializeField, Range(30,120)] private int targetFPS = 30;
 
     private async void Start()
     {
         await Task.Yield();
 
 #if UNITY_SERVER
-        Application.targetFrameRate = 30;
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = targetFPS;
         DontDestroyOnLoad(gameObject);
         await StartHub();
 #else
