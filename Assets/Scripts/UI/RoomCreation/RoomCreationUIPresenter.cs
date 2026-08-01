@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace UI.RoomCreation
@@ -7,12 +8,14 @@ namespace UI.RoomCreation
         private readonly RoomCreationUIModel _model;
         private readonly RoomCreationUIView _view;
         private string _currentLobbyId;
+        private readonly Action _onRoomCreatedRequested;
 
-        public RoomCreationUIPresenter(RoomCreationUIModel model, RoomCreationUIView view, string currentLobbyId)
+        public RoomCreationUIPresenter(RoomCreationUIModel model, RoomCreationUIView view, string currentLobbyId, Action onRoomCreatedRequested = null)
         {
             _model = model;
             _view = view;
             _currentLobbyId = currentLobbyId;
+            _onRoomCreatedRequested = onRoomCreatedRequested;
 
             SubscribeToEvents();
         }
@@ -45,6 +48,7 @@ namespace UI.RoomCreation
             _view.SetCreateButtonEnabled(false);
             _model.CreateRoom(formData, _currentLobbyId);
             _view.Hide();
+            _onRoomCreatedRequested?.Invoke();
         }
 
         private void HandleBackRequested()

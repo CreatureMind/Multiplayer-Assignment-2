@@ -102,7 +102,11 @@ namespace UI
             _roomCreationPresenter = new RoomCreationUIPresenter(
                 roomCreationModel,
                 roomCreationView,
-                lobbyId
+                lobbyId,
+                onRoomCreatedRequested: () =>
+                {
+                    ShowScreen(LobbyScreen.RoomLobby);
+                }
             );
 
             //Room Lobby

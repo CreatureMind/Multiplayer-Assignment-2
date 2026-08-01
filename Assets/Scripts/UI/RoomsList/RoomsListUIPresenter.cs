@@ -64,8 +64,6 @@ namespace UI.RoomsList
             {
                 _currentLobbyId = NetworkManager.Instance.CurrentLobbyId;
             }
-            
-            _view.Show();
 
             _view.SetHeader($"Tiny Soldiers / {_currentLobbyId} / Rooms");
             _view.SetRefreshButtonEnabled(true);

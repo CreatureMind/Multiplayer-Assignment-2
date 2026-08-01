@@ -34,6 +34,8 @@ namespace UI.NameEntry
                 _state = State.Confirmed;
                 _confirmedName = _model.SavedConfirmedName;
                 _view.Hide();
+                
+                EventBus.Raise(new PlayerNameConfirmedEvent { PlayerName = _confirmedName });
                 return;
             }
 
