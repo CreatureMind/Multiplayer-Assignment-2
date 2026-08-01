@@ -51,13 +51,11 @@ public class TurnManager : NetworkBehaviour
 
     private bool IsPlayerTurnSelectable(int playerId)
     {
-        if (!_clientManagersByPlayerId.ContainsKey((byte)playerId))
+        if (!TryGetPlayerIndex(playerId, out var playerIndex))
             return false;
 
-        if (!TryGetPlayerActionData(playerId, out var currentPlayingPlayer))
-            return false;
-
-        return currentPlayingPlayer.MaxActionAmountPerTurn > 0;
+        var playerActionData = PlayerActions[playerIndex];
+        return playerActionData.PlayerId == playerId && playerActionData.MaxActionAmountPerTurn > 0;
     }
 
     private bool TryGetNextTurnPlayerId(byte startExclusive, out byte nextPlayerId)
@@ -477,9 +475,9 @@ public class TurnManager : NetworkBehaviour
 
     private bool TryGetPlayerIndex(int playerId, out int playerIndex)
     {
-        for (int i = 0; i < _clientManagers.Count; i++)
+        for (int i = 0; i < PlayerActions.Length; i++)
         {
-            if (_clientManagers[i].PlayerId == playerId)
+            if (PlayerActions[i].PlayerId == playerId)
             {
                 playerIndex = i;
                 return true;
