@@ -12,7 +12,7 @@ public static class BoardUtilities
         Manager = boardManager;
         Debug.Log("Instantiated board utilities.");
     }
-    
+
     public static bool PawnElegabiltyCheckDFS([NotNull] TileState tileState, Vector2Int tileIndex, int playerId)
     {
         if (!Manager)
@@ -32,6 +32,30 @@ public static class BoardUtilities
         
         checkedTileIndexes.Add(Manager.ToIndex(tileIndex));
         
+        return RecursiveHelperUDLRCheck(tileIndex, tileState, checkedTileIndexes, currentOwnerId);
+    }
+
+    public static bool BombElegabilityDFS([NotNull] TileState tileState, Vector2Int tileIndex, int playerId)
+    {
+        if (!Manager)
+        {
+            Debug.LogError("BoardManager instance is not set. Ensure InstantiateBoardData is called before using this method.");
+            return false;
+        }
+
+        var checkedTileIndexes = new List<int>();
+        var currentOwnerId = playerId;
+
+        // Bomb placement must start on a friendly soldier and still be connected to a friendly base.
+        if (!Manager.IsValidIndex(tileIndex) ||
+            tileState.Type != TileType.Soldier ||
+            tileState.OwnerId != currentOwnerId)
+        {
+            return false;
+        }
+
+        checkedTileIndexes.Add(Manager.ToIndex(tileIndex));
+
         return RecursiveHelperUDLRCheck(tileIndex, tileState, checkedTileIndexes, currentOwnerId);
     }
 

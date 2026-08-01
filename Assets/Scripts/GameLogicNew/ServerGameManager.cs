@@ -422,7 +422,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (!changeSet.IsExplosionPath)
         {
             if (request.Intent == MoveIntent.BuildBase)
-                AddBuildBaseCoreCells(request.RequestedCell, changeSet.BoardChangedCells);
+                AddBuildBaseCoreCells(request.MutationCell, changeSet.BoardChangedCells);
             else
                 changeSet.BoardChangedCells.Add(request.RequestedCell);
         }

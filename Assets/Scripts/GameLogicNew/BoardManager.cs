@@ -333,11 +333,16 @@ public class BoardManager : NetworkBehaviour
         GameTraceLogger.Board(TraceLogsEnabled, $"ValidateBoardChange player={playerId}, intent={intent}, cell={gridPosition}.");
         switch (intent)
         {
-            case MoveIntent.PlaceBomb:
             case MoveIntent.MoveSoldier:
             {
                 var result = PawnCheck(gridPosition, playerId);
                 GameTraceLogger.Board(TraceLogsEnabled, $"PawnCheck result for player={playerId}, cell={gridPosition}: {result}.");
+                return result;
+            }
+            case MoveIntent.PlaceBomb:
+            {
+                var result = BombCheck(gridPosition, playerId);
+                GameTraceLogger.Board(TraceLogsEnabled, $"BombCheck result for player={playerId}, cell={gridPosition}: {result}.");
                 return result;
             }
             case MoveIntent.BuildBase:
@@ -369,7 +374,16 @@ public class BoardManager : NetworkBehaviour
         return ValidationType.True;
         
     }
-    
+
+    private ValidationType BombCheck(Vector2Int gridPosition, int playerId)
+    {
+        var con = BoardUtilities.BombElegabilityDFS(Tiles[ToIndex(gridPosition)], gridPosition, playerId);
+        if (!con)
+            return ValidationType.False;
+
+        return ValidationType.True;
+    }
+
     #endregion
 
     // never call without the correct checks
