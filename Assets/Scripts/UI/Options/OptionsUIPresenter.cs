@@ -18,7 +18,6 @@ namespace UI.Options
 
             SubscribeToEvents();
             InitializeView();
-            _view.Hide();
         }
 
         private void SubscribeToEvents()

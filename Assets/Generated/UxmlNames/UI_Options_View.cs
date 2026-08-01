@@ -1,13 +1,13 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Options_View.uxml
-// Updated: 2026-07-28 11:19 UTC
+// Updated: 2026-08-01 19:11 UTC
 
 using System.Collections.Generic;
 
 public enum UI_Options_View
 {
+    tint,
     container,
-    container_2,
     header,
     music_volume_slider,
     sfx_volume_slider,
@@ -24,8 +24,8 @@ internal static class UI_Options_View_Map
     internal static readonly Dictionary<UI_Options_View, string> Names =
         new Dictionary<UI_Options_View, string>
         {
+            { UI_Options_View.tint, "tint" },
             { UI_Options_View.container, "container" },
-            { UI_Options_View.container_2, "container" },
             { UI_Options_View.header, "header" },
             { UI_Options_View.music_volume_slider, "music-volume-slider" },
             { UI_Options_View.sfx_volume_slider, "sfx-volume-slider" },

@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace UI
 {
     public class UIOverlaySorter
@@ -16,8 +18,8 @@ namespace UI
         
         public static int PopOverlay()
         {
-            _currentSortOrder--;
-            return _currentSortOrder < 0 ? BASE_OVERLAY_SORT_ORDER : _currentSortOrder;
+            _currentSortOrder = Mathf.Max(0, _currentSortOrder - 1);
+            return BASE_OVERLAY_SORT_ORDER + _currentSortOrder;
         }
 
         /// <summary>
