@@ -17,16 +17,16 @@ public class InGameUIModel
 
     public void ReturnToLobby(float flushDelay = 0f)
     {
-        Debug.Log("[InGameUI] Returning to lobby...");
+        Debug.Log("[InGameUIModel] Returning to lobby...");
         
         if (_networkManager)
         {
-            Debug.Log("[InGameUI] Returning to lobby through network manager.");
+            Debug.Log("[InGameUIModel] Returning to lobby through network manager.");
             _ = _networkManager.ReturnToLobbyAsync(flushDelay);
         }
         else
         {
-            Debug.Log("[InGameUI] Returning to lobby (no network manager).");
+            Debug.Log("[InGameUIModel] Returning to lobby (no network manager).");
             SceneManager.LoadScene((int)SceneDefs.MENU, LoadSceneMode.Single);
         }
     }

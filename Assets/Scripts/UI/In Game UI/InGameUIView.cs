@@ -10,28 +10,24 @@ public class InGameUIView : MonoBehaviour
 
     public static event Action<UIDocument> OnObjectLoaded;
 
-    private UIDocument _document;
+    private UIDocument    _document;
     private VisualElement _root;
 
     private VisualElement _endGamePopup;
     private VisualElement _uiContainer;
-    private Button _leaveGameButton;
-    private Button _returnToLobbyButton;
+    private Button        _leaveGameButton;
+    private Button        _returnToLobbyButton;
 
     private void Awake()
     {
         _document = GetComponent<UIDocument>();
-        if (!_document.GetComponent<PanelEventHandler>())
-            _document.AddComponent<PanelEventHandler>();
-        if (!_document.GetComponent<PanelRaycaster>())
-            _document.AddComponent<PanelRaycaster>();
     }
 
     private void Start()
     {
         if (!_document)
         {
-            Debug.LogError("UIDocument is null");
+            Debug.LogError("[InGameUIView] UIDocument is null");
             return;
         }
         
@@ -42,10 +38,10 @@ public class InGameUIView : MonoBehaviour
     {
         _root = document.rootVisualElement;
 
-        _endGamePopup = _root.Q<VisualElement>(UI_In_Game_View.ended_popup);
-        _uiContainer = _root.Q<VisualElement>(UI_In_Game_View.ui_container);
-        _leaveGameButton = _root.Q<Button>(UI_In_Game_View.leave_button);
-        _returnToLobbyButton = _root.Q<Button>(UI_In_Game_View.return_button);
+        _endGamePopup        = _root.Q<VisualElement>(UI_In_Game_View.ended_popup);
+        _uiContainer         = _root.Q<VisualElement>(UI_In_Game_View.ui_container);
+        _leaveGameButton     = _root.Q<Button>       (UI_In_Game_View.leave_button);
+        _returnToLobbyButton = _root.Q<Button>       (UI_In_Game_View.return_button);
 
         SetupButtonCallbacks();
         OnObjectLoaded?.Invoke(_document);
@@ -58,7 +54,6 @@ public class InGameUIView : MonoBehaviour
         {
             _leaveGameButton.clicked += () =>
             {
-                Debug.Log("<color=green>[UI VIEW] Leave Button Clicked!</color>");
                 OnLeaveButtonClicked?.Invoke();
                 _leaveGameButton.text = "Leaving...";
                 _leaveGameButton.SetEnabled(false);
@@ -66,14 +61,13 @@ public class InGameUIView : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Leave button is null");
+            Debug.LogError("[InGameUIView] Leave button is null");
         }
 
         if (_returnToLobbyButton != null)
         {
             _returnToLobbyButton.clicked += () =>
             {
-                Debug.Log("<color=green>[UI VIEW] Return Button Clicked!</color>");
                 OnReturnButtonClicked?.Invoke();
                 _returnToLobbyButton.text = "Returning...";
                 _returnToLobbyButton.SetEnabled(false);
@@ -81,7 +75,7 @@ public class InGameUIView : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Return button is null");
+            Debug.LogError("[InGameUIView] Return button is null");
         }
     }
 
@@ -96,5 +90,15 @@ public class InGameUIView : MonoBehaviour
         {
             _uiContainer.ToggleInClassList("hidden");
         }
+    }
+    
+    public void Show()
+    {
+        if (_root != null) _root.style.display = DisplayStyle.Flex;
+    }
+
+    public void Hide()
+    {
+        if (_root != null) _root.style.display = DisplayStyle.None;
     }
 }

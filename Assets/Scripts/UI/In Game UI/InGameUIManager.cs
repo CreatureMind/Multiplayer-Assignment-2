@@ -6,29 +6,26 @@ public class InGameUIManager : MonoBehaviour
 {
     [SerializeField] private InGameUIView inGameView;
 
-    private InGameUIModel _model;
+    private InGameUIModel     _model;
     private InGameUIPresenter _presenter;
 
     private NetworkManager _networkManager;
-    public NetworkManager NetworkManager
+    public NetworkManager  NetworkManager
     {
         get => _networkManager;
-        set
-        {
-            _networkManager = value;
-        }
+        set => _networkManager = value;
     }
 
     private void Start()
     {
-        InitializeMVP();
+        InitializeMvp();
     }
 
-    private void InitializeMVP()
+    private void InitializeMvp()
     {
-        if (inGameView == null)
+        if (!inGameView)
         {
-            Debug.LogError("[GameUIManager] InGameUIView component not found on InGameUIManager!");
+            Debug.LogError("[InGameUIManager] InGameUIView component not found on InGameUIManager!");
             return;
         }
 
@@ -38,17 +35,11 @@ public class InGameUIManager : MonoBehaviour
 
     public void OnGameEnded()
     {
-        if (_model != null)
-        {
-            _model.NotifyGameEnded();
-        }
+        _model?.NotifyGameEnded();
     }
 
     private void OnDestroy()
     {
-        if (_presenter != null)
-        {
-            _presenter.UnsubscribeFromEvents();
-        }
+        _presenter?.UnsubscribeFromEvents();
     }
 }
