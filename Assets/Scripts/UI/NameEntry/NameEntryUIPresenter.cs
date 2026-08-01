@@ -29,12 +29,17 @@ namespace UI.NameEntry
         public void Initialize()
         {
             if (_model.IsReturningFromMatch) return;
-            if (!string.IsNullOrEmpty(_confirmedName))
+            
+            var savedName = _model.SavedConfirmedName;
+            
+            if (!string.IsNullOrEmpty(savedName))
             {
                 _state = State.Confirmed;
-                _confirmedName = _model.SavedConfirmedName;
+                _confirmedName = savedName;
+                _model.TryApplyConfirmedName(_confirmedName);
                 _view.Hide();
                 
+                Debug.Log($"[NameEntryUIPresenter] Applying saved name: {_confirmedName}]");
                 EventBus.Raise(new PlayerNameConfirmedEvent { PlayerName = _confirmedName });
                 return;
             }

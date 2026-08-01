@@ -20,8 +20,7 @@ namespace UI
         RoomsList,
         RoomLobby
     }
-
-    [RequireComponent(typeof(UIDocument))]
+    
     public class LobbyUIManager : MonoBehaviour
     {
         [Header("Full Screen Views")]
@@ -46,8 +45,6 @@ namespace UI
         private RoomLobbyUIPresenter    _roomLobbyPresenter;
         private RoomCreationUIPresenter _roomCreationPresenter;
         private LoadingUIPresenter      _loadingPresenter;
-        
-        private LobbyScreen _currentScreen = LobbyScreen.None;
 
         private void Start()
         {
@@ -154,15 +151,16 @@ namespace UI
         
         private void OnJoinedLobbyHub(JoinedLobbyEvent e) => _nameEntryPresenter.Initialize();
 
-        private void OnPlayerNameConfirmed(PlayerNameConfirmedEvent e) => ShowScreen(LobbyScreen.RoomsList);
+        private void OnPlayerNameConfirmed(PlayerNameConfirmedEvent e)
+        {
+            Debug.Log($"[NameEntryUIPresenter] Player name confirmed: {e.PlayerName}");
+            ShowScreen(LobbyScreen.RoomsList);
+        }
 
         private void OnJoinedRoom(JoinedRoomEvent e) => ShowScreen(LobbyScreen.RoomLobby);
 
         private void ShowScreen(LobbyScreen screen)
         {
-            if (_currentScreen == screen) return;
-            _currentScreen = screen;
-            
             UIOverlaySorter.Reset();
 
             // Full-Screen visibility standard using Show() / Hide()
@@ -173,8 +171,6 @@ namespace UI
         
         private void HideAllScreens()
         {
-            _currentScreen = LobbyScreen.None;
-            
             mainMenuView    .Hide();
             roomsListView   .Hide();
             roomLobbyView   .Hide();
