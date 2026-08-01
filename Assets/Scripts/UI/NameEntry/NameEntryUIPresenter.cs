@@ -28,7 +28,8 @@ namespace UI.NameEntry
 
         public void Initialize()
         {
-            if (_model.IsReturningFromMatch && !string.IsNullOrEmpty(_confirmedName))
+            if (_model.IsReturningFromMatch) return;
+            if (!string.IsNullOrEmpty(_confirmedName))
             {
                 _state = State.Confirmed;
                 _confirmedName = _model.SavedConfirmedName;

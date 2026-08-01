@@ -42,6 +42,7 @@ namespace UI.MainMenu
         private void HandlePlayClicked()
         {
             _model.EnterGlobalLobby();
+            _view.Hide();
         }
 
         private void HandleOptionsClicked()

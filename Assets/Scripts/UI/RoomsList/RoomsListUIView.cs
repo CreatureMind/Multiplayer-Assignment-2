@@ -74,13 +74,31 @@ namespace UI.RoomsList
             _mapsDropdown?.RegisterValueChangedCallback(_ => OnFilterChanged?.Invoke());
 
             if (_leaveBtn != null)
+            {
                 _leaveBtn.clicked += () => OnLeaveClicked?.Invoke();
+            }
+            else
+            {
+                Debug.LogError("[RoomsListUIView] Could not find Button named 'leave-btn' in Room_List_View.");
+            }
 
             if (_createBtn != null)
+            {
                 _createBtn.clicked += () => OnCreateRoomClicked?.Invoke();
+            }
+            else
+            {
+                Debug.LogError("[RoomsListUIView] Could not find Button named 'create-btn' in Room_List_View.");
+            }
 
             if (_refreshBtn != null)
+            {
                 _refreshBtn.clicked += () => OnRefreshClicked?.Invoke();
+            }
+            else
+            {
+                Debug.LogError("[RoomsListUIView] Could not find Button named 'refresh-btn' in Room_List_View.");
+            }
         }
 
         public void SetHeader(string text)
