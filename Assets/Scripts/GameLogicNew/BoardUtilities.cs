@@ -24,11 +24,17 @@ public static class BoardUtilities
         var checkedTileIndexes = new List<int>();
         var currentOwnerId = playerId;
 
-        //check if the requested tile can become pawn
-        if(!Manager.IsValidIndex(tileIndex) || !TileTransitions.CanRequest(tileState.Type, TileType.Soldier))
+        if (!Manager.IsValidIndex(tileIndex))
         {
             return false;
         }
+
+        // MoveSoldier target rules: empty, enemy soldier capture, or enemy bomb (detonation path).
+        var isEmpty = tileState.Type == TileType.Empty;
+        var isEnemySoldier = tileState.Type == TileType.Soldier && tileState.OwnerId != currentOwnerId;
+        var isEnemyBomb = tileState.Type == TileType.Bomb && tileState.OwnerId != currentOwnerId;
+        if (!isEmpty && !isEnemySoldier && !isEnemyBomb)
+            return false;
         
         checkedTileIndexes.Add(Manager.ToIndex(tileIndex));
         

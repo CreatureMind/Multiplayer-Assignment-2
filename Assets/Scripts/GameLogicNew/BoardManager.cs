@@ -424,10 +424,10 @@ public class BoardManager : NetworkBehaviour
 
     private void SetBase(Vector2Int gridPosition, int playerId)
     {
-        GameTraceLogger.Board(TraceLogsEnabled, $"SetBase start player={playerId}, buildOrigin={gridPosition}.");
-        for (var y = gridPosition.y + 1; y <= gridPosition.y + 2; y++)
+        GameTraceLogger.Board(TraceLogsEnabled, $"SetBase start player={playerId}, baseCoreOrigin={gridPosition}.");
+        for (var y = gridPosition.y; y <= gridPosition.y + 1; y++)
         {
-            for (var x = gridPosition.x + 1; x <= gridPosition.x + 2; x++)
+            for (var x = gridPosition.x; x <= gridPosition.x + 1; x++)
             {
                 if (!TryGetIndex(x, y, out var index))
                     continue;
@@ -440,7 +440,7 @@ public class BoardManager : NetworkBehaviour
         }
         
         // TODO
-        GameTraceLogger.Board(TraceLogsEnabled, $"SetBase completed player={playerId}, buildOrigin={gridPosition}.");
+        GameTraceLogger.Board(TraceLogsEnabled, $"SetBase completed player={playerId}, baseCoreOrigin={gridPosition}.");
         
     }
 

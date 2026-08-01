@@ -705,15 +705,15 @@ public sealed class ServerGameManager : NetworkBehaviour
         GameTraceLogger.Move(TraceLogsEnabled, "Added base cells.");
     }
 
-    private void AddBuildBaseCoreCells(Vector2Int buildWindowOrigin, List<Vector2Int> changedCells)
+    private void AddBuildBaseCoreCells(Vector2Int baseCoreOrigin, List<Vector2Int> changedCells)
     {
-        GameTraceLogger.Move(TraceLogsEnabled, $"Adding build-base core cells from origin {buildWindowOrigin}.");
+        GameTraceLogger.Move(TraceLogsEnabled, $"Adding build-base core cells from base-core origin {baseCoreOrigin}.");
         
-        changedCells.Add(new Vector2Int(buildWindowOrigin.x + 1, buildWindowOrigin.y + 1));
-        changedCells.Add(new Vector2Int(buildWindowOrigin.x + 2, buildWindowOrigin.y + 1));
-        changedCells.Add(new Vector2Int(buildWindowOrigin.x + 1, buildWindowOrigin.y + 2));
-        changedCells.Add(new Vector2Int(buildWindowOrigin.x + 2, buildWindowOrigin.y + 2));
+        changedCells.Add(new Vector2Int(baseCoreOrigin.x, baseCoreOrigin.y));
+        changedCells.Add(new Vector2Int(baseCoreOrigin.x + 1, baseCoreOrigin.y));
+        changedCells.Add(new Vector2Int(baseCoreOrigin.x, baseCoreOrigin.y + 1));
+        changedCells.Add(new Vector2Int(baseCoreOrigin.x + 1, baseCoreOrigin.y + 1));
         
-        GameTraceLogger.Move(TraceLogsEnabled, "Added motherload cells.");
+        GameTraceLogger.Move(TraceLogsEnabled, "Added build-base core cells.");
     }
 }
