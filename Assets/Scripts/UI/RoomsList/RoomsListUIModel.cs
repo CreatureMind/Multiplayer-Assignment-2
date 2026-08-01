@@ -61,6 +61,7 @@ namespace UI.RoomsList
             if (manager)
             {
                 _ = manager.ConnectToCustomLobby(lobbyId);
+                Debug.Log($"Refresh Button clicked");
             }
         }
 

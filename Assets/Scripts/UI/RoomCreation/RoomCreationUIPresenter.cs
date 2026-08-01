@@ -49,6 +49,7 @@ namespace UI.RoomCreation
             _model.CreateRoom(formData, _currentLobbyId);
             _view.Hide();
             _onRoomCreatedRequested?.Invoke();
+            _view.SetCreateButtonEnabled(true);
         }
 
         private void HandleBackRequested()

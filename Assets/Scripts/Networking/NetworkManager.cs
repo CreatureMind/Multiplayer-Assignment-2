@@ -286,11 +286,12 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (result.Ok)
         {
-            Debug.Log("Joined room successfully!");
+            Debug.Log("[Client] Joined room successfully!");
+            EventBus.Raise(new JoinedRoomEvent());
         }
         else
         {
-            Debug.LogError($"Failed to join room: {result.ShutdownReason}");
+            Debug.LogError($"[Client] Failed to join room: {result.ShutdownReason}");
             EventBus.Raise(new RoomJoinRejectedEvent { Reason = DescribeShutdown(result.ShutdownReason) });
             // Fall back to the hub so the player isn't stranded.
             await ConnectToCustomLobby();

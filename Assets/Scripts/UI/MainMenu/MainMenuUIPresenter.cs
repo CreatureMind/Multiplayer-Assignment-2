@@ -8,17 +8,20 @@ namespace UI.MainMenu
     {
         private readonly MainMenuUIModel _model;
         private readonly MainMenuUIView _view;
+        private readonly Action _onPlayRequested;
         private readonly Action _onOptionsRequested;
         private readonly Action _onCreditsRequested;
 
         public MainMenuUIPresenter(
             MainMenuUIModel model,
             MainMenuUIView view,
+            Action onPlayRequested = null,
             Action onOptionsRequested = null,
             Action onCreditsRequested = null)
         {
             _model = model;
             _view = view;
+            _onPlayRequested = onPlayRequested;
             _onOptionsRequested = onOptionsRequested;
             _onCreditsRequested = onCreditsRequested;
 
@@ -42,6 +45,7 @@ namespace UI.MainMenu
         private void HandlePlayClicked()
         {
             _model.EnterGlobalLobby();
+            _onPlayRequested?.Invoke();
         }
 
         private void HandleOptionsClicked()

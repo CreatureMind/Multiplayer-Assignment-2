@@ -64,8 +64,9 @@ namespace UI
             _mainMenuPresenter = new MainMenuUIPresenter(
                 mainMenuModel, 
                 mainMenuView,
-                onCreditsRequested: () => { },
-                onOptionsRequested: () => optionsView.Show()
+                onPlayRequested: () => ShowScreen(LobbyScreen.None),
+                onOptionsRequested: () => optionsView.Show(),
+                onCreditsRequested: () => { }
             );
             
             //Name Entry
@@ -105,7 +106,7 @@ namespace UI
                 lobbyId,
                 onRoomCreatedRequested: () =>
                 {
-                    ShowScreen(LobbyScreen.RoomLobby);
+                    ShowScreen(LobbyScreen.None);
                 }
             );
 
@@ -127,13 +128,15 @@ namespace UI
         private void SubscribeToGlobalEvents()
         {
             EventBus.Subscribe<PlayerNameConfirmedEvent>(OnPlayerNameConfirmed);
-            EventBus.Subscribe<JoinedLobbyEvent>(OnJoinedLobbyHub);
+            EventBus.Subscribe<JoinedLobbyEvent>        (OnJoinedLobbyHub);
+            EventBus.Subscribe<JoinedRoomEvent>         (OnJoinedRoom);
         }
 
         private void UnsubscribeGlobalEvents()
         {
             EventBus.Unsubscribe<PlayerNameConfirmedEvent>(OnPlayerNameConfirmed);
-            EventBus.Unsubscribe<JoinedLobbyEvent>(OnJoinedLobbyHub);
+            EventBus.Unsubscribe<JoinedLobbyEvent>        (OnJoinedLobbyHub);
+            EventBus.Unsubscribe<JoinedRoomEvent>         (OnJoinedRoom);
         }
         
         private void DetermineInitialFlow()
@@ -145,20 +148,15 @@ namespace UI
             }
             else
             {
-                // Otherwise keep all main screens hidden while Name Entry overlay is active
                 ShowScreen(LobbyScreen.MainMenu);
             }
         }
         
-        private void OnJoinedLobbyHub(JoinedLobbyEvent e)
-        {
-            _nameEntryPresenter.Initialize();
-        }
-        
-        private void OnPlayerNameConfirmed(PlayerNameConfirmedEvent e)
-        {
-            ShowScreen(LobbyScreen.RoomsList);
-        }
+        private void OnJoinedLobbyHub(JoinedLobbyEvent e) => _nameEntryPresenter.Initialize();
+
+        private void OnPlayerNameConfirmed(PlayerNameConfirmedEvent e) => ShowScreen(LobbyScreen.RoomsList);
+
+        private void OnJoinedRoom(JoinedRoomEvent e) => ShowScreen(LobbyScreen.RoomLobby);
 
         private void ShowScreen(LobbyScreen screen)
         {

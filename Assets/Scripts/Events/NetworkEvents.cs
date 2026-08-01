@@ -17,6 +17,8 @@ namespace Events
         public List<RoomInfo> Rooms;
         public int TotalPlayers;
     }
+    
+    public struct JoinedRoomEvent { }
 
     // Raised on the requesting client when the server refuses a creation/join.
     public struct RoomJoinRejectedEvent
