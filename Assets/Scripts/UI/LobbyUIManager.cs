@@ -33,6 +33,7 @@ namespace UI
         [SerializeField] private OptionsUIView      optionsView;
         [SerializeField] private RoomCreationUIView roomCreationView;
         [SerializeField] private LoadingUIView      loadingView;
+        [SerializeField] private ChatUIController   chatViewPrefab;
 
         [Header("Audio Settings")]
         [SerializeField] private AudioMixer audioMixer;
@@ -45,6 +46,9 @@ namespace UI
         private RoomLobbyUIPresenter    _roomLobbyPresenter;
         private RoomCreationUIPresenter _roomCreationPresenter;
         private LoadingUIPresenter      _loadingPresenter;
+        
+        // Chat
+        private ChatUIController _chatViewInstance;
 
         private void Start()
         {
@@ -127,6 +131,8 @@ namespace UI
             EventBus.Subscribe<PlayerNameConfirmedEvent>(OnPlayerNameConfirmed);
             EventBus.Subscribe<JoinedLobbyEvent>        (OnJoinedLobbyHub);
             EventBus.Subscribe<JoinedRoomEvent>         (OnJoinedRoom);
+            EventBus.Subscribe<OnChatRelaySpawnedEvent> (CreateNewChat);
+            EventBus.Subscribe<MatchStartedEvent>(StartMatch);
         }
 
         private void UnsubscribeGlobalEvents()
@@ -134,6 +140,15 @@ namespace UI
             EventBus.Unsubscribe<PlayerNameConfirmedEvent>(OnPlayerNameConfirmed);
             EventBus.Unsubscribe<JoinedLobbyEvent>        (OnJoinedLobbyHub);
             EventBus.Unsubscribe<JoinedRoomEvent>         (OnJoinedRoom);
+            EventBus.Unsubscribe<OnChatRelaySpawnedEvent> (CreateNewChat);
+            EventBus.Unsubscribe<MatchStartedEvent>(StartMatch);
+            
+        }
+        
+        private void StartMatch(MatchStartedEvent e)
+        {
+            EventBus.Raise(new ShowLoadingScreenEvent());
+            HideAllScreens();
         }
         
         private void DetermineInitialFlow()
@@ -173,6 +188,13 @@ namespace UI
             nameEntryView   .Hide();
             optionsView     .Hide();
             roomCreationView.Hide();
+        }
+        
+        private void CreateNewChat(OnChatRelaySpawnedEvent e)
+        {
+            if (_chatViewInstance) return;
+        
+            _chatViewInstance = Instantiate(chatViewPrefab);
         }
 
         private void OnDestroy()

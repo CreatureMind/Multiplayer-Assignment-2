@@ -11,9 +11,9 @@ namespace UI.RoomLobby
         private readonly RoomLobbyUIModel _model;
         private readonly RoomLobbyUIView _view;
 
-        private string _currentLobbyId;
-        private string _modeName;
-        private string _mapName;
+        private readonly string _currentLobbyId;
+        private string          _modeName;
+        private string          _mapName;
 
         public RoomLobbyUIPresenter(RoomLobbyUIModel model, RoomLobbyUIView view, string currentLobbyId)
         {
@@ -30,14 +30,14 @@ namespace UI.RoomLobby
             _view.OnLeaveClicked += HandleLeaveClicked;
             _view.OnReadyClicked += HandleReadyClicked;
             _view.OnStartClicked += HandleStartClicked;
-            _view.OnKickClicked += HandleKickClicked;
+            _view.OnKickClicked  += HandleKickClicked;
         }
 
         private void SubscribeToEventBus()
         {
             EventBus.Subscribe<PlayerListChangedEvent>(OnPlayerListChanged);
             EventBus.Subscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
-            EventBus.Subscribe<RoomCreatedEvent>(OnRoomCreated);
+            EventBus.Subscribe<RoomCreatedEvent>      (OnRoomCreated);
         }
 
         public void UnsubscribeFromEvents()
@@ -45,11 +45,11 @@ namespace UI.RoomLobby
             _view.OnLeaveClicked -= HandleLeaveClicked;
             _view.OnReadyClicked -= HandleReadyClicked;
             _view.OnStartClicked -= HandleStartClicked;
-            _view.OnKickClicked -= HandleKickClicked;
+            _view.OnKickClicked  -= HandleKickClicked;
 
             EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
             EventBus.Unsubscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
-            EventBus.Unsubscribe<RoomCreatedEvent>(OnRoomCreated);
+            EventBus.Unsubscribe<RoomCreatedEvent>      (OnRoomCreated);
         }
 
         public void SetupRoomDetails(string roomName, string modeName, string mapName)
@@ -98,15 +98,22 @@ namespace UI.RoomLobby
             }
 
             // Refresh Start Button
-            bool isOwner = _model.CanStartGame();
-            bool allReady = _model.AreAllPlayersReady();
+            var isOwner = _model.CanStartGame();
+            var allReady = _model.AreAllPlayersReady();
             _view.SetStartButtonState(isOwner, allReady);
         }
 
         private async void HandleLeaveClicked()
         {
-            _view.SetLeaveButtonEnabled(false);
-            await _model.LeaveRoomAsync(_currentLobbyId);
+            try
+            {
+                _view.SetLeaveButtonEnabled(false);
+                await _model.LeaveRoomAsync(_currentLobbyId);
+            }
+            catch (Exception e)
+            {
+                throw; // TODO handle exception
+            }
         }
 
         private void HandleReadyClicked()
