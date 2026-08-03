@@ -216,11 +216,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             
             EventBus.Raise(new ShowDialogEvent(
                 title: "Connection Failed",
-                message: $"Could not connect to Lobby Hub: {DescribeShutdown(result.ShutdownReason)}",
+                message: $"Could not connect to the server: {DescribeShutdown(result.ShutdownReason)}",
                 primaryText: "Reconnect",
                 onPrimary: () => _ = ConnectToCustomLobby(),
                 secondaryText: "Cancel",
-                onSecondary: null,
+                onSecondary: () => EventBus.Raise(new ReturnToMainMenuEvent()),
                 type: DialogType.Error
             ));
         }
@@ -404,7 +404,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private static string DescribeShutdown(ShutdownReason reason) => reason switch
     {
-        ShutdownReason.GameNotFound => "Room no longer exists.",
+        ShutdownReason.GameNotFound => "Server is down.",
         ShutdownReason.GameIsFull => "Room is full.",
         ShutdownReason.ConnectionRefused => "The server refused the connection.",
         ShutdownReason.ConnectionTimeout => "Connection timed out.",
