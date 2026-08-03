@@ -21,7 +21,7 @@ namespace UI.RoomCreation
         private Button        _createButton;
         private Button        _backButton;
         
-        private bool _isVisible;
+        private bool _isVisible = true;
 
         private void Awake()
         {

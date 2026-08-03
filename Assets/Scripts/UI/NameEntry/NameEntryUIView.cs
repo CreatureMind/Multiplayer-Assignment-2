@@ -18,7 +18,7 @@ namespace UI.NameEntry
         private Button    _randomButton;
         private Label     _errorLabel;
         
-        private bool _isVisible;
+        private bool _isVisible = true;
 
         private void Awake()
         {

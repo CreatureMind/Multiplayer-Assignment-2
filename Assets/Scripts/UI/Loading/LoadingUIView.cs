@@ -11,7 +11,7 @@ namespace UI.Loading
         private VisualElement _root;
         private VisualElement _loadingSpinner;
         
-        private bool _isVisible;
+        private bool _isVisible = true;
         private bool _canSpin;
 
         private void Awake()

@@ -22,7 +22,7 @@ namespace UI.Options
         private Toggle    _soundFXMuteToggle;
         private Button    _backButton;
         
-        private bool _isVisible;
+        private bool _isVisible = true;
 
         private void Awake()
         {

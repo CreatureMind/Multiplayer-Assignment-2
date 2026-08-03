@@ -22,7 +22,7 @@ namespace UI.Dialog
         private Button _secondaryBtn;
         private Button _tertiaryBtn;
 
-        private bool _isVisible;
+        private bool _isVisible = true;
 
         private void Awake()
         {
