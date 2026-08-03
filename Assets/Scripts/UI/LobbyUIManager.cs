@@ -129,6 +129,7 @@ namespace UI
             //Loading Overlay
             var loadingModel = new LoadingUIModel();
             _loadingPresenter = new LoadingUIPresenter(loadingModel, loadingView);
+            DontDestroyOnLoad(loadingView);
             
             //Dialog Overlay
             var dialogModel = new DialogUIModel();

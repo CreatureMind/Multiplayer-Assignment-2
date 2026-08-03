@@ -345,8 +345,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     // Leave the match: disconnect, reload the menu scene, rejoin the hub.
-    public async Task ReturnToLobbyAsync(float flushDelay = 0f)
+    public async Task ReturnToLobbyAsync(float flushDelay = 1f)
     {
+        EventBus.Raise(new ShowLoadingScreenEvent());
+        
         if (flushDelay > 0f)
             await Task.Delay((int)(flushDelay * 1000));
         
@@ -367,7 +369,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         var tcs = new TaskCompletionSource<bool>();
         var op = SceneManager.LoadSceneAsync(buildIndex);
-        op.completed += _ => tcs.TrySetResult(true);
+        if (op != null) op.completed += _ => tcs.TrySetResult(true);
         return tcs.Task;
     }
 
