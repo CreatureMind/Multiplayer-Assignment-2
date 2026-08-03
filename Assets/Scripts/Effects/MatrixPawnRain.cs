@@ -71,6 +71,23 @@ public class MatrixPawnRain : MonoBehaviour
     [Tooltip("Evaluated 0 (head) to 1 (tail). Output is used as alpha.")]
     [SerializeField] private AnimationCurve tailFadeCurve = AnimationCurve.Linear(0f, 1f, 1f, 0f);
 
+    [Header("Depth / Parallax")]
+    [Tooltip("Gives each stripe a random depth (0 = far background, 1 = near foreground), layering dimmer/smaller/slower stripes behind brighter/closer ones — on top of the normal head-to-tail fade, not instead of it.")]
+    [SerializeField] private bool enableDepthVariation = true;
+    [Tooltip("Remaps a uniform random 0-1 roll into a depth value. Use this to bias how many stripes end up 'close' vs 'far' — e.g. an S-curve to push most stripes toward the two extremes for more visible layering.")]
+    [SerializeField] private AnimationCurve depthDistributionCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+    [Tooltip("Overall alpha multiplier at depth 0 (far) vs depth 1 (near), applied on top of tailFadeCurve. Lower farAlphaMultiplier pushes background stripes further into the dark.")]
+    [SerializeField, Range(0f, 1f)] private float farAlphaMultiplier = 0.35f;
+    [SerializeField, Range(0f, 1f)] private float nearAlphaMultiplier = 1f;
+    [Tooltip("Scales each pawn's size by depth, so far stripes read as smaller/further away. Set both to 1 to disable.")]
+    [SerializeField] private float farScale = 0.7f;
+    [SerializeField] private float nearScale = 1f;
+    [Tooltip("Multiplies each stripe's step interval by depth. Values above 1 on the far side make background stripes fall slower than foreground ones, for a parallax feel. Set both to 1 to disable.")]
+    [SerializeField] private float farSpeedMultiplier = 1.6f;
+    [SerializeField] private float nearSpeedMultiplier = 1f;
+    [Tooltip("Extra sorting-order spread across the depth range, so near stripes always draw on top of far ones regardless of spawn order.")]
+    [SerializeField] private int depthSortingRange = 20;
+
     [Header("Flicker")]
     [Tooltip("Each step, every visible pawn has this chance to re-roll its color from the palette (subtle glitch feel).")]
     [SerializeField, Range(0f, 1f)] private float recolorChance = 0f;
@@ -93,6 +110,7 @@ public class MatrixPawnRain : MonoBehaviour
         public int length;
         public SpriteRenderer[] units; // fixed-size buffer, only [0, length) in use
         public Color stripeColor;
+        public float depth; // 0 = far background, 1 = near foreground
     }
 
     private readonly List<Stripe> _stripePool = new List<Stripe>();
@@ -237,9 +255,10 @@ public class MatrixPawnRain : MonoBehaviour
         stripe.column = column;
         stripe.headRow = 0;
         stripe.timer = 0f;
-        stripe.stepInterval = Random.Range(minStepInterval, maxStepInterval);
         stripe.length = length;
         stripe.stripeColor = palette.Length > 0 ? palette[Random.Range(0, palette.Length)] : Color.white;
+        stripe.depth = enableDepthVariation ? Mathf.Clamp01(depthDistributionCurve.Evaluate(Random.value)) : 1f;
+        stripe.stepInterval = Random.Range(minStepInterval, maxStepInterval) * DepthSpeedMultiplier(stripe);
 
         ApplyStripeVisuals(stripe);
         PositionStripe(stripe, 0f);
@@ -262,7 +281,7 @@ public class MatrixPawnRain : MonoBehaviour
             {
                 stripe.headRow++;
                 stripe.timer -= stripe.stepInterval;
-                stripe.stepInterval = Random.Range(minStepInterval, maxStepInterval);
+                stripe.stepInterval = Random.Range(minStepInterval, maxStepInterval) * DepthSpeedMultiplier(stripe);
                 if (recolorChance > 0f) MaybeRecolor(stripe);
             }
 
@@ -288,18 +307,23 @@ public class MatrixPawnRain : MonoBehaviour
         float x = _left + stripe.column * cellSize + cellSize * 0.5f;
         float headYExact = _top - (stripe.headRow + subStepProgress) * cellSize;
 
+        float depthAlphaMul = enableDepthVariation ? Mathf.Lerp(farAlphaMultiplier, nearAlphaMultiplier, stripe.depth) : 1f;
+        float depthScale = enableDepthVariation ? Mathf.Lerp(farScale, nearScale, stripe.depth) : 1f;
+
         for (int i = 0; i < stripe.length; i++)
         {
             // i = 0 is the leading pawn (bottom, direction of travel). Higher indices trail
             // upward behind it, which is why they extend with a POSITIVE offset here.
             float y = headYExact + i * cellSize;
-            stripe.units[i].transform.position = new Vector3(x, y, 0f);
+            var unitTransform = stripe.units[i].transform;
+            unitTransform.position = new Vector3(x, y, 0f);
+            unitTransform.localScale = Vector3.one * depthScale;
 
             if (fadeTail)
             {
                 float t = stripe.length <= 1 ? 0f : (float)i / (stripe.length - 1);
                 Color baseColor = (i == 0 && headHighlightColor.a > 0f) ? headHighlightColor : stripe.units[i].color;
-                baseColor.a = tailFadeCurve.Evaluate(t);
+                baseColor.a = tailFadeCurve.Evaluate(t) * depthAlphaMul;
                 stripe.units[i].color = baseColor;
             }
         }
@@ -307,12 +331,20 @@ public class MatrixPawnRain : MonoBehaviour
 
     private void ApplyStripeVisuals(Stripe stripe)
     {
+        int sortingOffset = enableDepthVariation ? Mathf.RoundToInt(Mathf.Lerp(0, depthSortingRange, stripe.depth)) : 0;
+
         for (int i = 0; i < stripe.length; i++)
         {
             Color c = ResolveUnitColor(stripe, i);
             if (i == 0 && headHighlightColor.a > 0f) c = headHighlightColor;
             stripe.units[i].color = c;
+            stripe.units[i].sortingOrder = orderInLayer + sortingOffset;
         }
+    }
+
+    private float DepthSpeedMultiplier(Stripe stripe)
+    {
+        return enableDepthVariation ? Mathf.Lerp(farSpeedMultiplier, nearSpeedMultiplier, stripe.depth) : 1f;
     }
 
     private Color ResolveUnitColor(Stripe stripe, int index)
