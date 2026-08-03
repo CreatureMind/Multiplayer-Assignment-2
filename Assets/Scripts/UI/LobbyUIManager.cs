@@ -221,6 +221,7 @@ namespace UI
         {
             if (_loadingViewInstance) return;
             _loadingViewInstance = Instantiate(loadingViewPrefab);
+            _loadingViewInstance.gameObject.SetActive(true);
             
             var loadingModel = new LoadingUIModel();
             _loadingPresenter = new LoadingUIPresenter(loadingModel, _loadingViewInstance);
