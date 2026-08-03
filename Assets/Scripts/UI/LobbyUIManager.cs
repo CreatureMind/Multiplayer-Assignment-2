@@ -93,7 +93,11 @@ namespace UI
             _roomsListPresenter = new RoomsListUIPresenter(
                 roomsListModel,
                 roomsListView,
-                onLeaveRequested: () => ShowScreen(LobbyScreen.MainMenu),
+                onLeaveRequested: () =>
+                {
+                    EventBus.Raise(new HideChatEvent());
+                    ShowScreen(LobbyScreen.MainMenu);
+                },
                 onCreateRoomRequested: () => roomCreationView.Show(),
                 onJoinedRoomViewRequested: (roomName, mode, map) => 
                 {

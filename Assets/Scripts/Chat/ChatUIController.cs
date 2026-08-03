@@ -45,7 +45,7 @@ public class ChatUIController : MonoBehaviour
         EventBus.Subscribe<PlayerDataChangedEvent>   (OnPlayerDataChanged);
         EventBus.Subscribe<OnChatRelayDespawnedEvent>(OnChatRelayDespawned);
         EventBus.Subscribe<PlayerNameConfirmedEvent> (Show);
-        EventBus.Subscribe<ReturnToMainMenuEvent>    (Hide);
+        EventBus.Subscribe<HideChatEvent>            (Hide);
     }
 
     private void OnDisable()
@@ -55,7 +55,7 @@ public class ChatUIController : MonoBehaviour
         EventBus.Unsubscribe<PlayerDataChangedEvent>   (OnPlayerDataChanged);
         EventBus.Unsubscribe<OnChatRelayDespawnedEvent>(OnChatRelayDespawned);
         EventBus.Unsubscribe<PlayerNameConfirmedEvent> (Show);
-        EventBus.Unsubscribe<ReturnToMainMenuEvent>    (Hide);
+        EventBus.Unsubscribe<HideChatEvent>            (Hide);
 
         _chatTextField?.UnregisterCallback<KeyDownEvent>(OnTextFieldKeyDown, TrickleDown.TrickleDown);
     }
@@ -277,7 +277,7 @@ public class ChatUIController : MonoBehaviour
         if (_root != null) _root.style.display = DisplayStyle.Flex;
     }
 
-    private void Hide(ReturnToMainMenuEvent e)
+    private void Hide(HideChatEvent e)
     {
         if (!_isVisible) return;
         _isVisible = false;

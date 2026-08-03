@@ -80,6 +80,8 @@ namespace Events
     public struct OnChatRelaySpawnedEvent{}
     
     public struct OnChatRelayDespawnedEvent{}
+    
+    public struct HideChatEvent {}
 
     public struct PlayerNameConfirmedEvent
     {
