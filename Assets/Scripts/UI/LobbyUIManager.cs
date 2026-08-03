@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Events;
+using UI.Dialog;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UIElements;
@@ -34,6 +35,7 @@ namespace UI
         [SerializeField] private RoomCreationUIView roomCreationView;
         [SerializeField] private LoadingUIView      loadingView;
         [SerializeField] private ChatUIController   chatViewPrefab;
+        [SerializeField] private DialogUIView       dialogView;
 
         [Header("Audio Settings")]
         [SerializeField] private AudioMixer audioMixer;
@@ -46,6 +48,7 @@ namespace UI
         private RoomLobbyUIPresenter    _roomLobbyPresenter;
         private RoomCreationUIPresenter _roomCreationPresenter;
         private LoadingUIPresenter      _loadingPresenter;
+        private DialogUIPresenter       _dialogPresenter;
         
         // Chat
         private ChatUIController _chatViewInstance;
@@ -123,6 +126,10 @@ namespace UI
             var loadingModel = new LoadingUIModel();
             _loadingPresenter = new LoadingUIPresenter(loadingModel, loadingView);
             
+            //Dialog Overlay
+            var dialogModel = new DialogUIModel();
+            _dialogPresenter = new DialogUIPresenter(dialogModel, dialogView);
+            
             SubscribeToGlobalEvents();
         }
         
@@ -132,7 +139,8 @@ namespace UI
             EventBus.Subscribe<JoinedLobbyEvent>        (OnJoinedLobbyHub);
             EventBus.Subscribe<JoinedRoomEvent>         (OnJoinedRoom);
             EventBus.Subscribe<OnChatRelaySpawnedEvent> (CreateNewChat);
-            EventBus.Subscribe<MatchStartedEvent>(StartMatch);
+            EventBus.Subscribe<MatchStartedEvent>       (StartMatch);
+            EventBus.Subscribe<ReturnToMainMenuEvent>   (ShowMainMenu);
         }
 
         private void UnsubscribeGlobalEvents()
@@ -141,8 +149,8 @@ namespace UI
             EventBus.Unsubscribe<JoinedLobbyEvent>        (OnJoinedLobbyHub);
             EventBus.Unsubscribe<JoinedRoomEvent>         (OnJoinedRoom);
             EventBus.Unsubscribe<OnChatRelaySpawnedEvent> (CreateNewChat);
-            EventBus.Unsubscribe<MatchStartedEvent>(StartMatch);
-            
+            EventBus.Unsubscribe<MatchStartedEvent>       (StartMatch);
+            EventBus.Unsubscribe<ReturnToMainMenuEvent>   (ShowMainMenu);
         }
         
         private void StartMatch(MatchStartedEvent e)
@@ -150,7 +158,9 @@ namespace UI
             EventBus.Raise(new ShowLoadingScreenEvent());
             HideAllScreens();
         }
-        
+
+        private void ShowMainMenu(ReturnToMainMenuEvent e) => ShowScreen(LobbyScreen.MainMenu);
+
         private void DetermineInitialFlow()
         {
             // If name is already confirmed (or returning from match), go to Main Menu directly
@@ -208,6 +218,7 @@ namespace UI
             _roomCreationPresenter?.UnsubscribeFromEvents();
             _roomLobbyPresenter?.   UnsubscribeFromEvents();
             _loadingPresenter?.     UnsubscribeFromEvents();
+            _dialogPresenter?.      UnsubscribeFromEvents();
         }
     }
 }

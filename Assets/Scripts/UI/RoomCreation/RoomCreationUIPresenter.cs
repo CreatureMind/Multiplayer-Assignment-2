@@ -1,4 +1,5 @@
 using System;
+using Events;
 using UnityEngine;
 
 namespace UI.RoomCreation
@@ -17,25 +18,30 @@ namespace UI.RoomCreation
             _currentLobbyId = currentLobbyId;
             _onRoomCreatedRequested = onRoomCreatedRequested;
 
-            SubscribeToEvents();
+            SubscribeToViewEvents();
+            SubscribeToEventBus();
         }
 
-        public void SetLobbyId(string lobbyId)
-        {
-            _currentLobbyId = lobbyId;
-        }
-
-        private void SubscribeToEvents()
+        private void SubscribeToViewEvents()
         {
             _view.OnCreateRequested += HandleCreateRequested;
             _view.OnBackRequested   += HandleBackRequested;
+        }
+
+        private void SubscribeToEventBus()
+        {
+            EventBus.Subscribe<OpenRoomCreationOverlayEvent>(HandleOpenRoomCreationRequested);
         }
 
         public void UnsubscribeFromEvents()
         {
             _view.OnCreateRequested -= HandleCreateRequested;
             _view.OnBackRequested   -= HandleBackRequested;
+            
+            EventBus.Unsubscribe<OpenRoomCreationOverlayEvent>(HandleOpenRoomCreationRequested);
         }
+
+        private void HandleOpenRoomCreationRequested(OpenRoomCreationOverlayEvent e) => _view.Show();
 
         private void HandleCreateRequested(RoomCreationFormData formData)
         {

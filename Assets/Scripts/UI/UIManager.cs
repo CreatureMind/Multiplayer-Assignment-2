@@ -65,7 +65,7 @@ namespace UI
 
             // Rooms List
             EventBus.Subscribe<RoomCreatedEvent>(ShowRoomView);
-            EventBus.Subscribe<RoomJoinRejectedEvent>(OnRoomJoinRejected);
+            //EventBus.Subscribe<RoomJoinRejectedEvent>(OnRoomJoinRejected);
         
             // Loading Screen
             EventBus.Subscribe<ShowLoadingScreenEvent>(ShowLoadingScreen);
@@ -93,7 +93,7 @@ namespace UI
 
             // Rooms List
             EventBus.Unsubscribe<RoomCreatedEvent>(ShowRoomView);
-            EventBus.Unsubscribe<RoomJoinRejectedEvent>(OnRoomJoinRejected);
+            //EventBus.Unsubscribe<RoomJoinRejectedEvent>(OnRoomJoinRejected);
         
             // Loading Screen
             EventBus.Unsubscribe<ShowLoadingScreenEvent>(ShowLoadingScreen);
@@ -688,7 +688,7 @@ namespace UI
         }
 
         // Server refused a create/join. Surface it and return the player to the rooms list.
-        private void OnRoomJoinRejected(RoomJoinRejectedEvent e)
+        /*private void OnRoomJoinRejected(RoomJoinRejectedEvent e)
         {
             HideLoadingScreen(new HideLoadingScreenEvent());
 
@@ -698,6 +698,6 @@ namespace UI
             var header = _root?.Q<Label>(UI_Rooms_List_View_v3.header);
             if (header != null)
                 header.text = $"Rejected: {e.Reason}";
-        }
+        }*/
     }
 }

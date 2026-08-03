@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Fusion;
 
@@ -19,12 +20,6 @@ namespace Events
     }
     
     public struct JoinedRoomEvent { }
-
-    // Raised on the requesting client when the server refuses a creation/join.
-    public struct RoomJoinRejectedEvent
-    {
-        public string Reason;
-    }
 
     public struct ShowLoadingScreenEvent { }
 
@@ -85,15 +80,65 @@ namespace Events
     public struct OnChatRelaySpawnedEvent{}
     
     public struct OnChatRelayDespawnedEvent{}
-    
 
     public struct PlayerNameConfirmedEvent
     {
         public string PlayerName;
     }
     
+    public struct ReturnToMainMenuEvent {}
+    
+    public struct OpenRoomCreationOverlayEvent {}
+    
+    // Audio system
     public struct PlaySoundEvent
     {
         public SoundEffectEnum SoundName;
+    }
+    
+    // Feedback Dialog
+    public enum DialogType
+    {
+        Info,
+        Warning,
+        Error
+    }
+
+    public struct ShowDialogEvent
+    {
+        public readonly string Title;
+        public readonly string Message;
+        public readonly DialogType Type;
+
+        public readonly string PrimaryText;
+        public readonly Action OnPrimary;
+
+        public readonly string SecondaryText;
+        public readonly Action OnSecondary;
+
+        public readonly string TertiaryText;
+        public readonly Action OnTertiary;
+
+        public ShowDialogEvent(
+            string title,
+            string message,
+            string primaryText = "OK", Action onPrimary = null,
+            string secondaryText = null, Action onSecondary = null,
+            string tertiaryText = null, Action onTertiary = null,
+            DialogType type = DialogType.Error)
+        {
+            Title = title;
+            Message = message;
+            Type = type;
+
+            PrimaryText = primaryText;
+            OnPrimary = onPrimary;
+
+            SecondaryText = secondaryText;
+            OnSecondary = onSecondary;
+
+            TertiaryText = tertiaryText;
+            OnTertiary = onTertiary;
+        }
     }
 }

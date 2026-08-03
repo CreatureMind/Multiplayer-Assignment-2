@@ -10,13 +10,15 @@ namespace UI.NameEntry
         public event Action OnConfirmClicked;
         public event Action OnRandomizeClicked;
 
-        private UIDocument _document;
+        private UIDocument    _document;
         private VisualElement _root;
 
         private TextField _nameField;
-        private Button _confirmButton;
-        private Button _randomButton;
-        private Label _errorLabel;
+        private Button    _confirmButton;
+        private Button    _randomButton;
+        private Label     _errorLabel;
+        
+        private bool _isVisible;
 
         private void Awake()
         {
@@ -38,10 +40,10 @@ namespace UI.NameEntry
         {
             _root = document.rootVisualElement;
 
-            _nameField = _root.Q<TextField>(UI_Name_Entry_View.player_name_field);
+            _nameField     = _root.Q<TextField>(UI_Name_Entry_View.player_name_field);
             _confirmButton = _root.Q<Button>(UI_Name_Entry_View.confirm_button);
-            _randomButton = _root.Q<Button>(UI_Name_Entry_View.randomize_button);
-            _errorLabel = _root.Q<Label>(UI_Name_Entry_View.error_label);
+            _randomButton  = _root.Q<Button>(UI_Name_Entry_View.randomize_button);
+            _errorLabel    = _root.Q<Label>(UI_Name_Entry_View.error_label);
 
             if (_nameField == null || _confirmButton == null)
             {
@@ -93,15 +95,21 @@ namespace UI.NameEntry
 
         public void Show()
         {
+            if (_isVisible) return;
+            _isVisible = true;
+
             if (_document) _document.sortingOrder = UIOverlaySorter.PushOverlay();
-            
+
             if (_root != null) _root.style.display = DisplayStyle.Flex;
         }
 
         public void Hide()
         {
+            if (!_isVisible) return;
+            _isVisible = false;
+
             if (_root != null) _root.style.display = DisplayStyle.None;
-            
+
             UIOverlaySorter.PopOverlay();
         }
     }

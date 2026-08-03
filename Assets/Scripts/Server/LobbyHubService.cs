@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Events;
@@ -130,7 +131,7 @@ public class LobbyHubService : NetworkBehaviour
             Debug.Log($"[Server] CreateFlow done: Ok={result.Ok} session='{result.SessionName}' reason='{result.Reason}'. Registry count={Rooms.Count}");
             Rpc_CreateRoomResult(requester, result.Ok, result.SessionName, result.OwnerToken, result.Reason);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             Debug.LogException(ex);
             Rpc_CreateRoomResult(requester, false, "", "", "Server error while creating room.");

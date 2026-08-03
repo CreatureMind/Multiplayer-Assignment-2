@@ -31,7 +31,7 @@ namespace UI.RoomsList
 
         public string SelectedRoomFilter => _roomsDropdown?.value ?? "All";
         public string SelectedModeFilter => _modesDropdown?.value ?? "All";
-        public string SelectedMapFilter => _mapsDropdown?.value ?? "All";
+        public string SelectedMapFilter  => _mapsDropdown?.value ?? "All";
 
         private void Awake()
         {
@@ -53,15 +53,15 @@ namespace UI.RoomsList
         {
             _root = document.rootVisualElement;
 
-            _headerLabel = _root.Q<Label>(UI_Rooms_List_View_v3.header);
-            _roomsDropdown = _root.Q<DropdownField>(UI_Rooms_List_View_v3.rooms_dropdown);
-            _modesDropdown = _root.Q<DropdownField>(UI_Rooms_List_View_v3.modes_dropdown);
-            _mapsDropdown = _root.Q<DropdownField>(UI_Rooms_List_View_v3.maps_dropdown);
+            _headerLabel     = _root.Q<Label>(UI_Rooms_List_View_v3.header);
+            _roomsDropdown   = _root.Q<DropdownField>(UI_Rooms_List_View_v3.rooms_dropdown);
+            _modesDropdown   = _root.Q<DropdownField>(UI_Rooms_List_View_v3.modes_dropdown);
+            _mapsDropdown    = _root.Q<DropdownField>(UI_Rooms_List_View_v3.maps_dropdown);
             _roomsScrollView = _root.Q<ScrollView>(UI_Rooms_List_View_v3.rooms_scroll_view);
 
-            _leaveBtn = _root.Q<Button>(UI_Rooms_List_View.leave_button);
-            _createBtn = _root.Q<Button>(UI_Rooms_List_View.create_button);
-            _refreshBtn = _root.Q<Button>(UI_Rooms_List_View.refresh_button);
+            _leaveBtn    = _root.Q<Button>(UI_Rooms_List_View.leave_button);
+            _createBtn   = _root.Q<Button>(UI_Rooms_List_View.create_button);
+            _refreshBtn  = _root.Q<Button>(UI_Rooms_List_View.refresh_button);
             _onlineLabel = _root.Q<Label>(UI_Rooms_List_View.online_label);
 
             SetupCallbacks();

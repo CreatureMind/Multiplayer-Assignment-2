@@ -21,6 +21,8 @@ namespace UI.Options
         private Toggle    _musicMuteToggle;
         private Toggle    _soundFXMuteToggle;
         private Button    _backButton;
+        
+        private bool _isVisible;
 
         private void Awake()
         {
@@ -109,15 +111,21 @@ namespace UI.Options
         
         public void Show()
         {
+            if (_isVisible) return;
+            _isVisible = true;
+
             if (_document) _document.sortingOrder = UIOverlaySorter.PushOverlay();
-            
+
             if (_root != null) _root.style.display = DisplayStyle.Flex;
         }
 
         public void Hide()
         {
+            if (!_isVisible) return;
+            _isVisible = false;
+
             if (_root != null) _root.style.display = DisplayStyle.None;
-            
+
             UIOverlaySorter.PopOverlay();
         }
     }

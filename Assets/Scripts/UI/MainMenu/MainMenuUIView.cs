@@ -11,7 +11,7 @@ namespace UI.MainMenu
         public event Action OnOptionsClicked;
         public event Action OnCreditsClicked;
 
-        private UIDocument _document;
+        private UIDocument    _document;
         private VisualElement _root;
 
         private Button _playGameBtn;

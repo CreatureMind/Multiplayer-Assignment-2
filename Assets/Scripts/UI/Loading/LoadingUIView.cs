@@ -7,10 +7,11 @@ namespace UI.Loading
     [RequireComponent(typeof(UIDocument))]
     public class LoadingUIView : MonoBehaviour
     {
-        private UIDocument _document;
+        private UIDocument    _document;
         private VisualElement _root;
         private VisualElement _loadingSpinner;
-
+        
+        private bool _isVisible;
         private bool _canSpin;
 
         private void Awake()
@@ -53,9 +54,13 @@ namespace UI.Loading
 
         public void Show()
         {
+            if (_isVisible) return;
+            _isVisible = true;
+            
             if (_document) _document.sortingOrder = UIOverlaySorter.PushOverlay();
             
             if (_root != null) _root.style.display = DisplayStyle.Flex;
+            
             if (_loadingSpinner != null)
             {
                 StartSpinning();
@@ -68,8 +73,14 @@ namespace UI.Loading
 
         public void Hide()
         {
+            if (!_isVisible) return;
+            _isVisible = false;
+            
             _canSpin = false;
+            
             if (_root != null) _root.style.display = DisplayStyle.None;
+            
+            UIOverlaySorter.PopOverlay();
         }
     }
 }

@@ -4,11 +4,9 @@ using UnityEngine.UIElements;
 [UxmlElement]
 public partial class GradientBox : VisualElement
 {
-    // --- CLASS 1: THE MAIN ELEMENT ---
-    // Houses runtime logic and mesh properties
-    [UxmlAttribute] public Color startColor { get; set; } = Color.red;
-    [UxmlAttribute] public Color endColor { get; set; } = Color.blue;
-    [UxmlAttribute] public bool horizontal { get; set; } = false;
+    [UxmlAttribute] private Color startColor { get; set; } = Color.red;
+    [UxmlAttribute] private Color endColor { get; set; } = Color.blue;
+    [UxmlAttribute] private bool horizontal { get; set; } = false;
 
     public GradientBox()
     {

@@ -7,9 +7,10 @@ namespace UI.RoomsList
     public class RoomsListUIPresenter
     {
         private readonly RoomsListUIModel _model;
-        private readonly RoomsListUIView _view;
-        private readonly Action _onLeaveRequested;
-        private readonly Action _onCreateRoomRequested;
+        private readonly RoomsListUIView  _view;
+        
+        private readonly Action                         _onLeaveRequested;
+        private readonly Action                         _onCreateRoomRequested;
         private readonly Action<string, string, string> _onJoinedRoomViewRequested;
 
         private string _currentLobbyId;
@@ -33,28 +34,28 @@ namespace UI.RoomsList
 
         private void SubscribeToViewEvents()
         {
-            _view.OnFilterChanged += ApplyFiltersAndRender;
-            _view.OnLeaveClicked += HandleLeaveClicked;
+            _view.OnFilterChanged     += ApplyFiltersAndRender;
+            _view.OnLeaveClicked      += HandleLeaveClicked;
             _view.OnCreateRoomClicked += HandleCreateRoomClicked;
-            _view.OnRefreshClicked += HandleRefreshClicked;
-            _view.OnJoinRoomClicked += HandleJoinRoomClicked;
+            _view.OnRefreshClicked    += HandleRefreshClicked;
+            _view.OnJoinRoomClicked   += HandleJoinRoomClicked;
         }
 
         private void SubscribeToEventBus()
         {
-            EventBus.Subscribe<JoinedLobbyEvent>(OnJoinedLobby);
+            EventBus.Subscribe<JoinedLobbyEvent>    (OnJoinedLobby);
             EventBus.Subscribe<RoomListChangedEvent>(OnRoomListChanged);
         }
 
         public void UnsubscribeFromEvents()
         {
-            _view.OnFilterChanged -= ApplyFiltersAndRender;
-            _view.OnLeaveClicked -= HandleLeaveClicked;
+            _view.OnFilterChanged     -= ApplyFiltersAndRender;
+            _view.OnLeaveClicked      -= HandleLeaveClicked;
             _view.OnCreateRoomClicked -= HandleCreateRoomClicked;
-            _view.OnRefreshClicked -= HandleRefreshClicked;
-            _view.OnJoinRoomClicked -= HandleJoinRoomClicked;
+            _view.OnRefreshClicked    -= HandleRefreshClicked;
+            _view.OnJoinRoomClicked   -= HandleJoinRoomClicked;
 
-            EventBus.Unsubscribe<JoinedLobbyEvent>(OnJoinedLobby);
+            EventBus.Unsubscribe<JoinedLobbyEvent>    (OnJoinedLobby);
             EventBus.Unsubscribe<RoomListChangedEvent>(OnRoomListChanged);
         }
 

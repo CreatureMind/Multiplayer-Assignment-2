@@ -5,12 +5,12 @@
             <ui:VisualElement name="" style="flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; background-color: rgb(60, 60, 60); padding-top: 100px; padding-right: 60px; padding-bottom: 100px; padding-left: 60px; border-top-width: 1px; border-right-width: 0; border-bottom-width: 1px; border-left-width: 0; border-left-color: rgb(128, 128, 128); border-right-color: rgb(128, 128, 128); border-top-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128);">
                 <GradientBox name="" end-color="rgba(0, 0, 0, 0.5)" start-color="rgba(0, 0, 0, 0)" style="height: 104px; position: absolute; top: -105px; align-self: center; flex-grow: 1; width: 100%;"/>
                 <ui:Label text="Error" name="header" class="header" style="position: absolute; align-self: center; top: -105px;"/>
-                <ui:Label text="Error something something:&#10;Unable something something..." name="error-text" class="Lable" style="margin-top: 0; margin-right: 500px; margin-bottom: 0; margin-left: 500px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-text-align: middle-center; color: rgb(255, 255, 255);"/>
+                <ui:Label text="Error something something:&#10;Unable something something..." name="dialog-message" class="Lable" style="margin-top: 0; margin-right: 500px; margin-bottom: 0; margin-left: 500px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-text-align: middle-center; color: rgb(255, 255, 255);"/>
             </ui:VisualElement>
             <ui:VisualElement name="bottom-container" style="flex-direction: row; justify-content: space-around; align-items: flex-start; margin-right: 600px; margin-left: 600px;">
-                <ui:Button text="Retry" name="retry-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; display: flex;"/>
-                <ui:Button text="Ok" name="ok-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; display: flex;"/>
-                <ui:Button text="Reconnect" name="reconnect-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; display: flex;"/>
+                <ui:Button text="Retry" name="primary-btn" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; display: flex;"/>
+                <ui:Button text="Ok" name="secondary-btn" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; display: flex;"/>
+                <ui:Button text="Reconnect" name="tertiary-btn" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; display: flex;"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
