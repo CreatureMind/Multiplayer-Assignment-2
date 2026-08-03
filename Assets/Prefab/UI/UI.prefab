@@ -29,7 +29,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5938558921329361091}
   - {fileID: 1377784095003218369}
   - {fileID: 6017998213959253419}
   - {fileID: 6496492614772900781}
@@ -86,7 +85,7 @@ MonoBehaviour:
   roomLobbyView: {fileID: 7525119234567143642}
   optionsView: {fileID: 6377384859667689557}
   roomCreationView: {fileID: 2921044859621760522}
-  loadingView: {fileID: 3707746263296835704}
+  loadingViewPrefab: {fileID: 2743837903586713642, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
   chatViewPrefab: {fileID: 6575760504648723879, guid: 046a7adf8e10133479ecfb5dccccb912, type: 3}
   dialogView: {fileID: 3080539514211683060}
   audioMixer: {fileID: 24100000, guid: 12727e0891e931f4a95b8da5285afea9, type: 2}
@@ -295,55 +294,6 @@ MonoBehaviour:
 Transform:
   m_CorrespondingSourceObject: {fileID: 7546517375228588642, guid: 8d36ca1b9a1218a4eb24a5dc8747689a, type: 3}
   m_PrefabInstance: {fileID: 1385723044484576550}
-  m_PrefabAsset: {fileID: 0}
---- !u!1001 &1540404373712986194
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1967045491851565169}
-    m_Modifications:
-    - target: {fileID: 5118730744084996241, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5118730744084996241, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5118730744084996241, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7259980683239559684, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
-      propertyPath: m_Name
-      value: Loading_UI
-      objectReference: {fileID: 0}
-    - target: {fileID: 7259980683239559684, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
---- !u!114 &3707746263296835704 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2743837903586713642, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
-  m_PrefabInstance: {fileID: 1540404373712986194}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 926d81beb92b41b183cd33fe1492d67a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UI.Loading.LoadingUIView
---- !u!4 &5938558921329361091 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5118730744084996241, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
-  m_PrefabInstance: {fileID: 1540404373712986194}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1844734271254900506
 PrefabInstance:

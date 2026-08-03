@@ -33,7 +33,7 @@ namespace UI
         [Header("Overlays")]
         [SerializeField] private OptionsUIView      optionsView;
         [SerializeField] private RoomCreationUIView roomCreationView;
-        [SerializeField] private LoadingUIView      loadingView;
+        [SerializeField] private LoadingUIView      loadingViewPrefab;
         [SerializeField] private ChatUIController   chatViewPrefab;
         [SerializeField] private DialogUIView       dialogView;
 
@@ -52,6 +52,9 @@ namespace UI
         
         // Chat
         private ChatUIController _chatViewInstance;
+        
+        //Loading
+        private LoadingUIView _loadingViewInstance;
 
         private void Start()
         {
@@ -127,9 +130,7 @@ namespace UI
             );
 
             //Loading Overlay
-            var loadingModel = new LoadingUIModel();
-            _loadingPresenter = new LoadingUIPresenter(loadingModel, loadingView);
-            DontDestroyOnLoad(loadingView);
+            SpawnLoadingOverlay();
             
             //Dialog Overlay
             var dialogModel = new DialogUIModel();
@@ -214,6 +215,16 @@ namespace UI
             if (_chatViewInstance) return;
         
             _chatViewInstance = Instantiate(chatViewPrefab);
+        }
+
+        private void SpawnLoadingOverlay()
+        {
+            if (_loadingViewInstance) return;
+            _loadingViewInstance = Instantiate(loadingViewPrefab);
+            
+            var loadingModel = new LoadingUIModel();
+            _loadingPresenter = new LoadingUIPresenter(loadingModel, _loadingViewInstance);
+            DontDestroyOnLoad(_loadingViewInstance);
         }
 
         private void OnDestroy()
