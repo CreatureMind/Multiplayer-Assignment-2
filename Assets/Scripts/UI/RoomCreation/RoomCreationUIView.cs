@@ -110,5 +110,14 @@ namespace UI.RoomCreation
 
             UIOverlaySorter.PopOverlay();
         }
+
+        public void ResetView()
+        {
+            SetCreateButtonEnabled(true);
+            _roomNameField.value = string.Empty;
+            _maxPlayersSlider.value = 4;
+            _mapsDropdown.index = 0;
+            _modesDropdown.index = 0;
+        }
     }
 }
