@@ -159,7 +159,11 @@ namespace UI
             HideAllScreens();
         }
 
-        private void ShowMainMenu(ReturnToMainMenuEvent e) => ShowScreen(LobbyScreen.MainMenu);
+        private void ShowMainMenu(ReturnToMainMenuEvent e)
+        {
+            HideAllScreens();
+            ShowScreen(LobbyScreen.MainMenu);
+        }
 
         private void DetermineInitialFlow()
         {

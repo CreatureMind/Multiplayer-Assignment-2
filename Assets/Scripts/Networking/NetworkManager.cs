@@ -409,6 +409,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         ShutdownReason.ConnectionRefused => "The server refused the connection.",
         ShutdownReason.ConnectionTimeout => "Connection timed out.",
         ShutdownReason.ServerInRoom => "Room is full.",
+        ShutdownReason.DisconnectedByPluginLogic => "Disconnected from the server.",
         _ => $"Could not join room ({reason})."
     };
 
