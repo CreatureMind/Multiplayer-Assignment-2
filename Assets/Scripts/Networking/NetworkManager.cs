@@ -200,9 +200,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             SceneManager = _networkRunnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>(),
             Scene = SceneRef.FromIndex(hubNetSceneBuildIndex),
         });
-
-        EventBus.Raise(new HideLoadingScreenEvent());
-
+        
         if (result.Ok)
         {
             Debug.Log("[Client - NetworkManager] Joined Lobby Hub successfully!");
@@ -224,6 +222,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
                 type: DialogType.Error
             ));
         }
+        
+        EventBus.Raise(new HideLoadingScreenEvent());
     }
 
     // Create a room: ask the server. Approval/rejection comes back via LobbyHubService RPC.

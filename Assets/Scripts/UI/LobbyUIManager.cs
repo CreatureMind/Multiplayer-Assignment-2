@@ -59,7 +59,7 @@ namespace UI
         private void Start()
         {
             InitializePresenters();
-            DetermineInitialFlow();
+            //DetermineInitialFlow();
         }
 
         private void InitializePresenters()
@@ -173,7 +173,7 @@ namespace UI
 
         private void DetermineInitialFlow()
         {
-            // If name is already confirmed (or returning from match), go to Main Menu directly
+            // If name is already confirmed (or returning from match), go to Rooms list directly
             if (NetworkManager.Instance && NetworkManager.Instance.IsReturningFromMatch)
             {
                 ShowScreen(LobbyScreen.RoomsList);

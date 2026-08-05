@@ -27,7 +27,7 @@ public class InGameUIModel
         else
         {
             Debug.Log("[InGameUIModel] Returning to lobby (no network manager).");
-            SceneManager.LoadScene((int)SceneDefs.MENU, LoadSceneMode.Single);
+            SceneManager.LoadSceneAsync((int)SceneDefs.MENU, LoadSceneMode.Single);
         }
     }
 
