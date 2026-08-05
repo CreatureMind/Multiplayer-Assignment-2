@@ -21,16 +21,20 @@ namespace UI.Loading
         private void SubscribeToEventBus()
         {
             EventBus.Subscribe<ShowLoadingScreenEvent>(OnShowLoadingScreen);
+            EventBus.Subscribe<SceneLoadStartedEvent> (OnShowLoadingScreen);
             EventBus.Subscribe<HideLoadingScreenEvent>(OnHideLoadingScreen);
+            EventBus.Subscribe<SceneLoadDoneEvent>    (OnHideLoadingScreen);
         }
 
         public void UnsubscribeFromEvents()
         {
             EventBus.Unsubscribe<ShowLoadingScreenEvent>(OnShowLoadingScreen);
+            EventBus.Unsubscribe<SceneLoadStartedEvent> (OnShowLoadingScreen);
             EventBus.Unsubscribe<HideLoadingScreenEvent>(OnHideLoadingScreen);
+            EventBus.Unsubscribe<SceneLoadDoneEvent>    (OnHideLoadingScreen);
         }
 
-        private void OnShowLoadingScreen(ShowLoadingScreenEvent e)
+        private void OnShowLoadingScreen<T>(T e)
         {
             if (_isVisible) return;
             _isVisible = true;
@@ -39,7 +43,7 @@ namespace UI.Loading
             _model.PlaySound();
         }
 
-        private void OnHideLoadingScreen(HideLoadingScreenEvent e)
+        private void OnHideLoadingScreen<T>(T e)
         {
             if (!_isVisible) return;
             _isVisible = false;
