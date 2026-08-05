@@ -11,7 +11,6 @@ namespace UI.Loading
         private VisualElement _root;
         private VisualElement _loadingSpinner;
         
-        private bool _isVisible = true;
         private bool _canSpin;
 
         private void Awake()
@@ -54,9 +53,6 @@ namespace UI.Loading
 
         public void Show()
         {
-            if (_isVisible) return;
-            _isVisible = true;
-            
             if (_document) _document.sortingOrder = UIOverlaySorter.PushOverlay();
             
             if (_root != null) _root.style.display = DisplayStyle.Flex;
@@ -73,9 +69,6 @@ namespace UI.Loading
 
         public void Hide()
         {
-            if (!_isVisible) return;
-            _isVisible = false;
-            
             _canSpin = false;
             
             if (_root != null) _root.style.display = DisplayStyle.None;

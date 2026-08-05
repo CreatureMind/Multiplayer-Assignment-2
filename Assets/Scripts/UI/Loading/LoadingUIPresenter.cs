@@ -7,6 +7,8 @@ namespace UI.Loading
     {
         private readonly LoadingUIModel _model;
         private readonly LoadingUIView _view;
+        
+        private bool _isVisible = false;
 
         public LoadingUIPresenter(LoadingUIModel model, LoadingUIView view)
         {
@@ -30,14 +32,20 @@ namespace UI.Loading
 
         private void OnShowLoadingScreen(ShowLoadingScreenEvent e)
         {
+            if (_isVisible) return;
+            _isVisible = true;
+
             _view.Show();
-            _model.PlayStartSound();
+            _model.PlaySound();
         }
 
         private void OnHideLoadingScreen(HideLoadingScreenEvent e)
         {
+            if (!_isVisible) return;
+            _isVisible = false;
+
             _view.Hide();
-            _model.PlayEndSound();
+            _model.EndSound();
         }
     }
 }
