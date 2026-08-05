@@ -150,9 +150,15 @@ public class AudioHandler : MonoBehaviour
     private void HandleLoading(SoundEffectEnum toggle)
     {
         if (toggle == SoundEffectEnum.LOADING_START)
+        {
             loadingSound.Play();
+            Debug.Log("Loading start");
+        }
         else
+        {
             loadingSound.Stop();
+            Debug.Log("Loading end");
+        }
     }
 
     private void HandleSpawn()
