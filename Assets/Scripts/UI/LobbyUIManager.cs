@@ -173,10 +173,12 @@ namespace UI
 
         private void DetermineInitialFlow()
         {
+            EventBus.Raise(new ShowLoadingScreenEvent());
+            
             // If name is already confirmed (or returning from match), go to Main Menu directly
             if (NetworkManager.Instance && NetworkManager.Instance.IsReturningFromMatch)
             {
-                ShowScreen(LobbyScreen.RoomsList);
+                ShowScreen(LobbyScreen.None);
             }
             else
             {
@@ -192,9 +194,9 @@ namespace UI
 
         private void ShowScreen(LobbyScreen screen)
         {
+            EventBus.Raise(new HideLoadingScreenEvent());
             UIOverlaySorter.Reset();
-
-            // Full-Screen visibility standard using Show() / Hide()
+            
             if (screen == LobbyScreen.MainMenu)  mainMenuView.Show();  else mainMenuView.Hide();
             if (screen == LobbyScreen.RoomsList) roomsListView.Show(); else roomsListView.Hide();
             if (screen == LobbyScreen.RoomLobby) roomLobbyView.Show(); else roomLobbyView.Hide();

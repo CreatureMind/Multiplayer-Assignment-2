@@ -345,7 +345,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     // Leave the match: disconnect, reload the menu scene, rejoin the hub.
-    public async Task ReturnToLobbyAsync(float flushDelay = 1f)
+    public async Task ReturnToLobbyAsync(float flushDelay = 5f)
     {
         EventBus.Raise(new ShowLoadingScreenEvent());
         

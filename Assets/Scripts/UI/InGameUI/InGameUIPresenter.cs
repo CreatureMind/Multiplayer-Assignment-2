@@ -29,7 +29,10 @@ public class InGameUIPresenter
         _model.OnGameEnded -= HandleGameEnded;
     }
 
-    private void ReturnToLobby() => _model.ReturnToLobby();
+    private void ReturnToLobby()
+    {
+        _model.ReturnToLobby();
+    }
 
     private void HandleGameEnded() => _view.ShowEndGamePopup();
 }

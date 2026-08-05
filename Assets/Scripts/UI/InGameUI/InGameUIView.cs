@@ -49,7 +49,6 @@ public class InGameUIView : MonoBehaviour
 
     private void SetupButtonCallbacks()
     {
-
         if (_leaveGameButton != null)
         {
             _leaveGameButton.clicked += () =>
