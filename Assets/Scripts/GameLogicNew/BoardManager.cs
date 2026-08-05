@@ -206,6 +206,22 @@ public class BoardManager : NetworkBehaviour
             _baseCache.Add(bottomLeft, baseTilesList);
         }
     }
+
+    private static List<Vector2Int> BuildBaseTileList(Vector2Int bottomLeft)
+    {
+        return new List<Vector2Int>
+        {
+            bottomLeft,
+            new Vector2Int(bottomLeft.x + 1, bottomLeft.y),
+            new Vector2Int(bottomLeft.x, bottomLeft.y + 1),
+            new Vector2Int(bottomLeft.x + 1, bottomLeft.y + 1)
+        };
+    }
+
+    private void RefreshBaseCacheEntry(Vector2Int bottomLeft)
+    {
+        _baseCache[bottomLeft] = BuildBaseTileList(bottomLeft);
+    }
     
     public HashSet<Vector2Int> CheckForConqueredBasesAndUpdateBoardState()
     {
@@ -295,13 +311,7 @@ public class BoardManager : NetworkBehaviour
 
         foreach (var bottomLeft in keysToRefreshInCache)
         {
-            _baseCache[bottomLeft] = new List<Vector2Int>
-            {
-                bottomLeft,
-                new Vector2Int(bottomLeft.x + 1, bottomLeft.y),
-                new Vector2Int(bottomLeft.x, bottomLeft.y + 1),
-                new Vector2Int(bottomLeft.x + 1, bottomLeft.y + 1)
-            };
+            RefreshBaseCacheEntry(bottomLeft);
         }
 
         return updatedBottomLeftKeys;
@@ -439,7 +449,7 @@ public class BoardManager : NetworkBehaviour
             }
         }
         
-        // TODO
+        RefreshBaseCacheEntry(gridPosition);
         GameTraceLogger.Board(TraceLogsEnabled, $"SetBase completed player={playerId}, baseCoreOrigin={gridPosition}.");
         
     }
@@ -466,11 +476,15 @@ public class BoardManager : NetworkBehaviour
         // broadcast diff 
     }
     
-    private void ExistingBaseConqueredByPlayer(Vector2Int bottomLeft, int playerId)
+    public bool ConquerBaseServerOnly(Vector2Int bottomLeft, int playerId)
     {
-        if (!_baseCache.TryGetValue(bottomLeft, out var baseTiles))
-            return;
+        if (playerId == TileState.NoOwner)
+            return false;
 
+        var updated = false;
+        var baseTiles = _baseCache.TryGetValue(bottomLeft, out var cachedTiles)
+            ? cachedTiles
+            : BuildBaseTileList(bottomLeft);
         foreach (var baseTilePosition in baseTiles)
         {
             if (!TryGetIndex(baseTilePosition.x, baseTilePosition.y, out var baseTileIndex))
@@ -481,7 +495,15 @@ public class BoardManager : NetworkBehaviour
                 continue;
 
             Tiles.Set(baseTileIndex, currentState.WithOwner((byte)playerId));
+            updated = true;
         }
+
+        if (!updated)
+            return false;
+
+        RefreshBaseCacheEntry(bottomLeft);
+        GameTraceLogger.Board(TraceLogsEnabled, $"ConquerBaseServerOnly updated owner to {playerId} at base {bottomLeft}.");
+        return true;
     }
 
     #endregion
