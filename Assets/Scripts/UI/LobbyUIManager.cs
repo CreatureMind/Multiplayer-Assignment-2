@@ -177,6 +177,7 @@ namespace UI
             // If name is already confirmed (or returning from match), go to Rooms list directly
             if (NetworkManager.Instance && NetworkManager.Instance.IsReturningFromMatch)
             {
+                EventBus.Raise(new ShowLoadingScreenEvent());
                 ShowScreen(LobbyScreen.None);
             }
             else
@@ -193,6 +194,7 @@ namespace UI
 
         private void ShowScreen(LobbyScreen screen)
         {
+            EventBus.Raise(new HideLoadingScreenEvent());
             UIOverlaySorter.Reset();
             
             if (screen == LobbyScreen.MainMenu)  mainMenuView.Show();  else mainMenuView.Hide();

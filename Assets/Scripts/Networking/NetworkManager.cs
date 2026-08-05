@@ -31,8 +31,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private string _currentLobbyId;
     public string CurrentLobbyId => _currentLobbyId;
-
+    
     public bool IsReturningFromMatch { get; private set; }
+    private bool _unloading = false;
+    private InGameUIManager _inGameUIInstance;
+    
     public string LocalConfirmedName { get; set; }
     
     private string _pendingOwnerToken;
@@ -513,9 +516,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-
-    private bool _unloading = false;
-    private InGameUIManager _inGameUIInstance;
+    
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name}");
