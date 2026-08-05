@@ -136,6 +136,8 @@ namespace UI
             var dialogModel = new DialogUIModel();
             _dialogPresenter = new DialogUIPresenter(dialogModel, dialogView);
             
+            ShowScreen(LobbyScreen.MainMenu);
+            
             SubscribeToGlobalEvents();
         }
         
