@@ -28,7 +28,7 @@ namespace UI.NameEntry
 
         public void Initialize()
         {
-            if (_model.IsReturningFromMatch) return;
+            //if (_model.IsReturningFromMatch) return;
             
             var savedName = _model.SavedConfirmedName;
             

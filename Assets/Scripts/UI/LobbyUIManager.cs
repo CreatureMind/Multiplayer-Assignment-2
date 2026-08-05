@@ -47,19 +47,18 @@ namespace UI
         private RoomsListUIPresenter    _roomsListPresenter;
         private RoomLobbyUIPresenter    _roomLobbyPresenter;
         private RoomCreationUIPresenter _roomCreationPresenter;
-        private LoadingUIPresenter      _loadingPresenter;
         private DialogUIPresenter       _dialogPresenter;
         
         // Chat
         private ChatUIController _chatViewInstance;
         
         //Loading
-        private LoadingUIView _loadingViewInstance;
+        private static LoadingUIView      _loadingViewInstance;
+        private static LoadingUIPresenter _loadingPresenter;
 
         private void Start()
         {
             InitializePresenters();
-            //DetermineInitialFlow();
         }
 
         private void InitializePresenters()
@@ -136,7 +135,7 @@ namespace UI
             var dialogModel = new DialogUIModel();
             _dialogPresenter = new DialogUIPresenter(dialogModel, dialogView);
             
-            ShowScreen(LobbyScreen.MainMenu);
+            DetermineInitialFlow();
             
             SubscribeToGlobalEvents();
         }
@@ -178,7 +177,7 @@ namespace UI
             // If name is already confirmed (or returning from match), go to Rooms list directly
             if (NetworkManager.Instance && NetworkManager.Instance.IsReturningFromMatch)
             {
-                ShowScreen(LobbyScreen.RoomsList);
+                ShowScreen(LobbyScreen.None);
             }
             else
             {
