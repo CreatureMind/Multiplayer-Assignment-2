@@ -9,6 +9,8 @@ namespace UI.RoomLobby
     [RequireComponent(typeof(UIDocument))]
     public class RoomLobbyUIView : MonoBehaviour
     {
+        private const string ROOM_CODE_TEXT = "Room Code: ";
+        
         [SerializeField] private VisualTreeAsset playerRowTemplate;
 
         public event Action            OnLeaveClicked;
@@ -114,8 +116,8 @@ namespace UI.RoomLobby
         {
             if (_codeLabel != null)
             {
-                _codeLabel.style.display = isPublic ? DisplayStyle.Flex : DisplayStyle.None;
-                _codeLabel.text = code;
+                _codeLabel.style.display = !isPublic ? DisplayStyle.Flex : DisplayStyle.None;
+                _codeLabel.text = ROOM_CODE_TEXT + code;
             }
         }
 
