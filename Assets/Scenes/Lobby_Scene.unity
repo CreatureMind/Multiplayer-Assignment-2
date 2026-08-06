@@ -503,7 +503,7 @@ MonoBehaviour:
   loadingScreenViewPrefab: {fileID: 1884518436683433154}
   chatViewPrefab: {fileID: 6575760504648723879, guid: 046a7adf8e10133479ecfb5dccccb912, type: 3}
   sessionsListData: {fileID: 11400000, guid: b04296e5e9812d24e9dc78829d32bb7b, type: 2}
-  _audioMixer: {fileID: 24100000, guid: 12727e0891e931f4a95b8da5285afea9, type: 2}
+  audioMixer: {fileID: 24100000, guid: 12727e0891e931f4a95b8da5285afea9, type: 2}
 --- !u!114 &824371411
 MonoBehaviour:
   m_ObjectHideFlags: 0
