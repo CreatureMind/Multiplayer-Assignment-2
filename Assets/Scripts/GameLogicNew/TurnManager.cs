@@ -526,20 +526,30 @@ public class TurnManager : NetworkBehaviour
             return;
         }
 
-        if (TryGetPlayerActionData(overriddenPlayerID, out var playerActionData))
+        if (!TryReadPlayerActionData(overriddenPlayerID, out var playerIndex, out var playerActionData))
         {
-            playerActionData.CurrentActionAmount = Mathf.Max(0, playerActionData.CurrentActionAmount - _turnStats.ActionGainPerBase);
-            playerActionData.ReduceMaxActionAmountPerTurn(_turnStats.ActionGainPerBase);
-            WritePlayerActionData(overriddenPlayerID, playerActionData);
-
-            if (playerActionData.MaxActionAmountPerTurn <= 0f)
-            {
-                RemovePlayerFromTurnManager(overriddenPlayerID);
-                GameTraceLogger.Turn(TraceLogsEnabled, $"Player P{overriddenPlayerID} removed from turn manager due to max actions <= 0.");
-            }
-
-            GameTraceLogger.Turn(TraceLogsEnabled, $"Reduced max actions for P{overriddenPlayerID} to {playerActionData.CurrentActionAmount}.");
+            GameTraceLogger.Turn(TraceLogsEnabled, $"ReducePlayerMaxActions skipped: unresolved player id P{overriddenPlayerID}.");
+            return;
         }
+
+        var previousCurrent = playerActionData.CurrentActionAmount;
+        var previousMax = playerActionData.MaxActionAmountPerTurn;
+        playerActionData.CurrentActionAmount = Mathf.Max(0, playerActionData.CurrentActionAmount - _turnStats.ActionGainPerBase);
+        playerActionData.ReduceMaxActionAmountPerTurn(_turnStats.ActionGainPerBase);
+        WritePlayerActionData(playerIndex, playerActionData);
+
+        if (IsCurrentTurnPlayer(overriddenPlayerID))
+            _turnDiffBroadcaster?.BroadcastCurrentPlayingPlayer(playerActionData);
+
+        if (playerActionData.MaxActionAmountPerTurn <= 0f)
+        {
+            RemovePlayerFromTurnManager(overriddenPlayerID);
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Player P{overriddenPlayerID} removed from turn manager due to max actions <= 0.");
+        }
+
+        GameTraceLogger.Turn(
+            TraceLogsEnabled,
+            $"Reduced actions for P{overriddenPlayerID}: current {previousCurrent}->{playerActionData.CurrentActionAmount}, max {previousMax}->{playerActionData.MaxActionAmountPerTurn}.");
     }
 
     private void RemovePlayerFromTurnManager(int overriddenPlayerID)

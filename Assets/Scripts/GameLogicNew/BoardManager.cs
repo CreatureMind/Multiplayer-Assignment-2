@@ -476,9 +476,9 @@ public class BoardManager : NetworkBehaviour
         // broadcast diff 
     }
     
-    public bool ConquerBaseServerOnly(Vector2Int bottomLeft, int playerId, out int overridenPlayerID)
+    public bool ConquerBaseServerOnly(Vector2Int bottomLeft, int playerId, out int overriddenPlayerId)
     {
-        overridenPlayerID = TileState.NoOwner;
+        overriddenPlayerId = TileState.NoOwner;
         if (playerId == TileState.NoOwner)
             return false;
 
@@ -495,7 +495,7 @@ public class BoardManager : NetworkBehaviour
             if (currentState.Type != TileType.Base || currentState.OwnerId == playerId)
                 continue;
 
-            overridenPlayerID = Tiles[baseTileIndex].OwnerId;
+            overriddenPlayerId = Tiles[baseTileIndex].OwnerId;
             Tiles.Set(baseTileIndex, currentState.WithOwner((byte)playerId));
             updated = true;
         }
@@ -504,7 +504,7 @@ public class BoardManager : NetworkBehaviour
             return false;
         
         RefreshBaseCacheEntry(bottomLeft);
-        GameTraceLogger.Board(TraceLogsEnabled, $"ConquerBaseServerOnly updated owner to {playerId} at base {bottomLeft}.");
+        GameTraceLogger.Board(TraceLogsEnabled, $"ConquerBaseServerOnly updated owner to {playerId} at base {bottomLeft}; previous owner P{overriddenPlayerId}.");
         return true;
         
     }

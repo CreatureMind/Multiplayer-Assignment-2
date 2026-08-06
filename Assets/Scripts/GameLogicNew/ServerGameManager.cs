@@ -458,9 +458,22 @@ public sealed class ServerGameManager : NetworkBehaviour
             GameTraceLogger.Move(TraceLogsEnabled, $"Conquered bases by P{request.PlayerId} after intent={request.Intent}: {conqueredBases.Count}.");
             foreach (var baseBottomLeft in conqueredBases)
             {
-                if (!_boardManagerInstance.ConquerBaseServerOnly(baseBottomLeft, request.PlayerId, out var overriddenPlayerID))
+                if (!_boardManagerInstance.ConquerBaseServerOnly(baseBottomLeft, request.PlayerId, out var overriddenPlayerId))
+                {
+                    GameTraceLogger.Move(TraceLogsEnabled, $"ConquerBaseServerOnly returned no update for base {baseBottomLeft}.");
                     continue;
-                _turnManagerInstance.ReducePlayerMaxActions(overriddenPlayerID); 
+                }
+
+                if (overriddenPlayerId != TileState.NoOwner)
+                {
+                    GameTraceLogger.Move(TraceLogsEnabled, $"Applying conquest penalty to overridden player P{overriddenPlayerId} for base {baseBottomLeft}.");
+                    _turnManagerInstance.ReducePlayerMaxActions(overriddenPlayerId);
+                }
+                else
+                {
+                    GameTraceLogger.Move(TraceLogsEnabled, $"No overridden player to penalize for base {baseBottomLeft}.");
+                }
+
                 AddBaseCells(baseBottomLeft, changeSet.BoardChangedCells);
                 changeSet.BaseGainOwners.Add(request.PlayerId);
             }
