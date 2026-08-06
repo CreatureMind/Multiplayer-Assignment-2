@@ -51,6 +51,8 @@ namespace UI.RoomCreation
                 return;
             }
 
+            EventBus.Raise(new ShowLoadingScreenEvent());
+            
             _view.SetCreateButtonEnabled(false);
             _model.CreateRoom(formData, _currentLobbyId);
             _view.Hide();

@@ -47,6 +47,8 @@ namespace UI.RoomCreation
                 return;
             }
 
+            EventBus.Raise(new ShowLoadingScreenEvent());
+            
             _view.SetJoinButtonEnabled(false);
             _model.JoinRoom(trimmed);
             _view.Hide();
