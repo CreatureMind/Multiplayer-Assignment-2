@@ -7,6 +7,9 @@ namespace UI.RoomCreation
     [RequireComponent(typeof(UIDocument))]
     public class RoomCreationUIView : MonoBehaviour
     {
+        [SerializeField] private int maxPlayersMinValue = 2;
+        [SerializeField] private int maxPlayersMaxValue = 4;
+        
         public event Action<RoomCreationFormData> OnCreateRequested;
         public event Action OnBackRequested;
 
@@ -51,6 +54,9 @@ namespace UI.RoomCreation
             _createButton     = _root.Q<Button>       (UI_Room_Creation_View.create_button);
             _backButton       = _root.Q<Button>       (UI_Room_Creation_View.back_button);
 
+            _maxPlayersSlider.lowValue  = maxPlayersMinValue;
+            _maxPlayersSlider.highValue = maxPlayersMaxValue;
+            
             SetupCallbacks();
         }
 
@@ -62,11 +68,11 @@ namespace UI.RoomCreation
                 {
                     var formData = new RoomCreationFormData
                     {
-                        RoomName = _roomNameField?.value,
-                        MaxPlayers = _maxPlayersSlider?.value ?? 4,
+                        RoomName     = _roomNameField?.value,
+                        MaxPlayers   = _maxPlayersSlider.value,
                         SelectedMode = _modesDropdown?.value,
-                        SelectedMap = _mapsDropdown?.value,
-                        IsPublic = _publicToggle?.value ?? true
+                        SelectedMap  = _mapsDropdown?.value,
+                        IsPublic     = _publicToggle.value
                     };
                     
                     OnCreateRequested?.Invoke(formData);
@@ -115,9 +121,10 @@ namespace UI.RoomCreation
         {
             SetCreateButtonEnabled(true);
             _roomNameField.value = string.Empty;
-            _maxPlayersSlider.value = 4;
+            _maxPlayersSlider.value = maxPlayersMinValue;
             _mapsDropdown.index = 0;
             _modesDropdown.index = 0;
+            _publicToggle.value = true;
         }
     }
 }

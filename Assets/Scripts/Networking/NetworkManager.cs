@@ -249,7 +249,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
         EventBus.Raise(new ShowLoadingScreenEvent());
 
-        _pendingCreatedRoom = new RoomCreatedEvent { RoomName = roomName, ModeName = mode, MapName = map };
+        _pendingCreatedRoom = new RoomCreatedEvent { RoomName = roomName, ModeName = mode, MapName = map , IsPublic = isPublic };
 
         LobbyHubService.Instance.Rpc_RequestCreateRoom(roomName, mode, map, maxPlayers, isPublic, LocalPlayer);
         return Task.CompletedTask;
@@ -259,6 +259,13 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnRoomCreationApproved(string sessionName, string ownerToken)
     {
         _pendingOwnerToken = ownerToken;
+
+        if (_pendingCreatedRoom != null)
+        {
+            var room = _pendingCreatedRoom.Value;
+            room.RoomCode = sessionName;
+            _pendingCreatedRoom = room;
+        }
 
         if (_pendingCreatedRoom.HasValue)
             EventBus.Raise(_pendingCreatedRoom.Value);

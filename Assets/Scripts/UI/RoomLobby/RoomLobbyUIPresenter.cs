@@ -52,17 +52,18 @@ namespace UI.RoomLobby
             EventBus.Unsubscribe<RoomCreatedEvent>      (OnRoomCreated);
         }
 
-        public void SetupRoomDetails(string roomName, string modeName, string mapName)
+        public void SetupRoomDetails(string roomName, string modeName, string mapName, bool isPublic, string code)
         {
             _modeName = modeName;
             _mapName = mapName;
             _view.SetHeader(roomName, modeName, mapName);
+            _view.SetCodeLabel(isPublic, code);
             RefreshRoomState();
         }
 
         private void OnRoomCreated(RoomCreatedEvent e)
         {
-            SetupRoomDetails(e.RoomName, e.ModeName, e.MapName);
+            SetupRoomDetails(e.RoomName, e.ModeName, e.MapName, e.IsPublic, e.RoomCode);
         }
 
         private void OnPlayerListChanged(PlayerListChangedEvent e)
@@ -112,7 +113,15 @@ namespace UI.RoomLobby
             }
             catch (Exception e)
             {
-                throw; // TODO handle exception
+                EventBus.Raise(new ShowDialogEvent(
+                    title: "Failed to leave room",
+                    message: "Failed to leave room: " + e.Message,
+                    primaryText: "Retry",
+                    onPrimary: () => _ = _model.LeaveRoomAsync(_currentLobbyId),
+                    secondaryText: "Cancel",
+                    onSecondary: null,
+                    type: DialogType.Error
+                    ));
             }
         }
 

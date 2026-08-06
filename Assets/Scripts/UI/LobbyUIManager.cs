@@ -35,6 +35,7 @@ namespace UI
         [SerializeField] private RoomCreationUIView roomCreationView;
         [SerializeField] private LoadingUIView      loadingViewPrefab;
         [SerializeField] private ChatUIController   chatViewPrefab;
+        [SerializeField] private RoomJoinUIView     roomJoinView;
         [SerializeField] private DialogUIView       dialogView;
 
         [Header("Audio Settings")]
@@ -47,6 +48,7 @@ namespace UI
         private RoomsListUIPresenter    _roomsListPresenter;
         private RoomLobbyUIPresenter    _roomLobbyPresenter;
         private RoomCreationUIPresenter _roomCreationPresenter;
+        private RoomJoinUIPresenter     _roomJoinPresenter;
         private DialogUIPresenter       _dialogPresenter;
         
         // Chat
@@ -100,10 +102,11 @@ namespace UI
                     EventBus.Raise(new HideChatEvent());
                     ShowScreen(LobbyScreen.MainMenu);
                 },
+                onJoinRequested: () => roomJoinView.Show(),
                 onCreateRoomRequested: () => roomCreationView.Show(),
-                onJoinedRoomViewRequested: (roomName, mode, map) => 
+                onEnterRoomRequested: (roomName, mode, map, isPublic, roomCode) => 
                 {
-                    _roomLobbyPresenter.SetupRoomDetails(roomName, mode, map);
+                    _roomLobbyPresenter.SetupRoomDetails(roomName, mode, map, isPublic, roomCode);
                     ShowScreen(LobbyScreen.RoomLobby);
                 }
             );
@@ -126,6 +129,16 @@ namespace UI
                 roomLobbyModel,
                 roomLobbyView,
                 lobbyId
+            );
+            
+            var roomJoinModel = new RoomJoinUIModel();
+            _roomJoinPresenter = new RoomJoinUIPresenter(
+                roomJoinModel,
+                roomJoinView,
+                onJoinRequested: () =>
+                {
+                    ShowScreen(LobbyScreen.None);
+                }
             );
 
             //Loading Overlay
@@ -241,6 +254,7 @@ namespace UI
             _roomCreationPresenter?.UnsubscribeFromEvents();
             _roomLobbyPresenter?.   UnsubscribeFromEvents();
             _loadingPresenter?.     UnsubscribeFromEvents();
+            _roomJoinPresenter?.    UnsubscribeFromEvents();
             _dialogPresenter?.      UnsubscribeFromEvents();
         }
     }

@@ -2,21 +2,22 @@ using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace UI.NameEntry
+namespace UI.RoomCreation
 {
     [RequireComponent(typeof(UIDocument))]
-    public class NameEntryUIView : MonoBehaviour
+    public class RoomJoinUIView : MonoBehaviour
     {
-        public event Action OnConfirmClicked;
-        public event Action OnRandomizeClicked;
+        
+        public event Action OnJoinRequested;
+        public event Action OnBackRequested;
 
         private UIDocument    _document;
         private VisualElement _root;
 
-        private TextField _nameField;
-        private Button    _confirmButton;
-        private Button    _randomButton;
+        private TextField _roomCodeField;
         private Label     _errorLabel;
+        private Button    _joinButton;
+        private Button    _backButton;
         
         private bool _isVisible = true;
 
@@ -29,7 +30,7 @@ namespace UI.NameEntry
         {
             if (!_document)
             {
-                Debug.LogError("[NameEntryUIView] UIDocument is null!");
+                Debug.LogError("[RoomJoinUIView] UIDocument is null!");
                 return;
             }
 
@@ -40,52 +41,52 @@ namespace UI.NameEntry
         {
             _root = document.rootVisualElement;
 
-            _nameField     = _root.Q<TextField>(UI_Name_Entry_View.player_name_field);
-            _confirmButton = _root.Q<Button>   (UI_Name_Entry_View.confirm_button);
-            _randomButton  = _root.Q<Button>   (UI_Name_Entry_View.randomize_button);
-            _errorLabel    = _root.Q<Label>    (UI_Name_Entry_View.error_label);
-
+            _roomCodeField = _root.Q<TextField>(UI_Join_Room_View.room_code_field);
+            _errorLabel    = _root.Q<Label>    (UI_Join_Room_View.error_label);
+            _joinButton    = _root.Q<Button>   (UI_Join_Room_View.join_button);
+            _backButton    = _root.Q<Button>   (UI_Join_Room_View.back_button);
+            
             SetupCallbacks();
         }
 
         private void SetupCallbacks()
         {
-            if (_confirmButton != null)
+            if (_joinButton != null)
             {
-                _confirmButton.clicked += () => OnConfirmClicked?.Invoke();
+                _joinButton.clicked += () => OnJoinRequested?.Invoke();
             }
             else
             {
-                Debug.LogError("[NameEntryUIView] Could not find Button named 'confirm-button' in Name_Entry_View.");
+                Debug.LogError("[RoomJoinUIView] Could not find Button named 'create-button' in Room_Creation_View.");
             }
 
-            if (_randomButton != null)
+            if (_backButton != null)
             {
-                _randomButton.clicked += () => OnRandomizeClicked?.Invoke();
+                _backButton.clicked += () => OnBackRequested?.Invoke();
             }
             else
             {
-                Debug.LogError("[NameEntryUIView] Could not find Button named 'randomize-button' in Name_Entry_View.");
+                Debug.LogError("[RoomJoinUIView] Could not find Button named 'back-button' in Room_Creation_View.");
             }
             
             Hide();
         }
-
-        public string GetInputValue() => _nameField != null ? _nameField.value : string.Empty;
-
-        public void SetInputValue(string text)
-        {
-            if (_nameField != null)
-                _nameField.value = text;
-        }
-
+        
+        public string GetInputValue() => _roomCodeField != null ? _roomCodeField.value : string.Empty;
+        
         public void ShowError(string message)
         {
             if (_errorLabel != null)
                 _errorLabel.text = message;
         }
 
-        public void ClearError() => ShowError(string.Empty);
+        public void SetJoinButtonEnabled(bool isEnabled) => _joinButton?.SetEnabled(isEnabled);
+
+        public void ResetView()
+        {
+            _roomCodeField.value = string.Empty;
+            _errorLabel.text = string.Empty;
+        }
 
         public void Show()
         {

@@ -24,6 +24,7 @@ namespace UI.RoomLobby
         private Button     _leaveButton;
         private Button     _readyButton;
         private Button     _startButton;
+        private Label      _codeLabel;
 
         private void Awake()
         {
@@ -45,11 +46,12 @@ namespace UI.RoomLobby
         {
             _root = document.rootVisualElement;
 
-            _headerLabel          = _root.Q<Label>(UI_Room_View.header);
+            _headerLabel          = _root.Q<Label>     (UI_Room_View.header);
             _playerListScrollView = _root.Q<ScrollView>(UI_Room_View.players_scroll_view);
-            _leaveButton          = _root.Q<Button>(UI_Room_View.leave_button);
-            _readyButton          = _root.Q<Button>(UI_Room_View.ready_button);
-            _startButton          = _root.Q<Button>(UI_Room_View.start_button);
+            _leaveButton          = _root.Q<Button>    (UI_Room_View.leave_button);
+            _readyButton          = _root.Q<Button>    (UI_Room_View.ready_button);
+            _startButton          = _root.Q<Button>    (UI_Room_View.start_button);
+            _codeLabel            = _root.Q<Label>     (UI_Room_View.code_label);
 
             SetupCallbacks();
         }
@@ -106,6 +108,15 @@ namespace UI.RoomLobby
         public void SetLeaveButtonEnabled(bool isEnabled)
         {
             _leaveButton?.SetEnabled(isEnabled);
+        }
+
+        public void SetCodeLabel(bool isPublic, string code)
+        {
+            if (_codeLabel != null)
+            {
+                _codeLabel.style.display = isPublic ? DisplayStyle.Flex : DisplayStyle.None;
+                _codeLabel.text = code;
+            }
         }
 
         public void RenderPlayerList(IEnumerable<PlayerData> players, bool canKick, Func<PlayerRef, bool> isSelfFunc)

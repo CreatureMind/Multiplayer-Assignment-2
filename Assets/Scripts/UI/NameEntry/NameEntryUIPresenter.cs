@@ -77,7 +77,7 @@ namespace UI.NameEntry
         {
             if (_state == State.EnteringName)
             {
-                string networkName = _model.GetCurrentNetworkDisplayName();
+                var networkName = _model.GetCurrentNetworkDisplayName();
                 if (!string.IsNullOrEmpty(networkName))
                 {
                     _view.SetInputValue(networkName);
@@ -96,7 +96,7 @@ namespace UI.NameEntry
             if (_state == State.Confirmed)
                 return;
 
-            string trimmed = _view.GetInputValue().Trim();
+            var trimmed = _view.GetInputValue().Trim();
 
             if (string.IsNullOrEmpty(trimmed))
             {

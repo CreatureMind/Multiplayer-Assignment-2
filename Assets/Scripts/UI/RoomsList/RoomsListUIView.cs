@@ -12,9 +12,10 @@ namespace UI.RoomsList
 
         public event Action OnFilterChanged;
         public event Action OnLeaveClicked;
+        public event Action OnJoinClicked;
         public event Action OnCreateRoomClicked;
         public event Action OnRefreshClicked;
-        public event Action<RoomInfo, string, string, string> OnJoinRoomClicked;
+        public event Action<RoomInfo, string, string, string> OnEnterRoomClicked;
 
         private UIDocument    _document;
         private VisualElement _root;
@@ -24,10 +25,11 @@ namespace UI.RoomsList
         private DropdownField _modesDropdown;
         private DropdownField _mapsDropdown;
         private ScrollView    _roomsScrollView;
+        private Label         _onlineLabel;
         private Button        _leaveBtn;
+        private Button        _joinBtn;
         private Button        _createBtn;
         private Button        _refreshBtn;
-        private Label         _onlineLabel;
 
         public string SelectedRoomFilter => _roomsDropdown?.value ?? "All";
         public string SelectedModeFilter => _modesDropdown?.value ?? "All";
@@ -53,16 +55,18 @@ namespace UI.RoomsList
         {
             _root = document.rootVisualElement;
 
-            _headerLabel     = _root.Q<Label>(UI_Rooms_List_View_v3.header);
-            _roomsDropdown   = _root.Q<DropdownField>(UI_Rooms_List_View_v3.rooms_dropdown);
-            _modesDropdown   = _root.Q<DropdownField>(UI_Rooms_List_View_v3.modes_dropdown);
-            _mapsDropdown    = _root.Q<DropdownField>(UI_Rooms_List_View_v3.maps_dropdown);
-            _roomsScrollView = _root.Q<ScrollView>(UI_Rooms_List_View_v3.rooms_scroll_view);
+            _headerLabel     = _root.Q<Label>        (UI_Rooms_List_View.header);
+            _roomsDropdown   = _root.Q<DropdownField>(UI_Rooms_List_View.rooms_dropdown);
+            _modesDropdown   = _root.Q<DropdownField>(UI_Rooms_List_View.modes_dropdown);
+            _mapsDropdown    = _root.Q<DropdownField>(UI_Rooms_List_View.maps_dropdown);
+            _roomsScrollView = _root.Q<ScrollView>   (UI_Rooms_List_View.rooms_scroll_view);
+            _onlineLabel     = _root.Q<Label>        (UI_Rooms_List_View.online_label);
 
-            _leaveBtn    = _root.Q<Button>(UI_Rooms_List_View.leave_button);
-            _createBtn   = _root.Q<Button>(UI_Rooms_List_View.create_button);
-            _refreshBtn  = _root.Q<Button>(UI_Rooms_List_View.refresh_button);
-            _onlineLabel = _root.Q<Label>(UI_Rooms_List_View.online_label);
+            _leaveBtn   = _root.Q<Button>(UI_Rooms_List_View.leave_button);
+            _joinBtn    = _root.Q<Button>(UI_Rooms_List_View.join_button);
+            _createBtn  = _root.Q<Button>(UI_Rooms_List_View.create_button);
+            _refreshBtn = _root.Q<Button>(UI_Rooms_List_View.refresh_button);
+            
 
             SetupCallbacks();
         }
@@ -71,7 +75,7 @@ namespace UI.RoomsList
         {
             _roomsDropdown?.RegisterValueChangedCallback(_ => OnFilterChanged?.Invoke());
             _modesDropdown?.RegisterValueChangedCallback(_ => OnFilterChanged?.Invoke());
-            _mapsDropdown?.RegisterValueChangedCallback(_ => OnFilterChanged?.Invoke());
+            _mapsDropdown? .RegisterValueChangedCallback(_ => OnFilterChanged?.Invoke());
 
             if (_leaveBtn != null)
             {
@@ -80,6 +84,15 @@ namespace UI.RoomsList
             else
             {
                 Debug.LogError("[RoomsListUIView] Could not find Button named 'leave-btn' in Room_List_View.");
+            }
+            
+            if (_joinBtn != null)
+            {
+                _joinBtn.clicked += () => OnJoinClicked?.Invoke();
+            }
+            else
+            {
+                Debug.LogError("[RoomsListUIView] Could not find Button named 'join-btn' in Room_List_View.");
             }
 
             if (_createBtn != null)
@@ -155,7 +168,7 @@ namespace UI.RoomsList
                     enterBtn.clicked += () =>
                     {
                         enterBtn.SetEnabled(false);
-                        OnJoinRoomClicked?.Invoke(room, displayName, modeName, mapName);
+                        OnEnterRoomClicked?.Invoke(room, displayName, modeName, mapName);
                     };
                 }
 

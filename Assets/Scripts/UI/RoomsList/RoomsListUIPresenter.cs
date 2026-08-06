@@ -9,24 +9,27 @@ namespace UI.RoomsList
         private readonly RoomsListUIModel _model;
         private readonly RoomsListUIView  _view;
         
-        private readonly Action                         _onLeaveRequested;
-        private readonly Action                         _onCreateRoomRequested;
-        private readonly Action<string, string, string> _onJoinedRoomViewRequested;
+        private readonly Action                                       _onLeaveRequested;
+        private readonly Action                                       _onJoinRequested;
+        private readonly Action                                       _onCreateRoomRequested;
+        private readonly Action<string, string, string, bool, string> _onEnterRoomRequested;
 
         private string _currentLobbyId;
 
         public RoomsListUIPresenter(
             RoomsListUIModel model,
             RoomsListUIView view,
-            Action onLeaveRequested = null,
+            Action onLeaveRequested      = null,
+            Action onJoinRequested       = null,
             Action onCreateRoomRequested = null,
-            Action<string, string, string> onJoinedRoomViewRequested = null)
+            Action<string, string, string, bool, string> onEnterRoomRequested = null)
         {
             _model = model;
-            _view = view;
+            _view  = view;
             _onLeaveRequested = onLeaveRequested;
+            _onJoinRequested  = onJoinRequested;
             _onCreateRoomRequested = onCreateRoomRequested;
-            _onJoinedRoomViewRequested = onJoinedRoomViewRequested;
+            _onEnterRoomRequested  = onEnterRoomRequested;
 
             SubscribeToViewEvents();
             SubscribeToEventBus();
@@ -36,9 +39,10 @@ namespace UI.RoomsList
         {
             _view.OnFilterChanged     += ApplyFiltersAndRender;
             _view.OnLeaveClicked      += HandleLeaveClicked;
+            _view.OnJoinClicked       += HandleJoinClicked;
             _view.OnCreateRoomClicked += HandleCreateRoomClicked;
             _view.OnRefreshClicked    += HandleRefreshClicked;
-            _view.OnJoinRoomClicked   += HandleJoinRoomClicked;
+            _view.OnEnterRoomClicked  += HandleEnterRoomClicked;
         }
 
         private void SubscribeToEventBus()
@@ -51,9 +55,10 @@ namespace UI.RoomsList
         {
             _view.OnFilterChanged     -= ApplyFiltersAndRender;
             _view.OnLeaveClicked      -= HandleLeaveClicked;
+            _view.OnJoinClicked       -= HandleJoinClicked;
             _view.OnCreateRoomClicked -= HandleCreateRoomClicked;
             _view.OnRefreshClicked    -= HandleRefreshClicked;
-            _view.OnJoinRoomClicked   -= HandleJoinRoomClicked;
+            _view.OnEnterRoomClicked  -= HandleEnterRoomClicked;
 
             EventBus.Unsubscribe<JoinedLobbyEvent>    (OnJoinedLobby);
             EventBus.Unsubscribe<RoomListChangedEvent>(OnRoomListChanged);
@@ -98,20 +103,16 @@ namespace UI.RoomsList
             _model.RefreshLobby(_currentLobbyId);
         }
 
-        private void HandleJoinRoomClicked(RoomInfo room, string displayName, string modeName, string mapName)
+        private void HandleEnterRoomClicked(RoomInfo room, string displayName, string modeName, string mapName)
         {
-            _model.JoinRoom(room.SessionName);
-            _onJoinedRoomViewRequested?.Invoke(displayName, modeName, mapName);
+            _model.JoinRoom(room.RoomCode);
+            _onEnterRoomRequested?.Invoke(displayName, modeName, mapName, room.IsPublic, room.RoomCode);
         }
 
-        private void HandleLeaveClicked()
-        {
-            _onLeaveRequested?.Invoke();
-        }
+        private void HandleLeaveClicked() => _onLeaveRequested?.Invoke();
 
-        private void HandleCreateRoomClicked()
-        {
-            _onCreateRoomRequested?.Invoke();
-        }
+        private void HandleJoinClicked() => _onJoinRequested?.Invoke();
+
+        private void HandleCreateRoomClicked() => _onCreateRoomRequested?.Invoke();
     }
 }

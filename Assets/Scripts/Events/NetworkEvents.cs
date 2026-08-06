@@ -11,6 +11,8 @@ namespace Events
         public string RoomName;
         public string ModeName;
         public string MapName;
+        public bool IsPublic;
+        public string RoomCode;
     }
 
     public struct RoomListChangedEvent

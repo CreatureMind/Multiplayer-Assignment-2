@@ -100,8 +100,8 @@ public class RoomManager : MonoBehaviour
         maxPlayers = Mathf.Clamp(maxPlayers, absoluteMinPlayersPerRoom, absoluteMaxPlayersPerRoom);
 
         var roomId = _nextRoomId++;
-        var sessionName = LobbyCatalog.SessionNameFor(roomId);
-        var ownerToken = Guid.NewGuid().ToString("N")[..8];
+        var sessionName = GetUniqueToken();
+        var ownerToken = GetUniqueToken();
 
         var runner = Instantiate(roomRunnerPrefab);
         runner.name = $"Room_Runner_{sessionName}";
@@ -196,6 +196,7 @@ public class RoomManager : MonoBehaviour
 
         var info = new RoomInfo
         {
+            SessionName = sessionName,
             RoomId = roomId,
             DisplayName = cleanRoomName,
             ModeId = LobbyCatalog.ModeId(mode),
@@ -254,4 +255,5 @@ public class RoomManager : MonoBehaviour
         return cleaned.Length > 16 ? cleaned[..16] : cleaned;
     }
     
+    private string GetUniqueToken() => Guid.NewGuid().ToString("N")[..8];
 }

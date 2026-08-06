@@ -8,7 +8,7 @@ namespace UI.RoomCreation
     {
         private readonly RoomCreationUIModel _model;
         private readonly RoomCreationUIView _view;
-        private string _currentLobbyId;
+        private readonly string _currentLobbyId;
         private readonly Action _onRoomCreatedRequested;
 
         public RoomCreationUIPresenter(RoomCreationUIModel model, RoomCreationUIView view, string currentLobbyId, Action onRoomCreatedRequested = null)
