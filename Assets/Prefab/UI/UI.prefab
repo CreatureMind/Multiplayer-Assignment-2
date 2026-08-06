@@ -88,6 +88,7 @@ MonoBehaviour:
   roomCreationView: {fileID: 2921044859621760522}
   loadingViewPrefab: {fileID: 2743837903586713642, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
   chatViewPrefab: {fileID: 6575760504648723879, guid: 046a7adf8e10133479ecfb5dccccb912, type: 3}
+  roomJoinView: {fileID: 6506015586623474931}
   dialogView: {fileID: 3080539514211683060}
   audioMixer: {fileID: 24100000, guid: 12727e0891e931f4a95b8da5285afea9, type: 2}
 --- !u!1 &5968944112706827552
@@ -667,3 +668,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6828007886276315116, guid: 8a05cfb7967ceb54fb172ff20a3de5e1, type: 3}
   m_PrefabInstance: {fileID: 8186738998698161606}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6506015586623474931 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3159029994112776501, guid: 8a05cfb7967ceb54fb172ff20a3de5e1, type: 3}
+  m_PrefabInstance: {fileID: 8186738998698161606}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d6a3a3572da4a98b684ae7d8c01effb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.RoomCreation.RoomJoinUIView
