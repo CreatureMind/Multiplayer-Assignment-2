@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/In_Game_View.uxml
-// Updated: 2026-07-28 15:17 UTC
+// Updated: 2026-07-28 11:19 UTC
 
 using System.Collections.Generic;
 

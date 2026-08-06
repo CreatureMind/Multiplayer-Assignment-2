@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1754628902184577877}
   - component: {fileID: 3866178037336975234}
   - component: {fileID: 4387314450106423605}
-  - component: {fileID: 1680106363789966460}
+  - component: {fileID: 54937258311126021}
   m_Layer: 0
   m_Name: In_Game_UI
   m_TagString: Untagged
@@ -95,7 +95,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e32874d772ae54ef08991f05c19ccf6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
---- !u!114 &1680106363789966460
+--- !u!114 &54937258311126021
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -104,7 +104,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 136037901631935820}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e08d2ff675248864ea782a4060eb63fe, type: 3}
+  m_Script: {fileID: 11500000, guid: 4133b5b81950849178380bbe0121fcf1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameHudController
-  document: {fileID: 3866178037336975234}
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalButtonEventListener
+  debug: 0
