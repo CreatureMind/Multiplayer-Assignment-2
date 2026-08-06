@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using UnityEngine;
 
 public struct PlayerActionData : INetworkStruct
 {
@@ -50,4 +51,10 @@ public struct PlayerActionData : INetworkStruct
     {
         return CurrentActionAmount == 0;
     }
-}
+
+    public void ReduceMaxActionAmountPerTurn(int turnStatsActionGainPerBase)
+    {
+        MaxActionAmountPerTurn = Mathf.Max(0, MaxActionAmountPerTurn - turnStatsActionGainPerBase);
+        CurrentActionAmount = Mathf.Min(CurrentActionAmount, MaxActionAmountPerTurn);
+    }
+}   

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Fusion;
 using UnityEngine;
 
@@ -515,6 +516,39 @@ public class TurnManager : NetworkBehaviour
             return currentPlayingPlayer;
         }
         return default;
+    }
+
+    public void ReducePlayerMaxActions(int overriddenPlayerID)
+    {
+        if (!HasStateAuthority)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"ReducePlayerMaxActions failed: no state authority.");
+            return;
+        }
+
+        if (TryGetPlayerActionData(overriddenPlayerID, out var playerActionData))
+        {
+            playerActionData.CurrentActionAmount = Mathf.Max(0, playerActionData.CurrentActionAmount - _turnStats.ActionGainPerBase);
+            playerActionData.ReduceMaxActionAmountPerTurn(_turnStats.ActionGainPerBase);
+            WritePlayerActionData(overriddenPlayerID, playerActionData);
+
+            if (playerActionData.MaxActionAmountPerTurn <= 0f)
+            {
+                RemovePlayerFromTurnManager(overriddenPlayerID);
+                GameTraceLogger.Turn(TraceLogsEnabled, $"Player P{overriddenPlayerID} removed from turn manager due to max actions <= 0.");
+            }
+
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Reduced max actions for P{overriddenPlayerID} to {playerActionData.CurrentActionAmount}.");
+        }
+    }
+
+    private void RemovePlayerFromTurnManager(int overriddenPlayerID)
+    {
+        _clientManagersByPlayerId.Remove((byte)overriddenPlayerID);
+        if (_clientManagersByPlayerId.Count == 1)
+        {
+            _serverGameManager.EndGame(_clientManagersByPlayerId.Keys.First());
+        }
     }
 }
 

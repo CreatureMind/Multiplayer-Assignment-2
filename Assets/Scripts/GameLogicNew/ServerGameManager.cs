@@ -458,9 +458,9 @@ public sealed class ServerGameManager : NetworkBehaviour
             GameTraceLogger.Move(TraceLogsEnabled, $"Conquered bases by P{request.PlayerId} after intent={request.Intent}: {conqueredBases.Count}.");
             foreach (var baseBottomLeft in conqueredBases)
             {
-                if (!_boardManagerInstance.ConquerBaseServerOnly(baseBottomLeft, request.PlayerId))
+                if (!_boardManagerInstance.ConquerBaseServerOnly(baseBottomLeft, request.PlayerId, out var overriddenPlayerID))
                     continue;
-
+                _turnManagerInstance.ReducePlayerMaxActions(overriddenPlayerID); 
                 AddBaseCells(baseBottomLeft, changeSet.BoardChangedCells);
                 changeSet.BaseGainOwners.Add(request.PlayerId);
             }
