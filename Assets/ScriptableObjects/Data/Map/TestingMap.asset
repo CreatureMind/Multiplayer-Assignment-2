@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StartingPositionSO
   width: 32
   height: 32
+  maxPlayers: 4
   startingPosition:
   - type: 2
     ownerId: 4
@@ -315,14 +316,14 @@ MonoBehaviour:
   - type: 2
     ownerId: 4
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 4
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 4
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 4
     territoryId: 0
   - type: 1
     ownerId: 0
@@ -378,15 +379,6 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
   - type: 2
     ownerId: 2
     territoryId: 0
@@ -399,380 +391,14 @@ MonoBehaviour:
   - type: 2
     ownerId: 2
     territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 2
     territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 2
     territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 2
     territoryId: 0
   - type: 1
     ownerId: 0
@@ -783,16 +409,16 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 4
     territoryId: 0
-  - type: 1
+  - type: 4
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 4
     ownerId: 0
     territoryId: 0
-  - type: 3
+  - type: 2
     ownerId: 4
     territoryId: 0
   - type: 1
@@ -849,6 +475,1266 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 1
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 2
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 2
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 2
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
   - type: 1
     ownerId: 0
     territoryId: 0
@@ -963,1181 +1849,8 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 3
+    ownerId: 4
     territoryId: 0
   - type: 1
     ownerId: 0
@@ -2154,17 +1867,17 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 1
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 1
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 1
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 1
     territoryId: 0
   - type: 1
     ownerId: 0
@@ -2184,17 +1897,17 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 3
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 3
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 3
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 3
     territoryId: 0
   - type: 1
     ownerId: 0
@@ -2233,6 +1946,600 @@ MonoBehaviour:
     ownerId: 0
     territoryId: 0
   - type: 3
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 4
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 1
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 3
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
     ownerId: 1
     territoryId: 0
   - type: 1
@@ -2267,6 +2574,165 @@ MonoBehaviour:
     territoryId: 0
   - type: 1
     ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 4
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 3
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
+    territoryId: 0
+  - type: 3
+    ownerId: 1
+    territoryId: 0
+  - type: 2
+    ownerId: 1
     territoryId: 0
   - type: 1
     ownerId: 0
@@ -2313,479 +2779,14 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
   - type: 2
-    ownerId: 1
-    territoryId: 0
-  - type: 2
-    ownerId: 1
-    territoryId: 0
-  - type: 2
-    ownerId: 1
-    territoryId: 0
-  - type: 2
-    ownerId: 1
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 3
-    ownerId: 1
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 3
     ownerId: 3
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 3
     territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 3
     territoryId: 0
   - type: 2
     ownerId: 3
@@ -2811,14 +2812,14 @@ MonoBehaviour:
   - type: 2
     ownerId: 1
     territoryId: 0
-  - type: 1
+  - type: 4
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 4
     ownerId: 0
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 1
     territoryId: 0
   - type: 1
     ownerId: 0
@@ -2907,14 +2908,14 @@ MonoBehaviour:
   - type: 2
     ownerId: 1
     territoryId: 0
-  - type: 1
+  - type: 4
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 4
     ownerId: 0
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 1
     territoryId: 0
   - type: 1
     ownerId: 0
@@ -3003,14 +3004,14 @@ MonoBehaviour:
   - type: 2
     ownerId: 1
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 1
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 1
     territoryId: 0
-  - type: 1
-    ownerId: 0
+  - type: 2
+    ownerId: 1
     territoryId: 0
   - type: 1
     ownerId: 0
