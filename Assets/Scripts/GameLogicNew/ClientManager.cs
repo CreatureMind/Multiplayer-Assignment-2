@@ -28,6 +28,7 @@ public class ClientManager : NetworkBehaviour
     private IBoardRenderer _renderer;
     private InputHandler _inputHandler;
     private ClientConnectivityMap _connectivity;
+    private BoardAudioInterpreter _audio;
     private bool _clientReady;
     private bool _inputWired;
     private byte _localPlayerId;
@@ -151,6 +152,7 @@ public class ClientManager : NetworkBehaviour
         
         _mapper = new BoardCoordinateMapper(context.Grid, context.BoardCamera, context.BoardOriginCell, width, height);
         _board = new ClientBoardCache(width, height);
+        _audio = new BoardAudioInterpreter(_board, playerId);
 
         _connectivity = new ClientConnectivityMap(_board, playerId);
         var legal = new LegalMoveCalculator(_board, playerId, _connectivity);
@@ -209,6 +211,7 @@ public class ClientManager : NetworkBehaviour
             return;
 
         _board.Apply(_pendingDiffs); // raises Changed once
+        _audio?.Interpret(_pendingDiffs);
         _pendingDiffs.Clear();
     }
     

@@ -10,12 +10,13 @@ public class BoardView : MonoBehaviour, IBoardRenderer
     [SerializeField] private Tilemap baseTilemap;
     [SerializeField] private Tilemap highlightTilemap;
     [SerializeField] private Tilemap hoverTilemap;
+    [SerializeField, Min(0f)] private float hoverFadeSeconds = 0.25f;
     
     [Header("Assets")]
     [SerializeField] private TileVisualCatalogSO catalog;
     [SerializeField] private TileBase overlayTile;
-    [SerializeField] private Color highlightColor = new Color(1f, 1f, 1f, 0.35f);
-    [SerializeField] private Color hoverColor = new Color(1f, 0.95f, 0.4f, 0.5f);
+    [SerializeField] private Color highlightColor = new(1f, 1f, 1f, 0.35f);
+    [SerializeField] private Color hoverColor = new(1f, 0.95f, 0.4f, 0.5f);
     
     [Header("Blast Animation")]
     [SerializeField] private bool animateBlasts = true;
@@ -27,7 +28,7 @@ public class BoardView : MonoBehaviour, IBoardRenderer
     
     // Track what we set on the overlays so we clear only those cells, not the whole tilemap.
     private readonly List<Vector2Int> _activeHighlights = new();
-    private Vector2Int? _activeHover;
+    private HoverTrail _hoverTrail;
 
     private Coroutine _blastRoutine;
     private IReadOnlyList<CellDiff> _runningBlast;
@@ -36,6 +37,7 @@ public class BoardView : MonoBehaviour, IBoardRenderer
     {
         _board = board;
         _mapper = mapper;
+        _hoverTrail = new HoverTrail(hoverTilemap, _mapper, overlayTile, hoverColor, hoverFadeSeconds);
         _localPlayerId = localPlayerId;
 
         if (_board != null)
@@ -45,6 +47,8 @@ public class BoardView : MonoBehaviour, IBoardRenderer
 
         RepaintAll(); // the cache may already hold data received before this call
     }
+    
+    private void Update() => _hoverTrail?.Tick(Time.deltaTime);
     
     public void SetHighlights(IReadOnlyCollection<Vector2Int> cells)
     {
@@ -70,22 +74,9 @@ public class BoardView : MonoBehaviour, IBoardRenderer
     
     public void SetHover(Vector2Int? boardCell)
     {
-        if (!hoverTilemap)
-            return;
-
-        if (_activeHover.HasValue)
-        {
-            hoverTilemap.SetTile(_mapper.BoardToCell(_activeHover.Value), null);
-            _activeHover = null;
-        }
-
-        if (!boardCell.HasValue)
-            return;
-        if (_board != null && !_board.Contains(boardCell.Value))
-            return;
-
-        PaintOverlay(hoverTilemap, boardCell.Value, hoverColor);
-        _activeHover = boardCell;
+        if (boardCell.HasValue && _board != null && !_board.Contains(boardCell.Value))
+            boardCell = null;
+        _hoverTrail?.SetCurrent(boardCell);
     }
 
     private void OnDestroy()
@@ -94,6 +85,7 @@ public class BoardView : MonoBehaviour, IBoardRenderer
             _board.Changed -= OnBoardChanged;
         if (_blastRoutine != null)
             StopCoroutine(_blastRoutine);
+        _hoverTrail?.Clear();
     }
     
     private void RepaintAll()
