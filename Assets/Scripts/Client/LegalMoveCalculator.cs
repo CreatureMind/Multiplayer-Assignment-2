@@ -15,6 +15,7 @@ public sealed class LegalMoveCalculator
     
     private readonly ClientBoardCache _board;
     private readonly byte _localPlayerId;
+    private readonly ClientConnectivityMap _connectivity;
     
     // Reused across recomputes, so this allocates only on first warm-up
     private readonly HashSet<Vector2Int> _moveTargets = new HashSet<Vector2Int>();
@@ -26,10 +27,11 @@ public sealed class LegalMoveCalculator
     // My own live soldiers, each of which a bomb could replace
     public IReadOnlyCollection<Vector2Int> BombTargets => _bombTargets;
 
-    public LegalMoveCalculator(ClientBoardCache board, byte localPlayerId)
+    public LegalMoveCalculator(ClientBoardCache board, byte localPlayerId, ClientConnectivityMap connectivity)
     {
         _board = board;
         _localPlayerId = localPlayerId;
+        _connectivity = connectivity;
     }
     
     // O(1) membership tests.
@@ -51,14 +53,12 @@ public sealed class LegalMoveCalculator
                 if (view.OwnerId != _localPlayerId)
                     continue;
                 
-                // A bomb replaces a soldier, so bombs and bases are not valid hosts
-                if (view.VisualType == TileType.Soldier)
+                var isLive = _connectivity.IsLive(cell);
+                
+                if (isLive && view.VisualType == TileType.Soldier)
                     _bombTargets.Add(cell);
                 
-                if (view.Frozen)
-                    continue;
-                
-                if (!view.ConductsConnectivity)
+                if (!isLive)
                     continue;
 
                 foreach (var offset in Orthogonal4)

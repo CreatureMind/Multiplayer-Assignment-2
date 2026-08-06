@@ -35,6 +35,7 @@ public class ClientInputPreview : MonoBehaviour
     private BoardCoordinateMapper _mapper;
     private IBoardRenderer _renderer;
     private InputHandler _inputHandler;
+    private ClientConnectivityMap _connectivity;
     
     private PlayerActionController _actions;
     private byte _viewerId = 1;
@@ -102,8 +103,9 @@ public class ClientInputPreview : MonoBehaviour
         if (!_initialised)
             return;
 
-        var legal = new LegalMoveCalculator(_board, _viewerId);
-        var scanner = new BaseFormationScanner(_board, _viewerId);
+        _connectivity = new ClientConnectivityMap(_board, _viewerId);
+        var legal = new LegalMoveCalculator(_board, _viewerId, _connectivity);
+        var scanner = new BaseFormationScanner(_board, _viewerId, _connectivity);
 
         if (_actions != null)
             _actions.HighlightsInvalidated -= OnHighlightsInvalidated;

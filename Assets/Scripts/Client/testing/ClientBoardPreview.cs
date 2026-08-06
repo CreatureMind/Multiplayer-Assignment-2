@@ -12,6 +12,7 @@ public sealed class ClientBoardPreview : MonoBehaviour
     
     private ClientBoardCache _board;
     private BoardCoordinateMapper _mapper;
+    private ClientConnectivityMap _connectivity;
 
     private void Start()
     {
@@ -65,7 +66,8 @@ public sealed class ClientBoardPreview : MonoBehaviour
         context.Renderer.SetHover(null);
         if (previewLegalMoveHighlights)
         {
-            var legal = new LegalMoveCalculator(_board, localId);
+            _connectivity = new ClientConnectivityMap(_board, localId);
+            var legal = new LegalMoveCalculator(_board, localId, _connectivity);
             legal.Recompute();
             context.Renderer.SetHighlights(legal.MoveTargets);
         }

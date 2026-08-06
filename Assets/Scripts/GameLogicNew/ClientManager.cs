@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Fusion;
-using Unity.VisualScripting;
 using UnityEngine;
 
 // Implemented by BoardView. Interface so ClientManager compiles before the renderer and is mockable in tests.
@@ -29,6 +27,7 @@ public class ClientManager : NetworkBehaviour
     private PlayerActionController _actions;
     private IBoardRenderer _renderer;
     private InputHandler _inputHandler;
+    private ClientConnectivityMap _connectivity;
     private bool _clientReady;
     private bool _inputWired;
     private byte _localPlayerId;
@@ -95,6 +94,11 @@ public class ClientManager : NetworkBehaviour
             _actions.HighlightsInvalidated -= OnHighlightsInvalidated;
         if (_board != null)
             _board.Changed -= OnBoardChanged;
+        if (_connectivity != null)
+        {
+            _connectivity.Dispose();
+            _connectivity = null;
+        }
 
         _clientReady = false;
         _inputWired = false;
@@ -147,9 +151,10 @@ public class ClientManager : NetworkBehaviour
         
         _mapper = new BoardCoordinateMapper(context.Grid, context.BoardCamera, context.BoardOriginCell, width, height);
         _board = new ClientBoardCache(width, height);
-        
-        var legal = new LegalMoveCalculator(_board, playerId);
-        var scanner = new BaseFormationScanner(_board, playerId);
+
+        _connectivity = new ClientConnectivityMap(_board, playerId);
+        var legal = new LegalMoveCalculator(_board, playerId, _connectivity);
+        var scanner = new BaseFormationScanner(_board, playerId, _connectivity);
         
         _actions = new PlayerActionController(
             new SoldierMoveMode(legal),
@@ -294,24 +299,4 @@ public class ClientManager : NetworkBehaviour
         => _renderer?.SetHighlights(_actions.CurrentHighlights);
     private void OnHoverChanged(Vector2Int? cell)
         => _renderer?.SetHover(cell);
-
-    private void FinalizeClientBootstrap()
-    {
-        Debug.Log("Finalizing client bootstrap.");
-        if (_clientReady || !_inputHandler || _actions == null || _board == null)
-            return;
-
-        Debug.Log("Initializing input handler.");
-        _inputHandler.Initialize(_mapper, _actions);
-        _inputHandler.RequestSubmitted += OnRequestSubmitted;
-        _inputHandler.HoverChanged += OnHoverChanged;
-        _inputWired = true;
-
-        _renderer?.Initialise(_board, _mapper, _localPlayerId);
-
-        _clientReady = true;
-
-        _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
-
-    }
 }

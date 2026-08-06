@@ -11,6 +11,7 @@ public sealed class BaseFormationScanner
 
     private readonly ClientBoardCache _board;
     private readonly byte _localPlayerId;
+    private readonly ClientConnectivityMap _connectivity;
     
     private readonly List<Vector2Int> _origins = new List<Vector2Int>();
     
@@ -21,10 +22,11 @@ public sealed class BaseFormationScanner
     public IReadOnlyList<Vector2Int> Origins => _origins;
     public IReadOnlyCollection<Vector2Int> HighlightCells => _coreToOrigin.Keys;
 
-    public BaseFormationScanner(ClientBoardCache board, byte localPlayerId)
+    public BaseFormationScanner(ClientBoardCache board, byte localPlayerId, ClientConnectivityMap connectivity)
     {
         _board = board;
         _localPlayerId = localPlayerId;
+        _connectivity = connectivity;
     }
     
     public bool TryGetOriginForCell(Vector2Int cell, out Vector2Int origin)
@@ -68,22 +70,10 @@ public sealed class BaseFormationScanner
 
                 if (view.OwnerId != _localPlayerId)
                     return false;
-                if (view.Frozen)
+                if (!_connectivity.IsLive(cell))
                     return false;
-                
-                var isCore = dx is >= CoreOffset and < CoreOffset + CoreSize
-                             && dy is >= CoreOffset and < CoreOffset + CoreSize;
-                
-                if (isCore)
-                {
-                    if (view.VisualType != TileType.Soldier)
-                        return false;
-                }
-                else
-                {
-                    if (view.VisualType != TileType.Soldier && view.VisualType != TileType.Bomb)
-                        return false;
-                }
+                if (!view.IsFormationUnity)
+                    return false;
             }
         
         return true;
