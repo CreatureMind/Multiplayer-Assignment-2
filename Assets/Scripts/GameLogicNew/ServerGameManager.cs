@@ -247,7 +247,6 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         Debug.Log("Spawned board diff broadcaster...");
         
-        await TrySendFirstBoardUpdatesToAllClients();
         
         var changedBases= _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState();
         var setupDiffCells = new List<Vector2Int>();
@@ -256,7 +255,8 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         Debug.Log($"Added {changedBases.Count} bases...");
         
-        _boardDiffBroadcaster?.Broadcast(setupDiffCells);
+        await TrySendFirstBoardUpdatesToAllClients();
+
 
         int successCounter = 0;
         
