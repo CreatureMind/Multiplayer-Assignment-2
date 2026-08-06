@@ -22,8 +22,8 @@ public class RoomManager : MonoBehaviour
     [SerializeField] private ServerGameManager serverGameManagerPrefab;
 
     [SerializeField] private string hubLobbyName = "TinySoldiersLobby";
-    [SerializeField] private int maxRooms = 16;
-    [SerializeField] private int absoluteMaxPlayersPerRoom = 10;
+    [SerializeField] private int maxRooms = 5;
+    [SerializeField] private int absoluteMaxPlayersPerRoom = 4;
     [SerializeField] private int absoluteMinPlayersPerRoom = 2;
 
     private const string DisplayNameProp = "DisplayName";
@@ -255,5 +255,5 @@ public class RoomManager : MonoBehaviour
         return cleaned.Length > 16 ? cleaned[..16] : cleaned;
     }
     
-    private string GetUniqueToken() => Guid.NewGuid().ToString("N")[..8];
+    private string GetUniqueToken() => Guid.NewGuid().ToString("N").ToUpper()[..8];
 }

@@ -51,8 +51,8 @@ MonoBehaviour:
   chatRelayPrefab: {fileID: 4636337649601192298, guid: 586e1286dd37efd45a39688bea54edd0, type: 3}
   serverGameManagerPrefab: {fileID: 4475268518373070431, guid: 3201282e8aab4c340b6e71ad520e4319, type: 3}
   hubLobbyName: TinySoldiersLobby
-  maxRooms: 16
-  absoluteMaxPlayersPerRoom: 10
+  maxRooms: 5
+  absoluteMaxPlayersPerRoom: 4
   absoluteMinPlayersPerRoom: 2
 --- !u!114 &7190952270355023835
 MonoBehaviour:
@@ -74,3 +74,4 @@ MonoBehaviour:
   hubLobbyName: TinySoldiersLobby
   maxLobbyPlayers: 200
   hubNetSceneBuildIndex: 3
+  targetFPS: 30

@@ -46,8 +46,6 @@ namespace UI.RoomCreation
                 _view.ShowError("Room Code must be 8 characters.");
                 return;
             }
-
-            EventBus.Raise(new ShowLoadingScreenEvent());
             
             _view.SetJoinButtonEnabled(false);
             _model.JoinRoom(trimmed);

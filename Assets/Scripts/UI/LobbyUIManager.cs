@@ -124,6 +124,7 @@ namespace UI
                 onRoomCreatedRequested: () =>
                 {
                     ShowScreen(LobbyScreen.None);
+                    EventBus.Raise(new ShowLoadingScreenEvent());
                 }
             );
 
@@ -142,6 +143,7 @@ namespace UI
                 onJoinRequested: () =>
                 {
                     ShowScreen(LobbyScreen.None);
+                    EventBus.Raise(new ShowLoadingScreenEvent());
                 }
             );
 
