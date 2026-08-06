@@ -46,6 +46,7 @@ public static class ServerBoardRules
         return false;
     }
     
+    // Detection only: this method never mutates board state.
     public static bool ConqueredBasesByPawnPlacementCheck(BoardManager board, byte ownerId, Vector2Int origin, out HashSet<Vector2Int> conqueredBases)
     {
         conqueredBases = new HashSet<Vector2Int>();
