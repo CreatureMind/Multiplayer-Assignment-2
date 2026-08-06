@@ -41,7 +41,7 @@ namespace UI.RoomCreation
                 return;
             }
 
-            if (trimmed.Length > 8)
+            if (trimmed.Length < 8)
             {
                 _view.ShowError("Room Code must be 8 characters.");
                 return;

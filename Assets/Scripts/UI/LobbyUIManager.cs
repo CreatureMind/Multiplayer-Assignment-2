@@ -102,7 +102,11 @@ namespace UI
                     EventBus.Raise(new HideChatEvent());
                     ShowScreen(LobbyScreen.MainMenu);
                 },
-                onJoinRequested: () => roomJoinView.Show(),
+                onJoinRequested: () =>
+                {
+                    roomJoinView.ResetView();
+                    roomJoinView.Show();
+                },
                 onCreateRoomRequested: () => roomCreationView.Show(),
                 onEnterRoomRequested: (roomName, mode, map, isPublic, roomCode) => 
                 {

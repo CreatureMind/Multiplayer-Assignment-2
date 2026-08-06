@@ -14,6 +14,8 @@ namespace UI.RoomCreation
 
         public void JoinRoom(string sessionName)
         {
+            if (string.IsNullOrEmpty(sessionName)) return;
+            
             var manager = _networkManager ? _networkManager : NetworkManager.Instance;
             if (manager)
             {

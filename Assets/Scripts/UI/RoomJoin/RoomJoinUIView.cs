@@ -84,6 +84,7 @@ namespace UI.RoomCreation
 
         public void ResetView()
         {
+            SetJoinButtonEnabled(true);
             _roomCodeField.value = string.Empty;
             _errorLabel.text = string.Empty;
         }

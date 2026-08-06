@@ -332,7 +332,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             
             EventBus.Raise(new ShowDialogEvent(
                 title: "Failed to Join Room",
-                message: DescribeShutdown(result.ShutdownReason),
+                message: "Room is closed or not found",
                 primaryText: "Refresh Rooms",
                 onPrimary: () =>
                 {
