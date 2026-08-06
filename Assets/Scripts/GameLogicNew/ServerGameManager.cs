@@ -249,10 +249,10 @@ public sealed class ServerGameManager : NetworkBehaviour
         
         await TrySendFirstBoardUpdatesToAllClients();
         
-        var changedBases = _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState();
+        var changedBases= _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState();
         var setupDiffCells = new List<Vector2Int>();
-        foreach (var ownershipChange in changedBases)
-            AddBaseCells(ownershipChange.BaseBottomLeft, setupDiffCells);
+        foreach (var baseBottomLeft in changedBases)
+            AddBaseCells(baseBottomLeft, setupDiffCells);
         
         Debug.Log($"Added {changedBases.Count} bases...");
         
@@ -260,13 +260,13 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         int successCounter = 0;
         
-        foreach (var changedBase in changedBases)
+        foreach (var changedBasePos in changedBases)
         {
-            var result = _turnManagerInstance.PlayerBuiltBase(changedBase.NewOwnerId);
+            var result = _turnManagerInstance.PlayerBuiltBase(_boardManagerInstance.GetTileOwnerByIndex(changedBasePos));
             if (result == ActionResult.Success)
             {
                 successCounter++;
-                Debug.Log("Successfully built base: " + changedBase.BaseBottomLeft);
+                Debug.Log("Successfully built base: " + changedBasePos);
             }
         }
         
@@ -443,35 +443,21 @@ public sealed class ServerGameManager : NetworkBehaviour
         _boardManagerInstance.SetTileServerOnly(request.MutationCell, request.PlayerId, request.Intent);
 
         var changedBases = _boardManagerInstance.CheckForConqueredBasesAndUpdateBoardState();
-        var processedBases = new HashSet<Vector2Int>();
         GameTraceLogger.Move(TraceLogsEnabled, $"Conquered base updates after move: {changedBases.Count}.");
-        foreach (var ownershipChange in changedBases)
+        foreach (var baseBottomLeft in changedBases)
         {
-            processedBases.Add(ownershipChange.BaseBottomLeft);
-            AddBaseCells(ownershipChange.BaseBottomLeft, changeSet.BoardChangedCells);
-            changeSet.BaseGainOwners.Add(ownershipChange.NewOwnerId);
-
-            if (ownershipChange.PreviousOwnerId != TileState.NoOwner &&
-                ownershipChange.PreviousOwnerId != ownershipChange.NewOwnerId)
-            {
-                GameTraceLogger.Move(TraceLogsEnabled,
-                    $"Applying changed-bases conquest penalty to overridden player P{ownershipChange.PreviousOwnerId} for base {ownershipChange.BaseBottomLeft}.");
-                _turnManagerInstance.ReducePlayerMaxActions(ownershipChange.PreviousOwnerId);
-            }
+            AddBaseCells(baseBottomLeft, changeSet.BoardChangedCells);
+            var ownerId = _boardManagerInstance.GetTileOwnerByIndex(baseBottomLeft);
+            changeSet.BaseGainOwners.Add(ownerId);
         }
 
         GameTraceLogger.Move(TraceLogsEnabled, $"Check for base conquer P{request.PlayerId} after intent={request.Intent}.");
-        if (ServerBoardRules.ConqueredBasesByPawnPlacementCheck(_boardManagerInstance, request.ClientManager.PlayerId, request.RequestedCell, out var conqueredBases))
+        ServerBoardRules.ConqueredBasesByPawnPlacementCheck(_boardManagerInstance, request.ClientManager.PlayerId, request.RequestedCell, out var conqueredBases);
+        if (conqueredBases.Count > 0)
         {
             GameTraceLogger.Move(TraceLogsEnabled, $"Conquered bases by P{request.PlayerId} after intent={request.Intent}: {conqueredBases.Count}.");
             foreach (var baseBottomLeft in conqueredBases)
             {
-                if (processedBases.Contains(baseBottomLeft))
-                {
-                    GameTraceLogger.Move(TraceLogsEnabled, $"Conquered base {baseBottomLeft} already processed in changed-bases path.");
-                    continue;
-                }
-
                 if (!_boardManagerInstance.ConquerBaseServerOnly(baseBottomLeft, request.PlayerId, out var overriddenPlayerId))
                 {
                     GameTraceLogger.Move(TraceLogsEnabled, $"ConquerBaseServerOnly returned no update for base {baseBottomLeft}.");
@@ -490,7 +476,6 @@ public sealed class ServerGameManager : NetworkBehaviour
 
                 AddBaseCells(baseBottomLeft, changeSet.BoardChangedCells);
                 changeSet.BaseGainOwners.Add(request.PlayerId);
-                processedBases.Add(baseBottomLeft);
             }
         }
 

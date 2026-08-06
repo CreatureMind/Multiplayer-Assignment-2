@@ -223,28 +223,14 @@ public class BoardManager : NetworkBehaviour
         _baseCache[bottomLeft] = BuildBaseTileList(bottomLeft);
     }
     
-    public readonly struct BaseOwnershipChange
-    {
-        public BaseOwnershipChange(Vector2Int baseBottomLeft, int previousOwnerId, int newOwnerId)
-        {
-            BaseBottomLeft = baseBottomLeft;
-            PreviousOwnerId = previousOwnerId;
-            NewOwnerId = newOwnerId;
-        }
-
-        public Vector2Int BaseBottomLeft { get; }
-        public int PreviousOwnerId { get; }
-        public int NewOwnerId { get; }
-    }
-
-    public List<BaseOwnershipChange> CheckForConqueredBasesAndUpdateBoardState()
+    public HashSet<Vector2Int> CheckForConqueredBasesAndUpdateBoardState()
     {
         GameTraceLogger.Board(TraceLogsEnabled, $"Checking conquered bases. Cached bases={_baseCache.Count}.");
-        var ownershipChanges = new List<BaseOwnershipChange>();
+        var updatedBottomLeftKeys = new HashSet<Vector2Int>();
         var keysToRefreshInCache = new List<Vector2Int>();
 
         if (_baseCache.Count == 0)
-            return ownershipChanges;
+            return updatedBottomLeftKeys;
 
         foreach (var cacheEntry in _baseCache)
         {
@@ -302,7 +288,6 @@ public class BoardManager : NetworkBehaviour
                 };
 
             var wasUpdated = false;
-            var previousOwnerId = TileState.NoOwner;
             foreach (var baseTilePosition in baseTiles)
             {
                 if (!TryGetIndex(baseTilePosition.x, baseTilePosition.y, out var baseTileIndex))
@@ -312,9 +297,6 @@ public class BoardManager : NetworkBehaviour
                 if (currentState.Type != TileType.Base || currentState.OwnerId == surroundingOwnerId)
                     continue;
 
-                if (previousOwnerId == TileState.NoOwner)
-                    previousOwnerId = currentState.OwnerId;
-
                 Tiles.Set(baseTileIndex, currentState.WithOwner(surroundingOwnerId));
                 wasUpdated = true;
             }
@@ -323,7 +305,7 @@ public class BoardManager : NetworkBehaviour
                 continue;
 
             GameTraceLogger.Board(TraceLogsEnabled, $"Conquered base ownership updated for base at {bottomLeft} to owner {surroundingOwnerId}.");
-            ownershipChanges.Add(new BaseOwnershipChange(bottomLeft, previousOwnerId, surroundingOwnerId));
+            updatedBottomLeftKeys.Add(bottomLeft);
             keysToRefreshInCache.Add(bottomLeft);
         }
 
@@ -332,7 +314,7 @@ public class BoardManager : NetworkBehaviour
             RefreshBaseCacheEntry(bottomLeft);
         }
 
-        return ownershipChanges;
+        return updatedBottomLeftKeys;
     }
 
     #endregion
