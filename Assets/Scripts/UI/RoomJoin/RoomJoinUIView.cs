@@ -15,6 +15,9 @@ namespace UI.RoomCreation
 
         private UIDocument    _document;
         private VisualElement _root;
+        
+        private VisualElement _tint;
+        private VisualElement _container;
 
         private TextField _roomCodeField;
         private Label     _errorLabel;
@@ -42,6 +45,12 @@ namespace UI.RoomCreation
         private void InitializeUI(UIDocument document)
         {
             _root = document.rootVisualElement;
+            
+            _tint      = _root.Q<VisualElement>(UI_Join_Room_View.tint);
+            _tint?.AddToClassList("overlay-tint--hidden");
+            
+            _container = _root.Q<VisualElement>(UI_Join_Room_View.container);
+            _container?.AddToClassList("overlay-container--hidden");
 
             _roomCodeField = _root.Q<TextField>(UI_Join_Room_View.room_code_field);
             _errorLabel    = _root.Q<Label>    (UI_Join_Room_View.error_label);
@@ -108,7 +117,16 @@ namespace UI.RoomCreation
 
             if (_document) _document.sortingOrder = UIOverlaySorter.PushOverlay();
 
-            if (_root != null) _root.style.display = DisplayStyle.Flex;
+            if (_root != null)
+            {
+                _root.style.display = DisplayStyle.Flex;
+                
+                _root.schedule.Execute(() =>
+                {
+                    _tint.RemoveFromClassList("overlay-tint--hidden");
+                    _container?.RemoveFromClassList("overlay-container--hidden");
+                });
+            }
         }
 
         public void Hide()
@@ -116,9 +134,32 @@ namespace UI.RoomCreation
             if (!_isVisible) return;
             _isVisible = false;
 
-            if (_root != null) _root.style.display = DisplayStyle.None;
-
-            UIOverlaySorter.PopOverlay();
+            if (_root != null)
+            {
+                _tint.AddToClassList("overlay-tint--hidden");
+                _container?.AddToClassList("overlay-container--hidden");
+                
+                if (_container != null)
+                {
+                    _container.RegisterCallback<TransitionEndEvent>(OnHideTransitionEnd);
+                }
+                else
+                {
+                    _root.style.display = DisplayStyle.None;
+                    UIOverlaySorter.PopOverlay();
+                }
+            }
+        }
+        
+        private void OnHideTransitionEnd(TransitionEndEvent evt)
+        {
+            _container.UnregisterCallback<TransitionEndEvent>(OnHideTransitionEnd);
+            
+            if (!_isVisible && _root != null)
+            {
+                _root.style.display = DisplayStyle.None;
+                UIOverlaySorter.PopOverlay();
+            }
         }
     }
 }

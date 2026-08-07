@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
-// Source : Assets/UI Toolkit/UXMLs/Views/Rooms_List_View 1.uxml
-// Updated: 2026-08-06 20:22 UTC
+// Source : Assets/UI Toolkit/UXMLs/Views/Rooms_List_View.uxml
+// Updated: 2026-08-07 11:33 UTC
 
 using System.Collections.Generic;
 

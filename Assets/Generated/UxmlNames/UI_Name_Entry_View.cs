@@ -1,12 +1,13 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Name_Entry_View.uxml
-// Updated: 2026-08-02 14:55 UTC
+// Updated: 2026-08-07 11:35 UTC
 
 using System.Collections.Generic;
 
 public enum UI_Name_Entry_View
 {
     tint,
+    container,
     panel,
     title,
     player_name_field,
@@ -21,6 +22,7 @@ internal static class UI_Name_Entry_View_Map
         new Dictionary<UI_Name_Entry_View, string>
         {
             { UI_Name_Entry_View.tint, "tint" },
+            { UI_Name_Entry_View.container, "container" },
             { UI_Name_Entry_View.panel, "panel" },
             { UI_Name_Entry_View.title, "title" },
             { UI_Name_Entry_View.player_name_field, "player-name-field" },

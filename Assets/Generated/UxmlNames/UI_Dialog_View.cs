@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Dialog_View.uxml
-// Updated: 2026-08-03 13:24 UTC
+// Updated: 2026-08-07 11:49 UTC
 
 using System.Collections.Generic;
 
@@ -8,6 +8,7 @@ public enum UI_Dialog_View
 {
     tint,
     container,
+    panel,
     header,
     dialog_message,
     bottom_container,
@@ -23,6 +24,7 @@ internal static class UI_Dialog_View_Map
         {
             { UI_Dialog_View.tint, "tint" },
             { UI_Dialog_View.container, "container" },
+            { UI_Dialog_View.panel, "panel" },
             { UI_Dialog_View.header, "header" },
             { UI_Dialog_View.dialog_message, "dialog-message" },
             { UI_Dialog_View.bottom_container, "bottom-container" },

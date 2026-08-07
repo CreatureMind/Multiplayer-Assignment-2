@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Options_View.uxml
-// Updated: 2026-08-02 14:57 UTC
+// Updated: 2026-08-07 11:50 UTC
 
 using System.Collections.Generic;
 
@@ -8,6 +8,7 @@ public enum UI_Options_View
 {
     tint,
     container,
+    panel,
     header,
     music_volume_slider,
     sfx_volume_slider,
@@ -26,6 +27,7 @@ internal static class UI_Options_View_Map
         {
             { UI_Options_View.tint, "tint" },
             { UI_Options_View.container, "container" },
+            { UI_Options_View.panel, "panel" },
             { UI_Options_View.header, "header" },
             { UI_Options_View.music_volume_slider, "music-volume-slider" },
             { UI_Options_View.sfx_volume_slider, "sfx-volume-slider" },

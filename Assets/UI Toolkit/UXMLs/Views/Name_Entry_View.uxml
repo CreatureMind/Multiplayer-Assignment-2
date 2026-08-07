@@ -1,15 +1,17 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/Styles/LobbyStyle.uss?fileID=7433441132597879392&amp;guid=c1ae93633323eed4e9baa1825210ea51&amp;type=3#LobbyStyle"/>
-    <ui:VisualElement name="tint" style="flex-grow: 1; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.4);">
-        <ui:VisualElement name="panel" style="background-color: rgb(60, 60, 60); padding-top: 60px; padding-bottom: 40px; padding-left: 60px; padding-right: 60px; min-width: 600px; align-items: stretch; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(128, 128, 128); border-right-color: rgb(128, 128, 128); border-top-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128); max-width: 600px;">
-            <GradientBox name="" end-color="rgba(0, 0, 0, 0.5)" start-color="rgba(0, 0, 0, 0)" style="width: 600px; height: 67px; position: absolute; top: -68px; align-self: center;"/>
-            <ui:Label text="Enter Your Name" name="title" class="header" style="font-size: 48px; margin-bottom: 0; position: absolute; padding-top: 10px; top: -68px; align-self: center;"/>
-            <ui:TextField placeholder-text="Your name..." name="player-name-field" class="Lable name-entry unity-base-field__input text-field" style="font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
-            <ui:Label text="" name="error-label" enable-rich-text="false" class="Lable" style="color: rgb(255, 80, 80); font-size: 22px; margin-top: 20px; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; height: 0; flex-wrap: wrap; white-space: normal; translate: 0 10px;"/>
-        </ui:VisualElement>
-        <ui:VisualElement style="flex-grow: 0; flex-direction: row; justify-content: space-between; width: 600px;">
-            <ui:Button text="Randomize" name="randomize-button" style="font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
-            <ui:Button text="Confirm" name="confirm-button" style="font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+    <ui:VisualElement name="tint" class="overlay-tint" style="flex-grow: 1; justify-content: center; align-items: center; background-color: rgba(0, 0, 0, 0.4);">
+        <ui:VisualElement name="container" class="overlay-container" style="flex-grow: 0;">
+            <ui:VisualElement name="panel" style="background-color: rgb(60, 60, 60); padding-top: 60px; padding-bottom: 40px; padding-left: 60px; padding-right: 60px; min-width: 600px; align-items: stretch; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(128, 128, 128); border-right-color: rgb(128, 128, 128); border-top-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128); max-width: 600px;">
+                <GradientBox name="" end-color="rgba(0, 0, 0, 0.5)" start-color="rgba(0, 0, 0, 0)" style="width: 600px; height: 67px; position: absolute; top: -68px; align-self: center;"/>
+                <ui:Label text="Enter Your Name" name="title" class="header" style="font-size: 48px; margin-bottom: 0; position: absolute; padding-top: 10px; top: -68px; align-self: center;"/>
+                <ui:TextField placeholder-text="Your name..." name="player-name-field" class="Lable name-entry unity-base-field__input text-field" style="font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                <ui:Label text="" name="error-label" enable-rich-text="false" class="Lable" style="color: rgb(255, 80, 80); font-size: 22px; margin-top: 20px; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; height: 0; flex-wrap: wrap; white-space: normal; translate: 0 10px;"/>
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 0; flex-direction: row; justify-content: space-between; width: 600px;">
+                <ui:Button text="Randomize" name="randomize-button" style="font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                <ui:Button text="Confirm" name="confirm-button" style="font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
