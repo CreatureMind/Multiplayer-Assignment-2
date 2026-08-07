@@ -197,8 +197,8 @@ namespace UI
             // If name is already confirmed (or returning from match), go to Rooms list directly
             if (NetworkManager.Instance && NetworkManager.Instance.IsReturningFromMatch)
             {
-                EventBus.Raise(new ShowLoadingScreenEvent());
                 ShowScreen(LobbyScreen.None);
+                EventBus.Raise(new ShowLoadingScreenEvent());
             }
             else
             {

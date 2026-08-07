@@ -12,7 +12,7 @@ namespace UI.Common
         protected VisualElement Tint { get; private set; }
         protected VisualElement Container { get; private set; }
 
-        // Element names from UXML (override if your UXML uses different names)
+        // Element names from UXML
         protected virtual string TintName => "tint";
         protected virtual string ContainerName => "container";
 
@@ -20,7 +20,7 @@ namespace UI.Common
         protected virtual string TintHiddenClass => "overlay-tint--hidden";
         protected virtual string ContainerHiddenClass => "overlay-container--hidden";
 
-        public bool IsVisible { get; private set; }
+        public bool IsVisible { get; private set; } = true;
 
         protected virtual void Awake()
         {
@@ -50,14 +50,10 @@ namespace UI.Common
                 Container = Root.Q<VisualElement>(ContainerName);
                 Container?.AddToClassList(ContainerHiddenClass);
             }
-
-            // Hook for derived views to query specific controls & register callbacks
+            
             OnInitializeUI();
         }
-
-        /// <summary>
-        /// Derived classes override this to query buttons, text fields, and bind click events.
-        /// </summary>
+        
         protected abstract void OnInitializeUI();
 
         public virtual void Show()
@@ -119,14 +115,13 @@ namespace UI.Common
             }
         }
 
-        private void SetPickingModeRecursive(VisualElement element, PickingMode mode)
+        protected void SetPickingModeRecursive(VisualElement element, PickingMode mode)
         {
             if (element == null) return;
             element.pickingMode = mode;
             element.Query<VisualElement>().ForEach(child => child.pickingMode = mode);
         }
-
-        // Optional hooks for derived overlays
+        
         protected virtual void OnShow() { }
         protected virtual void OnHide() { }
     }

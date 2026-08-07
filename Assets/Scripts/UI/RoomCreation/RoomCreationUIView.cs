@@ -21,8 +21,6 @@ namespace UI.RoomCreation
         private Toggle        _publicToggle;
         private Button        _createButton;
         private Button        _backButton;
-        
-        private bool _isVisible = true;
 
         protected override void OnInitializeUI()
         {
