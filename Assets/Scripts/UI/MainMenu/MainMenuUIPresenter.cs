@@ -48,15 +48,8 @@ namespace UI.MainMenu
             _model.EnterGlobalLobby();
         }
 
-        private void HandleOptionsClicked()
-        {
-            _onOptionsRequested?.Invoke();
-        }
+        private void HandleOptionsClicked() => _onOptionsRequested?.Invoke();
 
-        private void HandleCreditsClicked()
-        {
-            Debug.Log("Credits button clicked");
-            _onCreditsRequested?.Invoke();
-        }
+        private void HandleCreditsClicked() => _onCreditsRequested?.Invoke();
     }
 }

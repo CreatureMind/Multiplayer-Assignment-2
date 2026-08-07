@@ -36,6 +36,7 @@ namespace UI
         [SerializeField] private LoadingUIView      loadingViewPrefab;
         [SerializeField] private ChatUIController   chatViewPrefab;
         [SerializeField] private RoomJoinUIView     roomJoinView;
+        [SerializeField] private CreditsUIView      creditsView;
         [SerializeField] private DialogUIView       dialogView;
 
         [Header("Audio Settings")]
@@ -49,6 +50,7 @@ namespace UI
         private RoomLobbyUIPresenter    _roomLobbyPresenter;
         private RoomCreationUIPresenter _roomCreationPresenter;
         private RoomJoinUIPresenter     _roomJoinPresenter;
+        private CreditsUIPresenter      _creditsPresenter;
         private DialogUIPresenter       _dialogPresenter;
         
         // Chat
@@ -74,7 +76,7 @@ namespace UI
                 mainMenuView,
                 onPlayRequested: () => ShowScreen(LobbyScreen.None),
                 onOptionsRequested: () => optionsView.Show(),
-                onCreditsRequested: () => { }
+                onCreditsRequested: () => creditsView.Show()
             );
             
             //Name Entry
@@ -90,6 +92,13 @@ namespace UI
             _optionsPresenter = new OptionsUIPresenter(
                 optionsModel, 
                 optionsView
+            );
+            
+            //Credits
+            var creditsModel = new CreditsUIModel();
+            _creditsPresenter = new CreditsUIPresenter(
+                creditsModel, 
+                creditsView
             );
 
             //Rooms List
@@ -230,6 +239,8 @@ namespace UI
             nameEntryView   .Hide();
             optionsView     .Hide();
             roomCreationView.Hide();
+            roomJoinView    .Hide();
+            creditsView     .Hide();
         }
         
         private void CreateNewChat(OnChatRelaySpawnedEvent e)
@@ -262,6 +273,7 @@ namespace UI
             _roomLobbyPresenter?.   UnsubscribeFromEvents();
             _loadingPresenter?.     UnsubscribeFromEvents();
             _roomJoinPresenter?.    UnsubscribeFromEvents();
+            _creditsPresenter?.     UnsubscribeFromEvents();
             _dialogPresenter?.      UnsubscribeFromEvents();
         }
     }

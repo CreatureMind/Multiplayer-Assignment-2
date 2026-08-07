@@ -34,6 +34,7 @@ Transform:
   - {fileID: 6496492614772900781}
   - {fileID: 2828485688710063930}
   - {fileID: 3412839293812306474}
+  - {fileID: 6517419100489705030}
   m_Father: {fileID: 1459037363433140308}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3690543675413315849
@@ -89,6 +90,7 @@ MonoBehaviour:
   loadingViewPrefab: {fileID: 2743837903586713642, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
   chatViewPrefab: {fileID: 6575760504648723879, guid: 046a7adf8e10133479ecfb5dccccb912, type: 3}
   roomJoinView: {fileID: 6506015586623474931}
+  creditsView: {fileID: 3383420762383255393}
   dialogView: {fileID: 3080539514211683060}
   audioMixer: {fileID: 24100000, guid: 12727e0891e931f4a95b8da5285afea9, type: 2}
 --- !u!1 &5968944112706827552
@@ -679,3 +681,76 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d6a3a3572da4a98b684ae7d8c01effb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.RoomCreation.RoomJoinUIView
+--- !u!1001 &8849998132200422828
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1967045491851565169}
+    m_Modifications:
+    - target: {fileID: 2351728160613456874, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2351728160613456874, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2351728160613456874, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2351728160613456874, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2351728160613456874, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2351728160613456874, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2351728160613456874, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2351728160613456874, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2351728160613456874, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2351728160613456874, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3987402328708852659, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+      propertyPath: m_Name
+      value: Credits_UI
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+--- !u!114 &3383420762383255393 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6063482445991525069, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+  m_PrefabInstance: {fileID: 8849998132200422828}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fa0d9309a058724ea2991d0810cb0df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.RoomCreation.CreditsUIView
+--- !u!4 &6517419100489705030 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2351728160613456874, guid: 8ad50404f7c30cd498c1e2a7f4b5156f, type: 3}
+  m_PrefabInstance: {fileID: 8849998132200422828}
+  m_PrefabAsset: {fileID: 0}
