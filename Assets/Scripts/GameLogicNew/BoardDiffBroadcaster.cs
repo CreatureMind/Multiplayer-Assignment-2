@@ -64,7 +64,10 @@ public sealed class BoardDiffBroadcaster
         if (projected.Count == 0)
             return;
 
-        var max = Mathf.Max(1, maxPerRpc);
+        var defaultChunkSize = Mathf.Max(1, maxPerRpc);
+        var max = projected.Count > FullBoardPulseSize
+            ? FullBoardPulseSize
+            : defaultChunkSize;
         for (var start = 0; start < projected.Count; start += max)
         {
             var count = Mathf.Min(max, projected.Count - start);
