@@ -1,11 +1,12 @@
 using System;
+using UI.Common;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UI.Options
 {
     [RequireComponent(typeof(UIDocument))]
-    public class OptionsUIView : MonoBehaviour
+    public class OptionsUIView : BaseOverlayView
     {
         public event Action<int>  OnMusicVolumeChanged;
         public event Action<int>  OnSfxVolumeChanged;
@@ -13,42 +14,21 @@ namespace UI.Options
         public event Action<bool> OnSfxMuteToggled;
         public event Action       OnBackButtonClicked;
 
-        private UIDocument    _document;
-        private VisualElement _root;
-
         private SliderInt _musicVolumeSlider;
         private SliderInt _soundFXSlider;
         private Toggle    _musicMuteToggle;
         private Toggle    _soundFXMuteToggle;
         private Button    _backButton;
-        
-        private bool _isVisible = true;
 
-        private void Awake()
+        protected override void OnInitializeUI()
         {
-            _document = GetComponent<UIDocument>();
-        }
+            if (Root == null) return;
 
-        private void Start()
-        {
-            if (!_document)
-            {
-                Debug.LogError("[OptionsUIView] UIDocument is null!");
-                return;
-            }
-
-            InitializeUI(_document);
-        }
-
-        private void InitializeUI(UIDocument document)
-        {
-            _root = document.rootVisualElement;
-
-            _musicVolumeSlider = _root.Q<SliderInt>(UI_Options_View.music_volume_slider);
-            _soundFXSlider     = _root.Q<SliderInt>(UI_Options_View.sfx_volume_slider);
-            _musicMuteToggle   = _root.Q<Toggle>   (UI_Options_View.mute_music_toggle);
-            _soundFXMuteToggle = _root.Q<Toggle>   (UI_Options_View.mute_sfx_toggle);
-            _backButton        = _root.Q<Button>   (UI_Options_View.back_button);
+            _musicVolumeSlider = Root.Q<SliderInt>(UI_Options_View.music_volume_slider);
+            _soundFXSlider     = Root.Q<SliderInt>(UI_Options_View.sfx_volume_slider);
+            _musicMuteToggle   = Root.Q<Toggle>   (UI_Options_View.mute_music_toggle);
+            _soundFXMuteToggle = Root.Q<Toggle>   (UI_Options_View.mute_sfx_toggle);
+            _backButton        = Root.Q<Button>   (UI_Options_View.back_button);
 
             SetupCallbacks();
         }
@@ -108,25 +88,5 @@ namespace UI.Options
         public void SetSfxVolume(int value)    => _soundFXSlider?.SetValueWithoutNotify(value);
         public void SetMusicMute(bool isMuted) => _musicMuteToggle?.SetValueWithoutNotify(isMuted);
         public void SetSfxMute(bool isMuted)   => _soundFXMuteToggle?.SetValueWithoutNotify(isMuted);
-        
-        public void Show()
-        {
-            if (_isVisible) return;
-            _isVisible = true;
-
-            if (_document) _document.sortingOrder = UIOverlaySorter.PushOverlay();
-
-            if (_root != null) _root.style.display = DisplayStyle.Flex;
-        }
-
-        public void Hide()
-        {
-            if (!_isVisible) return;
-            _isVisible = false;
-
-            if (_root != null) _root.style.display = DisplayStyle.None;
-
-            UIOverlaySorter.PopOverlay();
-        }
     }
 }

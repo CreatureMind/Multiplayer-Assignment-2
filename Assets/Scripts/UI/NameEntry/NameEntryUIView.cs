@@ -1,49 +1,29 @@
 using System;
+using UI.Common;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UI.NameEntry
 {
     [RequireComponent(typeof(UIDocument))]
-    public class NameEntryUIView : MonoBehaviour
+    public class NameEntryUIView : BaseOverlayView
     {
         public event Action OnConfirmClicked;
         public event Action OnRandomizeClicked;
-
-        private UIDocument    _document;
-        private VisualElement _root;
 
         private TextField _nameField;
         private Button    _confirmButton;
         private Button    _randomButton;
         private Label     _errorLabel;
-        
-        private bool _isVisible = true;
 
-        private void Awake()
+        protected override void OnInitializeUI()
         {
-            _document = GetComponent<UIDocument>();
-        }
+            if (Root == null) return;
 
-        private void Start()
-        {
-            if (!_document)
-            {
-                Debug.LogError("[NameEntryUIView] UIDocument is null!");
-                return;
-            }
-
-            InitializeUI(_document);
-        }
-
-        private void InitializeUI(UIDocument document)
-        {
-            _root = document.rootVisualElement;
-
-            _nameField     = _root.Q<TextField>(UI_Name_Entry_View.player_name_field);
-            _confirmButton = _root.Q<Button>   (UI_Name_Entry_View.confirm_button);
-            _randomButton  = _root.Q<Button>   (UI_Name_Entry_View.randomize_button);
-            _errorLabel    = _root.Q<Label>    (UI_Name_Entry_View.error_label);
+            _nameField     = Root.Q<TextField>(UI_Name_Entry_View.player_name_field);
+            _confirmButton = Root.Q<Button>   (UI_Name_Entry_View.confirm_button);
+            _randomButton  = Root.Q<Button>   (UI_Name_Entry_View.randomize_button);
+            _errorLabel    = Root.Q<Label>    (UI_Name_Entry_View.error_label);
 
             SetupCallbacks();
         }
@@ -86,25 +66,5 @@ namespace UI.NameEntry
         }
 
         public void ClearError() => ShowError(string.Empty);
-
-        public void Show()
-        {
-            if (_isVisible) return;
-            _isVisible = true;
-
-            if (_document) _document.sortingOrder = UIOverlaySorter.PushOverlay();
-
-            if (_root != null) _root.style.display = DisplayStyle.Flex;
-        }
-
-        public void Hide()
-        {
-            if (!_isVisible) return;
-            _isVisible = false;
-
-            if (_root != null) _root.style.display = DisplayStyle.None;
-
-            UIOverlaySorter.PopOverlay();
-        }
     }
 }

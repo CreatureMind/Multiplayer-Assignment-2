@@ -1,19 +1,17 @@
 using System;
 using Events;
+using UI.Common;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UI.Dialog
 {
     [RequireComponent(typeof(UIDocument))]
-    public class DialogUIView : MonoBehaviour
+    public class DialogUIView : BaseOverlayView
     {
         public event Action OnPrimaryClicked;
         public event Action OnSecondaryClicked;
         public event Action OnTertiaryClicked;
-
-        private UIDocument    _document;
-        private VisualElement _root;
 
         private Label _titleLabel;
         private Label _messageLabel;
@@ -22,38 +20,18 @@ namespace UI.Dialog
         private Button _secondaryBtn;
         private Button _tertiaryBtn;
 
-        private bool _isVisible = true;
-
-        private void Awake()
+        protected override void OnInitializeUI()
         {
-            _document = GetComponent<UIDocument>();
-        }
-
-        private void Start()
-        {
-            if (!_document)
-            {
-                Debug.LogError("[DialogUIView] UIDocument is null!");
-                return;
-            }
-
-            InitializeUI(_document);
-        }
-
-        private void InitializeUI(UIDocument document)
-        {
-            _root = document.rootVisualElement;
+            if (Root == null) return;
             
-            _titleLabel   = _root.Q<Label>(UI_Dialog_View.header);
-            _messageLabel = _root.Q<Label>(UI_Dialog_View.dialog_message);
+            _titleLabel   = Root.Q<Label>(UI_Dialog_View.header);
+            _messageLabel = Root.Q<Label>(UI_Dialog_View.dialog_message);
 
-            _primaryBtn   = _root.Q<Button>(UI_Dialog_View.primary_btn);
-            _secondaryBtn = _root.Q<Button>(UI_Dialog_View.secondary_btn);
-            _tertiaryBtn  = _root.Q<Button>(UI_Dialog_View.tertiary_btn);
+            _primaryBtn   = Root.Q<Button>(UI_Dialog_View.primary_btn);
+            _secondaryBtn = Root.Q<Button>(UI_Dialog_View.secondary_btn);
+            _tertiaryBtn  = Root.Q<Button>(UI_Dialog_View.tertiary_btn);
             
             SetupCallbacks();
-            
-            Hide();
         }
         
         private void SetupCallbacks()
@@ -84,6 +62,8 @@ namespace UI.Dialog
             {
                 Debug.LogError("[DialogUIView] Could not find Button named 'tertiary-btn' in Dialog_View.");
             }
+            
+            Hide();
         }
 
         public void SetContent(string title, string message, DialogType type)
@@ -117,26 +97,6 @@ namespace UI.Dialog
             {
                 btn.style.display = DisplayStyle.None;
             }
-        }
-
-        public void Show()
-        {
-            if (_isVisible) return;
-            _isVisible = true;
-
-            if (_document) _document.sortingOrder = UIOverlaySorter.PushOverlay();
-
-            if (_root != null) _root.style.display = DisplayStyle.Flex;
-        }
-
-        public void Hide()
-        {
-            if (!_isVisible) return;
-            _isVisible = false;
-
-            if (_root != null) _root.style.display = DisplayStyle.None;
-
-            UIOverlaySorter.PopOverlay();
         }
     }
 }

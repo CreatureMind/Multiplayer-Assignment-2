@@ -102,6 +102,8 @@ namespace UI.RoomLobby
             var isOwner = _model.CanStartGame();
             var allReady = _model.AreAllPlayersReady();
             _view.SetStartButtonState(isOwner, allReady);
+            
+            _view.SetLeaveButtonEnabled(true);
         }
 
         private async void HandleLeaveClicked()
