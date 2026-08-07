@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Templates/Room_Row_Template.uxml
-// Updated: 2026-08-07 11:33 UTC
+// Updated: 2026-08-07 13:16 UTC
 
 using System.Collections.Generic;
 

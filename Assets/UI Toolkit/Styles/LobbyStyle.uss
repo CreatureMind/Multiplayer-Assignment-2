@@ -299,8 +299,8 @@ Button:active {
 
 .overlay-container {
     transition-property: opacity, scale;
-    transition-duration: 0.15s, 0.15s;
-    transition-timing-function: ease-out, ease-out;
+    transition-duration: 0.18s, 0.28s;
+    transition-timing-function: ease-out, ease-out-back;
     opacity: 1;
     scale: 1 1;
 }

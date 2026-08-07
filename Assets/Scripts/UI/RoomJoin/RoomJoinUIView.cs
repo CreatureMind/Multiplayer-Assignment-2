@@ -109,6 +109,13 @@ namespace UI.RoomCreation
             _roomCodeField.value = string.Empty;
             _errorLabel.text = string.Empty;
         }
+        
+        private void SetPickingModeRecursive(VisualElement element, PickingMode mode)
+        {
+            if (element == null) return;
+            element.pickingMode = mode;
+            element.Query<VisualElement>().ForEach(child => child.pickingMode = mode);
+        }
 
         public void Show()
         {
@@ -119,6 +126,8 @@ namespace UI.RoomCreation
 
             if (_root != null)
             {
+                SetPickingModeRecursive(_tint, PickingMode.Position);
+                
                 _root.style.display = DisplayStyle.Flex;
                 
                 _root.schedule.Execute(() =>
@@ -136,6 +145,8 @@ namespace UI.RoomCreation
 
             if (_root != null)
             {
+                SetPickingModeRecursive(_tint, PickingMode.Ignore);
+                
                 _tint.AddToClassList("overlay-tint--hidden");
                 _container?.AddToClassList("overlay-container--hidden");
                 

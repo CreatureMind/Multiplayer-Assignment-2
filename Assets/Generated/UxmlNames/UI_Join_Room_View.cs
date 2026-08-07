@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Join_Room_View.uxml
-// Updated: 2026-08-07 11:36 UTC
+// Updated: 2026-08-07 13:16 UTC
 
 using System.Collections.Generic;
 
