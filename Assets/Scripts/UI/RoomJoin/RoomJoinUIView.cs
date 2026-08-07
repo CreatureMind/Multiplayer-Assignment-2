@@ -9,6 +9,7 @@ namespace UI.RoomCreation
     [RequireComponent(typeof(UIDocument))]
     public class RoomJoinUIView : MonoBehaviour
     {
+        
         public event Action<List<RoomInfo>> OnJoinRequested;
         public event Action OnBackRequested;
 
@@ -46,7 +47,10 @@ namespace UI.RoomCreation
             _root = document.rootVisualElement;
             
             _tint      = _root.Q<VisualElement>(UI_Join_Room_View.tint);
+            _tint?.AddToClassList("overlay-tint--hidden");
+            
             _container = _root.Q<VisualElement>(UI_Join_Room_View.container);
+            _container?.AddToClassList("overlay-container--hidden");
 
             _roomCodeField = _root.Q<TextField>(UI_Join_Room_View.room_code_field);
             _errorLabel    = _root.Q<Label>    (UI_Join_Room_View.error_label);
@@ -85,15 +89,6 @@ namespace UI.RoomCreation
             {
                 Debug.LogError("[RoomJoinUIView] Could not find Button named 'back-button' in Room_Creation_View.");
             }
-                            
-            if (_container != null)
-            {
-                _container?.RegisterCallback<TransitionEndEvent>(OnHideTransitionEnd);
-            }
-            else
-            {
-                Debug.LogError("[RoomJoinUIView] Could not find VisualElement named 'container' in Room_Creation_View.");
-            }
             
             Hide();
         }
@@ -114,13 +109,6 @@ namespace UI.RoomCreation
             _roomCodeField.value = string.Empty;
             _errorLabel.text = string.Empty;
         }
-        
-        private void SetPickingModeRecursive(VisualElement element, PickingMode mode)
-        {
-            if (element == null) return;
-            element.pickingMode = mode;
-            element.Query<VisualElement>().ForEach(child => child.pickingMode = mode);
-        }
 
         public void Show()
         {
@@ -131,12 +119,11 @@ namespace UI.RoomCreation
 
             if (_root != null)
             {
-                SetPickingModeRecursive(_tint, PickingMode.Position);
                 _root.style.display = DisplayStyle.Flex;
                 
                 _root.schedule.Execute(() =>
                 {
-                    _tint?.RemoveFromClassList("overlay-tint--hidden");
+                    _tint.RemoveFromClassList("overlay-tint--hidden");
                     _container?.RemoveFromClassList("overlay-container--hidden");
                 });
             }
@@ -149,25 +136,30 @@ namespace UI.RoomCreation
 
             if (_root != null)
             {
-                SetPickingModeRecursive(_tint, PickingMode.Ignore);
-                
-                _tint?.AddToClassList("overlay-tint--hidden");
+                _tint.AddToClassList("overlay-tint--hidden");
                 _container?.AddToClassList("overlay-container--hidden");
+                
+                if (_container != null)
+                {
+                    _container.RegisterCallback<TransitionEndEvent>(OnHideTransitionEnd);
+                }
+                else
+                {
+                    _root.style.display = DisplayStyle.None;
+                    UIOverlaySorter.PopOverlay();
+                }
             }
         }
         
         private void OnHideTransitionEnd(TransitionEndEvent evt)
         {
+            _container.UnregisterCallback<TransitionEndEvent>(OnHideTransitionEnd);
+            
             if (!_isVisible && _root != null)
             {
                 _root.style.display = DisplayStyle.None;
                 UIOverlaySorter.PopOverlay();
             }
-        }
-
-        private void OnDestroy()
-        {
-            _container.UnregisterCallback<TransitionEndEvent>(OnHideTransitionEnd);
         }
     }
 }
