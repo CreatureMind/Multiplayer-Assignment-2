@@ -198,7 +198,6 @@ namespace UI
             if (NetworkManager.Instance && NetworkManager.Instance.IsReturningFromMatch)
             {
                 ShowScreen(LobbyScreen.None);
-                EventBus.Raise(new ShowLoadingScreenEvent());
             }
             else
             {
@@ -214,7 +213,8 @@ namespace UI
 
         private void ShowScreen(LobbyScreen screen)
         {
-            EventBus.Raise(new HideLoadingScreenEvent());
+            if (screen == LobbyScreen.None) _loadingViewInstance.Show(); else _loadingViewInstance.Hide();
+
             UIOverlaySorter.Reset();
             
             if (screen == LobbyScreen.MainMenu)  mainMenuView.Show();  else mainMenuView.Hide();
