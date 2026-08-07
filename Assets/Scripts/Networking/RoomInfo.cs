@@ -19,7 +19,7 @@ public struct RoomInfo : INetworkStruct
     public PlayerRef Owner;
 
     public bool IsFull => PlayerCount >= MaxPlayers;
-    public string Mode => LobbyCatalog.ModeName(ModeId);
+    public string ModeName => LobbyCatalog.ModeName(ModeId);
+    public string MapName => LobbyCatalog.MapName(MapId);
     public string RoomCode => SessionName.Value;
-    public string Map => LobbyCatalog.MapName(MapId);
 }

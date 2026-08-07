@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using UI.RoomsList;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,7 +10,7 @@ namespace UI.RoomCreation
     public class RoomJoinUIView : MonoBehaviour
     {
         
-        public event Action OnJoinRequested;
+        public event Action<List<RoomInfo>> OnJoinRequested;
         public event Action OnBackRequested;
 
         private UIDocument    _document;
@@ -53,7 +55,17 @@ namespace UI.RoomCreation
         {
             if (_joinButton != null)
             {
-                _joinButton.clicked += () => OnJoinRequested?.Invoke();
+                _joinButton.clicked += () =>
+                {
+                    if (RoomsListUIModel.CachedRoomData == null)
+                    {
+                        Debug.LogError("[RoomJoinUIView] CachedRoomData is null!.");
+                        return;
+                    }
+                    var rooms = RoomsListUIModel.CachedRoomData.Value.Rooms;
+
+                    OnJoinRequested?.Invoke(rooms);
+                };
             }
             else
             {

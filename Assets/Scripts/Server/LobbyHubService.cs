@@ -47,8 +47,7 @@ public class LobbyHubService : NetworkBehaviour
     public void AddRoom(RoomInfo info)
     {
         if (!HasStateAuthority) return;
-        // Private rooms should not appear in the public lobby list.
-        if (!info.IsPublic) return;
+
         Rooms.Set(info.RoomId, info);
         Touch();
     }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Events;
 using UnityEngine;
 
@@ -7,9 +8,9 @@ namespace UI.RoomsList
     public class RoomsListUIModel
     {
         private NetworkManager _networkManager;
-        private RoomListChangedEvent? _cachedRoomData;
+        private static RoomListChangedEvent? _cachedRoomData;
 
-        public RoomListChangedEvent? CachedRoomData => _cachedRoomData;
+        public static RoomListChangedEvent? CachedRoomData => _cachedRoomData;
 
         public RoomsListUIModel(NetworkManager networkManager = null)
         {
@@ -25,11 +26,13 @@ namespace UI.RoomsList
         {
             var filteredRooms = new List<RoomInfo>();
             if (!_cachedRoomData.HasValue) return filteredRooms;
+            
+            var publicRoomsOnly = _cachedRoomData.Value.Rooms.Where(r => r.IsPublic).ToList();
 
-            foreach (var room in _cachedRoomData.Value.Rooms)
+            foreach (var room in publicRoomsOnly)
             {
-                var modeName = room.Mode;
-                var mapName = room.Map;
+                var modeName = room.ModeName;
+                var mapName = room.MapName;
                 var isOpen = (bool)room.IsOpen;
 
                 var matchesRoomFilter = roomFilter == "All" ||

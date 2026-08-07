@@ -15,7 +15,7 @@ namespace UI.RoomsList
         public event Action OnJoinClicked;
         public event Action OnCreateRoomClicked;
         public event Action OnRefreshClicked;
-        public event Action<RoomInfo, string, string, string> OnEnterRoomClicked;
+        public event Action<RoomInfo> OnEnterRoomClicked;
 
         private UIDocument    _document;
         private VisualElement _root;
@@ -140,8 +140,8 @@ namespace UI.RoomsList
             {
                 var roomRow = roomRowTemplate.CloneTree();
                 var displayName = room.DisplayName.Value;
-                var modeName = room.Mode;
-                var mapName = room.Map;
+                var modeName = room.ModeName;
+                var mapName = room.MapName;
                 var isOpen = (bool)room.IsOpen;
 
                 roomRow.tooltip = isOpen ? "Waiting for players" : "Match is in progress";
@@ -168,7 +168,7 @@ namespace UI.RoomsList
                     enterBtn.clicked += () =>
                     {
                         enterBtn.SetEnabled(false);
-                        OnEnterRoomClicked?.Invoke(room, displayName, modeName, mapName);
+                        OnEnterRoomClicked?.Invoke(room);
                     };
                 }
 

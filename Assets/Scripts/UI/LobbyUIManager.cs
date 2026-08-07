@@ -140,9 +140,10 @@ namespace UI
             _roomJoinPresenter = new RoomJoinUIPresenter(
                 roomJoinModel,
                 roomJoinView,
-                onJoinRequested: () =>
+                onJoinRequested: (roomName, mode, map, isPublic, roomCode) =>
                 {
                     ShowScreen(LobbyScreen.None);
+                    _roomLobbyPresenter.SetupRoomDetails(roomName, mode, map, isPublic, roomCode);
                     EventBus.Raise(new ShowLoadingScreenEvent());
                 }
             );

@@ -103,10 +103,10 @@ namespace UI.RoomsList
             _model.RefreshLobby(_currentLobbyId);
         }
 
-        private void HandleEnterRoomClicked(RoomInfo room, string displayName, string modeName, string mapName)
+        private void HandleEnterRoomClicked(RoomInfo room)
         {
             _model.JoinRoom(room.RoomCode);
-            _onEnterRoomRequested?.Invoke(displayName, modeName, mapName, room.IsPublic, room.RoomCode);
+            _onEnterRoomRequested?.Invoke(room.DisplayName.Value, room.ModeName, room.MapName, room.IsPublic, room.RoomCode);
         }
 
         private void HandleLeaveClicked() => _onLeaveRequested?.Invoke();
