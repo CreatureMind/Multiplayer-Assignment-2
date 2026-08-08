@@ -5,12 +5,19 @@ public class GameLogicBoot : MonoBehaviour
 {
     [SerializeField] private float _pollIntervalSeconds = 0.2f;
     [SerializeField] private float _statusLogEverySeconds = 5f;
+    [SerializeField] private GameObject reqsPrefab;
 
     private bool _requestSent;
 
     private void Awake()
     {
+        
 #if !UNITY_SERVER
+        if (reqsPrefab != null)
+        {
+            Instantiate(reqsPrefab, Vector3.zero, Quaternion.identity);
+        }
+        
         Destroy(gameObject);
 #endif
     }
