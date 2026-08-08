@@ -3,10 +3,15 @@
     <ui:VisualElement name="container" style="flex-grow: 1;">
         <ui:Label text="Room name" name="header" class="header"/>
         <ui:ScrollView name="players-scroll-view" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="margin-right: 200px; margin-bottom: 200px; margin-left: 200px; background-color: rgba(0, 0, 0, 0.5); height: 100%; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(128, 128, 128); border-right-color: rgb(128, 128, 128); border-top-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128); padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;"/>
-        <ui:VisualElement name="bottom-container" style="flex-grow: 1; position: absolute; top: auto; left: 200px; right: 200px; bottom: 0; flex-direction: row; height: 200px; justify-content: space-between; align-items: flex-start;">
-            <ui:Button text="Leave" name="leave-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
-            <ui:Button text="Ready" name="ready-button" style="align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
-            <ui:Button text="Start Game" enabled="true" name="start-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+        <ui:VisualElement name="bottom-container" style="flex-grow: 1; position: absolute; top: auto; left: 200px; right: 200px; bottom: 0; flex-direction: column; height: 200px; justify-content: space-between; align-items: flex-start;">
+            <ui:VisualElement style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: space-between; align-self: stretch;">
+                <ui:Button text="Leave" name="leave-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                <ui:Button text="Ready" name="ready-button" style="align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                <ui:Button text="Start Game" enabled="true" name="start-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="" style="align-self: center;">
+                <ui:Label text="Room Code: ########" name="code-label" class="Lable" style="color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&amp;guid=19184939772a7974a86fbd3229349203&amp;type=3#Geometos&quot;); -unity-text-align: middle-left; padding-top: 10px;"/>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

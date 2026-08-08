@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Room_Creation_View.uxml
-// Updated: 2026-07-28 11:19 UTC
+// Updated: 2026-08-07 13:16 UTC
 
 using System.Collections.Generic;
 
@@ -8,8 +8,7 @@ public enum UI_Room_Creation_View
 {
     tint,
     container,
-    container_2,
-    VisualElement,
+    panel,
     header,
     room_name,
     max_players,
@@ -28,8 +27,7 @@ internal static class UI_Room_Creation_View_Map
         {
             { UI_Room_Creation_View.tint, "tint" },
             { UI_Room_Creation_View.container, "container" },
-            { UI_Room_Creation_View.container_2, "container" },
-            { UI_Room_Creation_View.VisualElement, "VisualElement" },
+            { UI_Room_Creation_View.panel, "panel" },
             { UI_Room_Creation_View.header, "header" },
             { UI_Room_Creation_View.room_name, "room-name" },
             { UI_Room_Creation_View.max_players, "max-players" },

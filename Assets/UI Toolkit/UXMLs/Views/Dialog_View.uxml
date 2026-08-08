@@ -1,0 +1,17 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Styles/LobbyStyle.uss?fileID=7433441132597879392&amp;guid=c1ae93633323eed4e9baa1825210ea51&amp;type=3#LobbyStyle"/>
+    <ui:VisualElement name="tint" class="overlay-tint" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.4);">
+        <ui:VisualElement name="container" class="overlay-container" style="flex-direction: column; align-items: stretch; align-content: auto; justify-content: center; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+            <ui:VisualElement name="panel" style="flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; background-color: rgb(60, 60, 60); padding-top: 100px; padding-right: 60px; padding-bottom: 100px; padding-left: 60px; border-top-width: 1px; border-right-width: 0; border-bottom-width: 1px; border-left-width: 0; border-left-color: rgb(128, 128, 128); border-right-color: rgb(128, 128, 128); border-top-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128);">
+                <GradientBox name="" end-color="rgba(0, 0, 0, 0.5)" start-color="rgba(0, 0, 0, 0)" style="height: 104px; position: absolute; top: -105px; align-self: center; flex-grow: 1; width: 100%;"/>
+                <ui:Label text="Error" name="header" class="header" style="position: absolute; align-self: center; top: -105px;"/>
+                <ui:Label text="Error something something:&#10;Unable something something..." name="dialog-message" class="Lable" style="margin-top: 0; margin-right: 500px; margin-bottom: 0; margin-left: 500px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-text-align: middle-center; color: rgb(255, 255, 255);"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="bottom-container" style="flex-direction: row; justify-content: space-around; align-items: flex-start; margin-right: 600px; margin-left: 600px;">
+                <ui:Button text="Retry" name="primary-btn" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; display: flex;"/>
+                <ui:Button text="Ok" name="secondary-btn" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; display: flex;"/>
+                <ui:Button text="Reconnect" name="tertiary-btn" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; display: flex;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

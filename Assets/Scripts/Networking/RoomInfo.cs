@@ -7,6 +7,7 @@ using Fusion;
 /// </summary>
 public struct RoomInfo : INetworkStruct
 {
+    public NetworkString<_8> SessionName;
     public int RoomId;                     // server-assigned; session name derives from this
     public NetworkString<_16> DisplayName; // human friendly name shown in the UI
     public byte ModeId;                    // index into LobbyCatalog.Modes
@@ -18,7 +19,7 @@ public struct RoomInfo : INetworkStruct
     public PlayerRef Owner;
 
     public bool IsFull => PlayerCount >= MaxPlayers;
-    public string SessionName => LobbyCatalog.SessionNameFor(RoomId);
-    public string Mode => LobbyCatalog.ModeName(ModeId);
-    public string Map => LobbyCatalog.MapName(MapId);
+    public string ModeName => LobbyCatalog.ModeName(ModeId);
+    public string MapName => LobbyCatalog.MapName(MapId);
+    public string RoomCode => SessionName.Value;
 }

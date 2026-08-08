@@ -25,8 +25,4 @@ public static class LobbyCatalog
     }
 
     public static string MapName(int id) => id >= 0 && id < Maps.Length ? Maps[id] : "Unknown";
-
-    // Room session names are derived from the server-assigned room id, so the
-    // full session string never needs to be replicated in the registry.
-    public static string SessionNameFor(int roomId) => $"Room_{roomId}";
 }

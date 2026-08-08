@@ -31,8 +31,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private string _currentLobbyId;
     public string CurrentLobbyId => _currentLobbyId;
-
+    
     public bool IsReturningFromMatch { get; private set; }
+    private bool _unloading = false;
+    private InGameUIManager _inGameUIInstance;
+    
     public string LocalConfirmedName { get; set; }
     
     private string _pendingOwnerToken;
@@ -97,7 +100,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         }
         catch (Exception e)
         {
-            Debug.LogException(new Exception($"Tried to register {player}: {e.Message}"));
+            Debug.LogException(new Exception($"[Client - NetworkManager] Tried to register {player}: {e.Message}"));
         }
     }
 
@@ -105,7 +108,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (!Application.isPlaying) return;
         
-        Debug.Log($"Unregistering player: {player.ToString()}");
+        Debug.Log($"[Client - NetworkManager] Unregistering player: {player.ToString()}");
         _playerDataMap.Remove(player);
 
         if (!_networkRunnerInstance || !_networkRunnerInstance.IsRunning || _networkRunnerInstance.IsShutdown) return;
@@ -173,7 +176,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public int GetAllPlayerCount() => _networkRunnerInstance.CommittedPlayers.Count();
 
     // Play Game -> connect to the server-hosted Lobby Hub as a client.
-    public async Task ConnectToCustomLobby(string _ = null)
+    public async Task ConnectToCustomLobby(string lobbyName = null)
     {
         // Already in the hub: just re-surface the cached room list.
         if (_networkRunnerInstance && _networkRunnerInstance.IsRunning &&
@@ -200,21 +203,30 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             SceneManager = _networkRunnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>(),
             Scene = SceneRef.FromIndex(hubNetSceneBuildIndex),
         });
-
-        EventBus.Raise(new HideLoadingScreenEvent());
-
+        
         if (result.Ok)
         {
-            Debug.Log("Joined Lobby Hub successfully!");
+            Debug.Log("[Client - NetworkManager] Joined Lobby Hub successfully!");
             EventBus.Raise(new JoinedLobbyEvent());
             if (_cachedRoomList.HasValue)
                 EventBus.Raise(_cachedRoomList.Value);
         }
         else
         {
-            Debug.LogError($"Failed to join Lobby Hub: {result.ShutdownReason}");
-            EventBus.Raise(new RoomJoinRejectedEvent { Reason = DescribeShutdown(result.ShutdownReason) });
+            Debug.LogError($"[Client - NetworkManager] Failed to join Lobby Hub: {result.ShutdownReason}");
+            
+            EventBus.Raise(new ShowDialogEvent(
+                title: "Connection Failed",
+                message: $"Could not connect to the server: {DescribeShutdown(result.ShutdownReason)}",
+                primaryText: "Reconnect",
+                onPrimary: () => _ = ConnectToCustomLobby(),
+                secondaryText: "Cancel",
+                onSecondary: () => EventBus.Raise(new ReturnToMainMenuEvent()),
+                type: DialogType.Error
+            ));
         }
+        
+        EventBus.Raise(new HideLoadingScreenEvent());
     }
 
     // Create a room: ask the server. Approval/rejection comes back via LobbyHubService RPC.
@@ -222,13 +234,22 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (!LobbyHubService.Instance)
         {
-            EventBus.Raise(new RoomJoinRejectedEvent { Reason = "Not connected to the lobby." });
+            EventBus.Raise(new ShowDialogEvent(
+                title: "Not Connected",
+                message: "Cannot create room because you are not connected to the lobby hub.",
+                primaryText: "Reconnect",
+                onPrimary: () => _ = ConnectToCustomLobby(),
+                secondaryText: "Cancel",
+                onSecondary: null,
+                type: DialogType.Warning
+            ));
+
             return Task.CompletedTask;
         }
 
         EventBus.Raise(new ShowLoadingScreenEvent());
 
-        _pendingCreatedRoom = new RoomCreatedEvent { RoomName = roomName, ModeName = mode, MapName = map };
+        _pendingCreatedRoom = new RoomCreatedEvent { RoomName = roomName, ModeName = mode, MapName = map , IsPublic = isPublic };
 
         LobbyHubService.Instance.Rpc_RequestCreateRoom(roomName, mode, map, maxPlayers, isPublic, LocalPlayer);
         return Task.CompletedTask;
@@ -238,6 +259,13 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnRoomCreationApproved(string sessionName, string ownerToken)
     {
         _pendingOwnerToken = ownerToken;
+
+        if (_pendingCreatedRoom != null)
+        {
+            var room = _pendingCreatedRoom.Value;
+            room.RoomCode = sessionName;
+            _pendingCreatedRoom = room;
+        }
 
         if (_pendingCreatedRoom.HasValue)
             EventBus.Raise(_pendingCreatedRoom.Value);
@@ -251,7 +279,16 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         _pendingCreatedRoom = null;
         EventBus.Raise(new HideLoadingScreenEvent());
-        EventBus.Raise(new RoomJoinRejectedEvent { Reason = reason });
+        
+        EventBus.Raise(new ShowDialogEvent(
+            title: "Room Creation Failed",
+            message: reason,
+            primaryText: "Retry",
+            onPrimary: () => EventBus.Raise(new OpenRoomCreationOverlayEvent()), // Re-opens Room Creation overlay
+            secondaryText: "Cancel",
+            onSecondary: null,
+            type: DialogType.Warning
+        ));
     }
 
     #endregion
@@ -267,7 +304,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
         await CreateFreshRunner();
 
-        Debug.Log($"[Client] JoinRoom: connecting to session '{sessionName}' (lobby '{hubLobbyName}')...");
+        Debug.Log($"[Client - NetworkManager] JoinRoom: connecting to session '{sessionName}' (lobby '{hubLobbyName}')...");
 
         var result = await _networkRunnerInstance.StartGame(new StartGameArgs
         {
@@ -286,12 +323,26 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (result.Ok)
         {
-            Debug.Log("Joined room successfully!");
+            Debug.Log("[Client] Joined room successfully!");
+            EventBus.Raise(new JoinedRoomEvent());
         }
         else
         {
-            Debug.LogError($"Failed to join room: {result.ShutdownReason}");
-            EventBus.Raise(new RoomJoinRejectedEvent { Reason = DescribeShutdown(result.ShutdownReason) });
+            Debug.LogError($"[Client] Failed to join room: {result.ShutdownReason}");
+            
+            EventBus.Raise(new ShowDialogEvent(
+                title: "Failed to Join Room",
+                message: "Room is closed or not found",
+                primaryText: "Refresh Rooms",
+                onPrimary: () =>
+                {
+                    if (_cachedRoomList != null) EventBus.Raise(_cachedRoomList.Value);
+                },
+                secondaryText: "OK",
+                onSecondary: null,
+                type: DialogType.Warning
+            ));
+            
             // Fall back to the hub so the player isn't stranded.
             await ConnectToCustomLobby();
         }
@@ -304,8 +355,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     // Leave the match: disconnect, reload the menu scene, rejoin the hub.
-    public async Task ReturnToLobbyAsync(float flushDelay = 0f)
+    public async Task ReturnToLobbyAsync(float flushDelay = 5f)
     {
+        EventBus.Raise(new ShowLoadingScreenEvent());
+        
         if (flushDelay > 0f)
             await Task.Delay((int)(flushDelay * 1000));
         
@@ -326,7 +379,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         var tcs = new TaskCompletionSource<bool>();
         var op = SceneManager.LoadSceneAsync(buildIndex);
-        op.completed += _ => tcs.TrySetResult(true);
+        if (op != null) op.completed += _ => tcs.TrySetResult(true);
         return tcs.Task;
     }
 
@@ -363,11 +416,12 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private static string DescribeShutdown(ShutdownReason reason) => reason switch
     {
-        ShutdownReason.GameNotFound => "Room no longer exists.",
+        ShutdownReason.GameNotFound => "Server is down.",
         ShutdownReason.GameIsFull => "Room is full.",
         ShutdownReason.ConnectionRefused => "The server refused the connection.",
         ShutdownReason.ConnectionTimeout => "Connection timed out.",
         ShutdownReason.ServerInRoom => "Room is full.",
+        ShutdownReason.DisconnectedByPluginLogic => "Disconnected from the server.",
         _ => $"Could not join room ({reason})."
     };
 
@@ -392,13 +446,12 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (shutdownReason == ShutdownReason.Ok)
         {
-            Debug.Log("Runner shut down cleanly.");
+            Debug.Log("[Client - NetworkManager] Runner shut down cleanly.");
         }
         else
         {
-            Debug.Log("Disconnected from session. Reason: " + shutdownReason);
-            // WebGL commonly disconnects when the tab is backgrounded/suspended.
-            // Treat it as a transient connection loss and just return to the hub.
+            Debug.Log("[Client - NetworkManager] Disconnected from session. Reason: " + DescribeShutdown(shutdownReason));
+
             if (shutdownReason == ShutdownReason.DisconnectedByPluginLogic &&
                 Application.platform == RuntimePlatform.WebGLPlayer)
             {
@@ -406,7 +459,15 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
                 return;
             }
 
-            EventBus.Raise(new RoomJoinRejectedEvent { Reason = DescribeShutdown(shutdownReason) });
+            EventBus.Raise(new ShowDialogEvent(
+                title: "Disconnected",
+                message: DescribeShutdown(shutdownReason),
+                primaryText: "Reconnect",
+                onPrimary: () => _ = ConnectToCustomLobby(),
+                secondaryText: "Main Menu",
+                onSecondary: () => EventBus.Raise(new ReturnToMainMenuEvent()),
+                type: DialogType.Error
+            ));
         }
     }
 
@@ -432,7 +493,18 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
     {
         Debug.LogWarning($"Connect failed: {reason}");
-        EventBus.Raise(new RoomJoinRejectedEvent { Reason = reason.ToString() });
+        
+        EventBus.Raise(new HideLoadingScreenEvent());
+
+        EventBus.Raise(new ShowDialogEvent(
+            title: "Connection Failed",
+            message: $"Failed to establish network connection: {reason}",
+            primaryText: "Retry",
+            onPrimary: () => _ = ConnectToCustomLobby(),
+            secondaryText: "OK",
+            onSecondary: null,
+            type: DialogType.Error
+        ));
     }
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
@@ -451,9 +523,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-
-    private bool _unloading = false;
-    private InGameUIManager _inGameUIInstance;
+    
     public void OnSceneLoadDone(NetworkRunner runner)
     {
         Debug.Log($"Scene loaded: {SceneManager.GetActiveScene().name}");

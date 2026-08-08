@@ -13,7 +13,7 @@ public class DynamicGlobalButtonListener : MonoBehaviour
         uiDocument = GetComponent<UIDocument>();
         
         // Listen to the UIDocument's container layout change
-        if (uiDocument != null)
+        if (uiDocument)
         {
             currentRoot = uiDocument.rootVisualElement;
             SubscribeToRoot(currentRoot);
@@ -28,7 +28,7 @@ public class DynamicGlobalButtonListener : MonoBehaviour
     private void Update()
     {
         // Fail-safe: Detect if the UI Manager swapped the underlying root asset
-        if (uiDocument != null && uiDocument.rootVisualElement != currentRoot)
+        if (uiDocument && uiDocument.rootVisualElement != currentRoot)
         {
             ResetSubscriptions();
         }
@@ -102,14 +102,18 @@ public class DynamicGlobalButtonListener : MonoBehaviour
     private void OnButtonHoverEnter(Button button)
     {
         EventBus.Raise(new PlaySoundEvent(){ SoundName = SoundEffectEnum.BTN_HOVER});
-        Debug.Log($"[Hover Enter] {button.name}");
+        //Debug.Log($"[Hover Enter] {button.name}");
     }
 
-    private void OnButtonHoverExit(Button button) => Debug.Log($"[Hover Exit] {button.name}");
+    private void OnButtonHoverExit(Button button)
+    {
+        //Debug.Log($"[Hover Exit] {button.name}");
+    }
+
     private void OnButtonClick(Button button)
     {
         EventBus.Raise(new PlaySoundEvent(){ SoundName = SoundEffectEnum.BTN_CLICK});
-        Debug.Log($"[Click / Submit] {button.name}");
+        //Debug.Log($"[Click / Submit] {button.name}");
     }
 
     #endregion

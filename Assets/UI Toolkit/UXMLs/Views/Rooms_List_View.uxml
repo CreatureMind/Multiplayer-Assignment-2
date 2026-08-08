@@ -2,15 +2,27 @@
     <Style src="project://database/Assets/UI%20Toolkit/Styles/LobbyStyle.uss?fileID=7433441132597879392&amp;guid=c1ae93633323eed4e9baa1825210ea51&amp;type=3#LobbyStyle"/>
     <ui:VisualElement name="container" style="flex-grow: 1;">
         <ui:Label text="Rooms" name="header" class="header"/>
-        <ui:ScrollView name="rooms-scroll-view" style="margin-right: 200px; margin-bottom: 200px; margin-left: 200px; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px; background-color: rgba(0, 0, 0, 0.5); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; height: 100%;"/>
-        <ui:VisualElement name="bottom-container" style="flex-grow: 1; position: absolute; top: auto; left: 200px; right: 200px; bottom: 0; flex-direction: column; height: 200px; justify-content: flex-start; align-items: flex-start; padding-top: 5px;">
-            <ui:VisualElement name="VisualElement" style="flex-grow: 0; align-items: center; justify-content: space-between; align-self: stretch; flex-direction: row;">
-                <ui:Button text="Leave" name="leave-button" style="align-items: auto; align-self: auto; font-size: 32px;"/>
-                <ui:Button text="Create a Room" enabled="true" name="create-button" style="align-items: auto; align-self: auto; font-size: 32px;"/>
-                <ui:Button text="Refresh" enabled="true" name="refresh-button" style="align-items: auto; align-self: auto; font-size: 32px;"/>
+        <ui:VisualElement name="top-container" style="flex-direction: row; justify-content: space-between; margin-left: 200px; margin-right: 200px; background-color: rgb(128, 128, 128); min-height: 50px;">
+            <ui:DropdownField label="Show" choices="All,Open,Closed" index="0" name="rooms-dropdown" focusable="false" class="top-dropdown">
+                <ui:Label text="Rooms" style="margin-left: 4px;"/>
+            </ui:DropdownField>
+            <ui:DropdownField label="Show" index="0" choices="All,Free for All,2 vs 2" name="modes-dropdown" focusable="false" class="top-dropdown" style="align-self: center;">
+                <ui:Label text="Modes"/>
+            </ui:DropdownField>
+            <ui:DropdownField label="Show" choices="All,Basic,Plus,Chokepoint" index="0" name="maps-dropdown" focusable="false" class="top-dropdown" style="align-self: center;">
+                <ui:Label text="Maps"/>
+            </ui:DropdownField>
+        </ui:VisualElement>
+        <ui:ScrollView name="rooms-scroll-view" style="margin-right: 200px; margin-bottom: 200px; margin-left: 200px; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px; background-color: rgba(0, 0, 0, 0.5); border-top-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-bottom-left-radius: 0; height: 100%; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(128, 128, 128); border-right-color: rgb(128, 128, 128); border-top-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128);"/>
+        <ui:VisualElement name="bottom-container" style="flex-grow: 1; position: absolute; top: auto; left: 200px; right: 200px; bottom: 0; flex-direction: column; height: 200px; justify-content: space-between; align-items: flex-start;">
+            <ui:VisualElement name="" style="align-items: center; justify-content: space-between; align-self: stretch; flex-direction: row;">
+                <ui:Button text="Leave" enabled="true" name="leave-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                <ui:Button text="Join private room" enabled="true" name="join-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                <ui:Button text="Create Room" enabled="true" name="create-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                <ui:Button text="Refresh" enabled="true" name="refresh-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
             </ui:VisualElement>
-            <ui:VisualElement style="flex-grow: 0;">
-                <ui:Label text="Players: 0" name="online-label" class="Lable" style="color: rgb(255, 255, 255);"/>
+            <ui:VisualElement name="" style="align-self: center;">
+                <ui:Label text="Players: 0" name="online-label" class="Lable" style="color: rgb(255, 255, 255); -unity-font-definition: url(&quot;project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&amp;guid=19184939772a7974a86fbd3229349203&amp;type=3#Geometos&quot;); -unity-text-align: middle-left; padding-top: 10px;"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
