@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Events;
 using Fusion;
 using UnityEngine;
 
@@ -50,101 +51,6 @@ public class TurnManager : NetworkBehaviour
         }
     }
 
-    private bool IsPlayerTurnSelectable(int playerId)
-    {
-        if (!TryGetPlayerIndex(playerId, out var playerIndex))
-            return false;
-
-        var playerActionData = PlayerActions[playerIndex];
-        return playerActionData.PlayerId == playerId && playerActionData.MaxActionAmountPerTurn > 0;
-    }
-
-    private bool TryGetNextTurnPlayerId(byte startExclusive, out byte nextPlayerId)
-    {
-        nextPlayerId = 0;
-        if (_clientManagersByPlayerId.Count == 0 || _highestPlayerId == 0)
-            return false;
-
-        var firstCandidate = Mathf.Clamp(startExclusive + 1, 1, _highestPlayerId + 1);
-        for (var playerId = firstCandidate; playerId <= _highestPlayerId; playerId++)
-        {
-            if (IsPlayerTurnSelectable(playerId))
-            {
-                nextPlayerId = (byte)playerId;
-                return true;
-            }
-        }
-
-        for (var playerId = 1; playerId < firstCandidate; playerId++)
-        {
-            if (IsPlayerTurnSelectable(playerId))
-            {
-                nextPlayerId = (byte)playerId;
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private bool TryGetSoleSelectablePlayerId(out byte playerId)
-    {
-        playerId = 0;
-        var selectableCount = 0;
-        foreach (var entry in _clientManagersByPlayerId)
-        {
-            if (!IsPlayerTurnSelectable(entry.Key))
-                continue;
-
-            selectableCount++;
-            playerId = entry.Key;
-            if (selectableCount > 1)
-                return false;
-        }
-
-        return selectableCount == 1;
-    }
-
-    private void AdvanceTurnKeyFrom(byte startExclusive)
-    {
-        if (_gameBegun && TryGetSoleSelectablePlayerId(out var soleSelectablePlayerId))
-        {
-            CurrentTurnKey = 0;
-            GameTraceLogger.Turn(TraceLogsEnabled, $"Only one selectable player remains after game start: P{soleSelectablePlayerId}. Ending game.");
-            _serverGameManager?.EndGame(soleSelectablePlayerId);
-            return;
-        }
-
-        if (TryGetNextTurnPlayerId(startExclusive, out var nextPlayerId))
-        {
-            CurrentTurnKey = nextPlayerId;
-            return;
-        }
-
-        CurrentTurnKey = 0;
-        GameTraceLogger.Turn(TraceLogsEnabled, $"No selectable player found after key {startExclusive}. CurrentTurnKey set to 0.");
-    }
-
-    private void CurrentTurnKeyChanged()
-    {
-        if (!_isInstantiated || _clientManagersByPlayerId.Count == 0)
-            return;
-
-        if (CurrentTurnKey == 0)
-        {
-            GameTraceLogger.Turn(TraceLogsEnabled, "Turn has no active player yet (CurrentTurnKey=0).");
-            return;
-        }
-
-        if (!_clientManagersByPlayerId.ContainsKey(CurrentTurnKey))
-        {
-            GameTraceLogger.Turn(TraceLogsEnabled, $"Turn changed to unresolved player id {CurrentTurnKey}.");
-            return;
-        }
-
-        GameTraceLogger.Turn(TraceLogsEnabled, $"Turn changed to player {CurrentTurnKey}.");
-    }
-
     #region Lifetime Methods
 
     public override void Spawned()
@@ -156,6 +62,18 @@ public class TurnManager : NetworkBehaviour
         }
 
         Instance = this;
+        
+        EventBus.Subscribe<PlayerLeftEvent>(OnPlayerLeft);
+    }
+    
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        EventBus.Unsubscribe<PlayerLeftEvent>(OnPlayerLeft);
+    }
+
+    private void OnPlayerLeft(PlayerLeftEvent playerRefToPullOut)
+    {
+        RemovePlayerFromTurnManager(playerRefToPullOut.Player.PlayerId);
     }
 
     public void InstantiateTurnManager(ServerGameManager gm, List<ClientManager> clientManagers, TurnStatsSO turnStats, TurnDiffBroadcaster turnDiffBroadcaster)
@@ -372,6 +290,133 @@ public class TurnManager : NetworkBehaviour
 
     #endregion
     
+    #region Interanal Checks
+    
+     private bool IsPlayerTurnSelectable(int playerId)
+    {
+        if (!TryGetPlayerIndex(playerId, out var playerIndex))
+            return false;
+
+        var playerActionData = PlayerActions[playerIndex];
+        return playerActionData.PlayerId == playerId && playerActionData.MaxActionAmountPerTurn > 0;
+    }
+
+    private bool TryGetNextTurnPlayerId(byte startExclusive, out byte nextPlayerId)
+    {
+        nextPlayerId = 0;
+        if (_clientManagersByPlayerId.Count == 0 || _highestPlayerId == 0)
+            return false;
+
+        var firstCandidate = Mathf.Clamp(startExclusive + 1, 1, _highestPlayerId + 1);
+        for (var playerId = firstCandidate; playerId <= _highestPlayerId; playerId++)
+        {
+            if (IsPlayerTurnSelectable(playerId))
+            {
+                nextPlayerId = (byte)playerId;
+                return true;
+            }
+        }
+
+        for (var playerId = 1; playerId < firstCandidate; playerId++)
+        {
+            if (IsPlayerTurnSelectable(playerId))
+            {
+                nextPlayerId = (byte)playerId;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool TryGetSoleSelectablePlayerId(out byte playerId)
+    {
+        playerId = 0;
+        var selectableCount = 0;
+        foreach (var entry in _clientManagersByPlayerId)
+        {
+            if (!IsPlayerTurnSelectable(entry.Key))
+                continue;
+
+            selectableCount++;
+            playerId = entry.Key;
+            if (selectableCount > 1)
+                return false;
+        }
+
+        return selectableCount == 1;
+    }
+    
+    private void CurrentTurnKeyChanged()
+    {
+        if (!_isInstantiated || _clientManagersByPlayerId.Count == 0)
+            return;
+
+        if (CurrentTurnKey == 0)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, "Turn has no active player yet (CurrentTurnKey=0).");
+            return;
+        }
+
+        if (!_clientManagersByPlayerId.ContainsKey(CurrentTurnKey))
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Turn changed to unresolved player id {CurrentTurnKey}.");
+            return;
+        }
+
+        GameTraceLogger.Turn(TraceLogsEnabled, $"Turn changed to player {CurrentTurnKey}.");
+    }
+    
+    private bool TryReadPlayerActionData(int playerId, out int playerIndex, out PlayerActionData playerActionData)
+    {
+        if (!TryGetPlayerIndex(playerId, out playerIndex))
+        {
+            playerActionData = default;
+            return false;
+        }
+
+        playerActionData = PlayerActions[playerIndex];
+        return playerActionData.PlayerId == playerId;
+    }
+
+    private bool TryGetPlayerIndex(int playerId, out int playerIndex)
+    {
+        for (int i = 0; i < PlayerActions.Length; i++)
+        {
+            if (PlayerActions[i].PlayerId == playerId)
+            {
+                playerIndex = i;
+                return true;
+            }
+        }
+        playerIndex = -1;
+        return false;
+    }
+    
+    private bool IsCurrentTurnPlayer(int playerId)
+    {
+        // Centralised ownership check used to guard turn-only updates and end-turn requests.
+        if (_clientManagersByPlayerId.Count == 0)
+            return false;
+
+        return CurrentTurnKey == playerId;
+    }
+    
+    private bool TryGetCurrentPlayerActionData(out PlayerActionData currentPlayingPlayer)
+    {
+        // Returns the authoritative action payload for whichever player currently owns the turn.
+        if (_clientManagersByPlayerId.Count == 0)
+        {
+            currentPlayingPlayer = default;
+            return false;
+        }
+
+        return TryReadPlayerActionData(CurrentTurnKey, out _, out currentPlayingPlayer);
+    }
+
+
+    #endregion 
+    
     #region Server Turn Methods
     
     public void EndPlayerTurn(int playerId)
@@ -420,104 +465,6 @@ public class TurnManager : NetworkBehaviour
         _turnDiffBroadcaster?.BroadcastTurnChanged(nextPlayerActionData);
     }
     
-    #endregion
-
-    public bool TryGetPlayerActionData(int playerId, out PlayerActionData playerActionData)
-    {
-        // Exposes authoritative per-player action data to TurnDiffBroadcaster without leaking array internals.
-        return TryReadPlayerActionData(playerId, out _, out playerActionData);
-    }
-
-    private bool TryGetCurrentPlayerActionData(out PlayerActionData currentPlayingPlayer)
-    {
-        // Returns the authoritative action payload for whichever player currently owns the turn.
-        if (_clientManagersByPlayerId.Count == 0)
-        {
-            currentPlayingPlayer = default;
-            return false;
-        }
-
-        return TryReadPlayerActionData(CurrentTurnKey, out _, out currentPlayingPlayer);
-    }
-
-    private IReadOnlyList<PlayerActionData> GetPlayerActionsSnapshot()
-    {
-        // Builds a stable snapshot payload for initial turn-state broadcast.
-        var snapshot = new List<PlayerActionData>(_clientManagers.Count);
-        for (var i = 0; i < _clientManagers.Count; i++)
-        {
-            if (TryReadPlayerActionData(_clientManagers[i].PlayerId, out _, out var playerActionData))
-                snapshot.Add(playerActionData);
-        }
-        return snapshot;
-    }
-
-    private bool IsCurrentTurnPlayer(int playerId)
-    {
-        // Centralised ownership check used to guard turn-only updates and end-turn requests.
-        if (_clientManagersByPlayerId.Count == 0)
-            return false;
-
-        return CurrentTurnKey == playerId;
-    }
-
-
-    private bool TryReadPlayerActionData(int playerId, out int playerIndex, out PlayerActionData playerActionData)
-    {
-        if (!TryGetPlayerIndex(playerId, out playerIndex))
-        {
-            playerActionData = default;
-            return false;
-        }
-
-        playerActionData = PlayerActions[playerIndex];
-        return playerActionData.PlayerId == playerId;
-    }
-
-    private bool TryGetPlayerIndex(int playerId, out int playerIndex)
-    {
-        for (int i = 0; i < PlayerActions.Length; i++)
-        {
-            if (PlayerActions[i].PlayerId == playerId)
-            {
-                playerIndex = i;
-                return true;
-            }
-        }
-        playerIndex = -1;
-        return false;
-    }
-
-    private void WritePlayerActionData(int playerIndex, in PlayerActionData playerActionData)
-    {
-        PlayerActions.Set(playerIndex, playerActionData);
-    }
-
-    public List<byte> GetKeyList()
-    {
-        var keyList = new List<byte>(_clientManagers.Count);
-        for (var i = 0; i < _clientManagers.Count; i++)
-        {
-            keyList.Add(_clientManagers[i].PlayerId);
-        }
-        return keyList;
-    }
-
-    public PlayerActionData GetCurrentPlayingPlayer()
-    {
-        if (!HasStateAuthority)
-        {
-            GameTraceLogger.Turn(TraceLogsEnabled, $"GetCurrentPlayingPlayer failed: no state authority.");
-            return default;
-        }
-        
-        if (TryGetCurrentPlayerActionData(out var currentPlayingPlayer))
-        {
-            return currentPlayingPlayer;
-        }
-        return default;
-    }
-
     public void ReducePlayerMaxActions(int overriddenPlayerID)
     {
         if (!HasStateAuthority)
@@ -560,6 +507,71 @@ public class TurnManager : NetworkBehaviour
             _serverGameManager.EndGame(_clientManagersByPlayerId.Keys.First());
         }
     }
+    
+    private void AdvanceTurnKeyFrom(byte startExclusive)
+    {
+        if (_gameBegun && TryGetSoleSelectablePlayerId(out var soleSelectablePlayerId))
+        {
+            CurrentTurnKey = 0;
+            GameTraceLogger.Turn(TraceLogsEnabled, $"Only one selectable player remains after game start: P{soleSelectablePlayerId}. Ending game.");
+            _serverGameManager?.EndGame(soleSelectablePlayerId);
+            return;
+        }
+
+        if (TryGetNextTurnPlayerId(startExclusive, out var nextPlayerId))
+        {
+            CurrentTurnKey = nextPlayerId;
+            return;
+        }
+
+        CurrentTurnKey = 0;
+        GameTraceLogger.Turn(TraceLogsEnabled, $"No selectable player found after key {startExclusive}. CurrentTurnKey set to 0.");
+    }
+    
+    private IReadOnlyList<PlayerActionData> GetPlayerActionsSnapshot()
+    {
+        // Builds a stable snapshot payload for initial turn-state broadcast.
+        var snapshot = new List<PlayerActionData>(_clientManagers.Count);
+        for (var i = 0; i < _clientManagers.Count; i++)
+        {
+            if (TryReadPlayerActionData(_clientManagers[i].PlayerId, out _, out var playerActionData))
+                snapshot.Add(playerActionData);
+        }
+        return snapshot;
+    }
+
+    private void WritePlayerActionData(int playerIndex, in PlayerActionData playerActionData)
+    {
+        PlayerActions.Set(playerIndex, playerActionData);
+    }
+
+    public List<byte> GetKeyList()
+    {
+        var keyList = new List<byte>(_clientManagers.Count);
+        for (var i = 0; i < _clientManagers.Count; i++)
+        {
+            keyList.Add(_clientManagers[i].PlayerId);
+        }
+        return keyList;
+    }
+
+    public PlayerActionData GetCurrentPlayingPlayer()
+    {
+        if (!HasStateAuthority)
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"GetCurrentPlayingPlayer failed: no state authority.");
+            return default;
+        }
+        
+        if (TryGetCurrentPlayerActionData(out var currentPlayingPlayer))
+        {
+            return currentPlayingPlayer;
+        }
+        return default;
+    }
+    
+    #endregion
+    
 }
 
 public enum ActionResult
