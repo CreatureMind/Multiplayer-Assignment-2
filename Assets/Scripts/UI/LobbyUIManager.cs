@@ -119,8 +119,9 @@ namespace UI
                 onCreateRoomRequested: () => roomCreationView.Show(),
                 onEnterRoomRequested: (roomName, mode, map, isPublic, roomCode) => 
                 {
+                    ShowScreen(LobbyScreen.None);
                     _roomLobbyPresenter.SetupRoomDetails(roomName, mode, map, isPublic, roomCode);
-                    ShowScreen(LobbyScreen.RoomLobby);
+                    EventBus.Raise(new ShowLoadingScreenEvent());
                 }
             );
 
