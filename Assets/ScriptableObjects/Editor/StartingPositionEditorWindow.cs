@@ -7,6 +7,8 @@ public class StartingPositionEditorWindow : EditorWindow
 {
     private const int MinGridSize = 1;
     private const int MaxGridSize = 50;
+    private const int MinPlayers = 1;
+    private const int MaxPlayers = 8;
     private const float TileMinSize = 2f;
     private const float TileMaxSize = 64f;
     private const float TileSpacing = 1f;
@@ -20,8 +22,10 @@ public class StartingPositionEditorWindow : EditorWindow
     private TileType _selectedType = TileType.Soldier;
     private byte _selectedOwner = 1;
 
+    private FieldInfo _mapNameField;
     private FieldInfo _widthField;
     private FieldInfo _heightField;
+    private FieldInfo _maxPlayersField;
     private FieldInfo _startingPositionField;
     private GUIStyle _tileStyle;
 
@@ -49,8 +53,10 @@ public class StartingPositionEditorWindow : EditorWindow
     private void OnEnable()
     {
         var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        _mapNameField = typeof(StartingPositionSO).GetField("mapName", flags);
         _widthField = typeof(StartingPositionSO).GetField("width", flags);
         _heightField = typeof(StartingPositionSO).GetField("height", flags);
+        _maxPlayersField = typeof(StartingPositionSO).GetField("maxPlayers", flags);
         _startingPositionField = typeof(StartingPositionSO).GetField("startingPosition", flags);
     }
 
@@ -86,9 +92,19 @@ public class StartingPositionEditorWindow : EditorWindow
 
     private void DrawEditorForAsset(StartingPositionSO so)
     {
+        var mapName = GetMapName(so);
+        var rawMaxPlayers = GetMaxPlayers(so);
         var width = Mathf.Clamp(GetWidth(so), MinGridSize, MaxGridSize);
         var height = Mathf.Clamp(GetHeight(so), MinGridSize, MaxGridSize);
+        var maxPlayers = Mathf.Clamp(rawMaxPlayers, MinPlayers, MaxPlayers);
         var tiles = GetTiles(so);
+
+        if (rawMaxPlayers != maxPlayers)
+        {
+            Undo.RecordObject(so, "Clamp Max Players");
+            SetMaxPlayers(so, maxPlayers);
+            EditorUtility.SetDirty(so);
+        }
 
         if (tiles == null || tiles.Length != width * height)
         {
@@ -97,11 +113,32 @@ public class StartingPositionEditorWindow : EditorWindow
             EditorUtility.SetDirty(so);
             tiles = GetTiles(so);
         }
-        else if (SanitizeOwners(tiles))
+        else if (SanitizeOwners(tiles, maxPlayers))
         {
             Undo.RecordObject(so, "Sanitize Tile Owners");
             SetTiles(so, tiles);
             EditorUtility.SetDirty(so);
+        }
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Map Settings", EditorStyles.boldLabel);
+        EditorGUI.BeginChangeCheck();
+        var newMapName = EditorGUILayout.TextField("Map Name", mapName);
+        var newMaxPlayers = EditorGUILayout.IntSlider("Max Players", maxPlayers, MinPlayers, MaxPlayers);
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(so, "Edit Map Settings");
+            SetMapName(so, newMapName);
+            SetMaxPlayers(so, newMaxPlayers);
+            _selectedOwner = (byte)Mathf.Clamp(_selectedOwner, MinPlayers, newMaxPlayers);
+
+            if (SanitizeOwners(tiles, newMaxPlayers))
+            {
+                SetTiles(so, tiles);
+            }
+
+            EditorUtility.SetDirty(so);
+            maxPlayers = newMaxPlayers;
         }
 
         EditorGUILayout.Space();
@@ -124,7 +161,7 @@ public class StartingPositionEditorWindow : EditorWindow
         _selectedType = (TileType)EditorGUILayout.EnumPopup("Tile Type", _selectedType);
         if (RequiresOwner(_selectedType))
         {
-            _selectedOwner = (byte)EditorGUILayout.IntSlider("Owner (1-4)", _selectedOwner, 1, 4);
+            _selectedOwner = (byte)EditorGUILayout.IntSlider($"Owner (1-{maxPlayers})", _selectedOwner, MinPlayers, maxPlayers);
         }
         else
         {
@@ -144,7 +181,7 @@ public class StartingPositionEditorWindow : EditorWindow
             Undo.RecordObject(so, "Clear Board");
             for (var i = 0; i < tiles.Length; i++)
             {
-                tiles[i] = BuildConstrainedTile(TileType.Empty, TileState.NoOwner, TileState.NoTerritory);
+                tiles[i] = BuildConstrainedTile(TileType.Empty, TileState.NoOwner, TileState.NoTerritory, maxPlayers);
             }
 
             SetTiles(so, tiles);
@@ -153,7 +190,7 @@ public class StartingPositionEditorWindow : EditorWindow
 
         EditorGUILayout.Space();
         var boardArea = GUILayoutUtility.GetRect(10f, 10000f, 10f, 10000f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-        DrawBoard(so, tiles, width, height, boardArea);
+        DrawBoard(so, tiles, width, height, maxPlayers, boardArea);
     }
 
     private void EnsureEditorCache()
@@ -182,6 +219,32 @@ public class StartingPositionEditorWindow : EditorWindow
         return _heightField != null ? (int)_heightField.GetValue(so) : MinGridSize;
     }
 
+    private string GetMapName(StartingPositionSO so)
+    {
+        return _mapNameField != null ? (string)_mapNameField.GetValue(so) : string.Empty;
+    }
+
+    private void SetMapName(StartingPositionSO so, string mapName)
+    {
+        if (_mapNameField != null)
+        {
+            _mapNameField.SetValue(so, mapName ?? string.Empty);
+        }
+    }
+
+    private int GetMaxPlayers(StartingPositionSO so)
+    {
+        return _maxPlayersField != null ? (int)_maxPlayersField.GetValue(so) : MinPlayers;
+    }
+
+    private void SetMaxPlayers(StartingPositionSO so, int maxPlayers)
+    {
+        if (_maxPlayersField != null)
+        {
+            _maxPlayersField.SetValue(so, Mathf.Clamp(maxPlayers, MinPlayers, MaxPlayers));
+        }
+    }
+
     private AuthoredTile[] GetTiles(StartingPositionSO so)
     {
         return _startingPositionField != null ? (AuthoredTile[])_startingPositionField.GetValue(so) : null;
@@ -196,6 +259,7 @@ public class StartingPositionEditorWindow : EditorWindow
     {
         var clampedWidth = Mathf.Clamp(newWidth, MinGridSize, MaxGridSize);
         var clampedHeight = Mathf.Clamp(newHeight, MinGridSize, MaxGridSize);
+        var maxPlayers = Mathf.Clamp(GetMaxPlayers(so), MinPlayers, MaxPlayers);
 
         var oldWidth = Mathf.Clamp(GetWidth(so), MinGridSize, MaxGridSize);
         var oldHeight = Mathf.Clamp(GetHeight(so), MinGridSize, MaxGridSize);
@@ -204,7 +268,7 @@ public class StartingPositionEditorWindow : EditorWindow
         var newTiles = new AuthoredTile[clampedWidth * clampedHeight];
         for (var i = 0; i < newTiles.Length; i++)
         {
-            newTiles[i] = BuildConstrainedTile(TileType.Empty, TileState.NoOwner, TileState.NoTerritory);
+            newTiles[i] = BuildConstrainedTile(TileType.Empty, TileState.NoOwner, TileState.NoTerritory, maxPlayers);
         }
 
         if (oldTiles != null && oldTiles.Length > 0)
@@ -220,7 +284,7 @@ public class StartingPositionEditorWindow : EditorWindow
                     {
                         var newIndex = y * clampedWidth + x;
                         var oldTile = oldTiles[oldIndex];
-                        newTiles[newIndex] = BuildConstrainedTile(oldTile.type, oldTile.ownerId, oldTile.territoryId);
+                        newTiles[newIndex] = BuildConstrainedTile(oldTile.type, oldTile.ownerId, oldTile.territoryId, maxPlayers);
                     }
                 }
             }
@@ -243,6 +307,14 @@ public class StartingPositionEditorWindow : EditorWindow
                 return new Color(0.28f, 0.77f, 0.39f);
             case 4:
                 return new Color(0.88f, 0.73f, 0.22f);
+            case 5:
+                return new Color(0.83f, 0.36f, 0.84f);
+            case 6:
+                return new Color(0.24f, 0.83f, 0.85f);
+            case 7:
+                return new Color(0.95f, 0.50f, 0.69f);
+            case 8:
+                return new Color(0.95f, 0.56f, 0.24f);
             default:
                 return _neutralColor;
         }
@@ -294,7 +366,7 @@ public class StartingPositionEditorWindow : EditorWindow
         }
     }
 
-    private void DrawBoard(StartingPositionSO so, AuthoredTile[] tiles, int width, int height, Rect boardArea)
+    private void DrawBoard(StartingPositionSO so, AuthoredTile[] tiles, int width, int height, int maxPlayers, Rect boardArea)
     {
         if (width <= 0 || height <= 0)
         {
@@ -325,7 +397,7 @@ public class StartingPositionEditorWindow : EditorWindow
                 if (GUI.Button(tileRect, GUIContent.none, GUIStyle.none))
                 {
                     Undo.RecordObject(so, "Paint Tile");
-                    tiles[index] = BuildConstrainedTile(_selectedType, _selectedOwner, tile.territoryId);
+                    tiles[index] = BuildConstrainedTile(_selectedType, _selectedOwner, tile.territoryId, maxPlayers);
                     SetTiles(so, tiles);
                     EditorUtility.SetDirty(so);
                 }
@@ -346,9 +418,10 @@ public class StartingPositionEditorWindow : EditorWindow
         return type == TileType.Soldier || type == TileType.Bomb;
     }
 
-    private static AuthoredTile BuildConstrainedTile(TileType type, byte ownerId, short previousTerritoryId)
+    private static AuthoredTile BuildConstrainedTile(TileType type, byte ownerId, short previousTerritoryId, int maxPlayers)
     {
-        var constrainedOwner = RequiresOwner(type) ? (byte)Mathf.Clamp(ownerId, 1, 4) : TileState.NoOwner;
+        var clampedMaxPlayers = Mathf.Clamp(maxPlayers, MinPlayers, MaxPlayers);
+        var constrainedOwner = RequiresOwner(type) ? (byte)Mathf.Clamp(ownerId, MinPlayers, clampedMaxPlayers) : TileState.NoOwner;
 
         if (type == TileType.Base || type == TileType.Motherload)
         {
@@ -358,13 +431,13 @@ public class StartingPositionEditorWindow : EditorWindow
         return new AuthoredTile(type, constrainedOwner, TileState.NoTerritory);
     }
 
-    private static bool SanitizeOwners(AuthoredTile[] tiles)
+    private static bool SanitizeOwners(AuthoredTile[] tiles, int maxPlayers)
     {
         var changed = false;
         for (var i = 0; i < tiles.Length; i++)
         {
             var tile = tiles[i];
-            var constrained = BuildConstrainedTile(tile.type, tile.ownerId, tile.territoryId);
+            var constrained = BuildConstrainedTile(tile.type, tile.ownerId, tile.territoryId, maxPlayers);
             if (tile.type != constrained.type || tile.ownerId != constrained.ownerId || tile.territoryId != constrained.territoryId)
             {
                 tiles[i] = constrained;

@@ -22,11 +22,13 @@ public struct AuthoredTile
 [CreateAssetMenu(fileName = "NewStartingPosition", menuName = "ScriptableObjects/StartingPositionSO", order = 1)]
 public class StartingPositionSO : ScriptableObject
 {
+    [SerializeField] private string mapName;
     [SerializeField] private int width;
     [SerializeField] private int height;
-    [SerializeField, Min(1)] private int maxPlayers = 4;
+    [SerializeField, Range(1, 8)] private int maxPlayers = 4;
     [SerializeField] private AuthoredTile[] startingPosition;
 
+    public string MapName => mapName;
     public int Width => width;
     public int Height => height;
     public int MaxPlayers => maxPlayers;
