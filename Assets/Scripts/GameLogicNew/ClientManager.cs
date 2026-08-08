@@ -72,11 +72,11 @@ public class ClientManager : NetworkBehaviour
     
     public override void Spawned()
     {
-        EventBus.Raise(new ShowLoadingScreenEvent());
-        _isLoading = true;
-        
         if (!Object.HasInputAuthority)
             return; // someone else's ClientManager (incl. the server-side instance)
+        
+        EventBus.Raise(new ShowLoadingScreenEvent());
+        _isLoading = true;
 
         var context = ClientSceneContext.Instance;
         if (!context)
@@ -215,16 +215,16 @@ public class ClientManager : NetworkBehaviour
         }
         if (!isFinalChunk)
             return;
+
+        _board.Apply(_pendingDiffs); // raises Changed once
+        _audio?.Interpret(_pendingDiffs);
+        _pendingDiffs.Clear();
         
         if (_isLoading)
         {
             _isLoading = false;
             EventBus.Raise(new HideLoadingScreenEvent());
         }
-
-        _board.Apply(_pendingDiffs); // raises Changed once
-        _audio?.Interpret(_pendingDiffs);
-        _pendingDiffs.Clear();
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
