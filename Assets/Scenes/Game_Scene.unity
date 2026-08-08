@@ -127,45 +127,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1548668606815030391, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
-      propertyPath: m_GameObjectRolesMask
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 4031289706337635485, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
-      propertyPath: reqsPrefab
-      value: 
-      objectReference: {fileID: 439060912975929690, guid: 83e0c0bb2c5f8284a8b9fe8eabbb4707, type: 3}
     - target: {fileID: 5752788252953398892, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
       propertyPath: m_Name
       value: Game_Logic_Boot_PF
-      objectReference: {fileID: 0}
-    - target: {fileID: 6077734399884440253, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6077734399884440253, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6077734399884440253, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6077734399884440253, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6077734399884440253, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6077734399884440253, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6077734399884440253, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6077734399884440253, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -179,8 +143,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1548668606815030391, guid: d2482f060017d7a46aff16c3ef6cf239, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

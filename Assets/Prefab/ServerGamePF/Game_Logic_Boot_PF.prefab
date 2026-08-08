@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6077734399884440253}
   - component: {fileID: 4031289706337635485}
-  - component: {fileID: 1548668606815030391}
   m_Layer: 0
   m_Name: Game_Logic_Boot_PF
   m_TagString: Untagged
@@ -45,16 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4bd3198c16e458dbac077b547eec4eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameLogicBoot
-  _serverGameManagerPrefab: {fileID: 4475268518373070431, guid: 3201282e8aab4c340b6e71ad520e4319, type: 3}
-  gameData: {fileID: 11400000, guid: 0a0ec13974287ab408c3e4c4720f9560, type: 2}
---- !u!1652712579 &1548668606815030391
-MultiplayerRolesData:
-  m_ObjectHideFlags: 2
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5752788252953398892}
-  m_GameObjectRolesMask: 3
-  m_ComponentsRolesMasks:
-  - m_Object: {fileID: 4031289706337635485}
-    m_RolesMask: 2
+  _pollIntervalSeconds: 0.2
+  _statusLogEverySeconds: 5
+  reqsPrefab: {fileID: 439060912975929690, guid: 83e0c0bb2c5f8284a8b9fe8eabbb4707, type: 3}

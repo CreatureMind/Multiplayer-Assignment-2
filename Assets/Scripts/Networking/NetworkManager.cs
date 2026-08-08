@@ -429,11 +429,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     #region Callbacks
 
-    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-    
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
-
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         EventBus.Raise(new PlayerLeftEvent { Player = player });
@@ -476,7 +471,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log($"Disconnected from server: {reason}");
 
         // When kicked (or otherwise server-disconnected) we need to actively return to the hub.
-        // Otherwise the client can remain "stuck" in the room UI even though transport is gone.
         if (_handlingDisconnect) return;
         if (!_networkRunnerInstance) return;
         if (runner != _networkRunnerInstance) return;
@@ -487,9 +481,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         _ = ReturnToLobbyAsync().ContinueWith(_ => _handlingDisconnect = false,
             TaskScheduler.Current);
     }
-
-    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
-
+    
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
     {
         Debug.LogWarning($"Connect failed: {reason}");
@@ -507,22 +499,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         ));
     }
 
-    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
-    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
-    public void OnInput(NetworkRunner runner, NetworkInput input) { }
-    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
-
     public void OnConnectedToServer(NetworkRunner runner)
     {
         Debug.Log("Connected to server!");
     }
-
-    // Photon lobby list is unused now; the room list comes from LobbyHubService.
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
-
-    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
     
     public void OnSceneLoadDone(NetworkRunner runner)
     {
@@ -592,8 +572,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         EventBus.Raise(new SceneLoadStartedEvent());
     }
 
-    #endregion
-
     private async void OnApplicationQuit()
     {
         try
@@ -605,4 +583,23 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             Debug.LogError(e);
         }
     }
+    
+    #endregion
+
+    #region unused callbacks
+
+    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
+    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
+    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
+    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
+    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
+    public void OnInput(NetworkRunner runner, NetworkInput input) { }
+    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+
+    #endregion
 }

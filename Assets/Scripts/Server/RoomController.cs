@@ -76,8 +76,7 @@ public class RoomController : NetworkBehaviour
         if (RoomManager.Instance)
             RoomManager.Instance.SetRoomOpen(_roomId, false);
         Runner.SessionInfo.IsOpen = false;
-
-        // Game scene selection by map is left to the game-logic pass; load the GAME scene.
+        
         Runner.LoadScene(SceneRef.FromIndex((int)SceneDefs.GAME));
     }
 

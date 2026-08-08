@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ba430f8c3302438449af57d9dcadcf0c, type: 3}
-  m_Name: Map
+  m_Name: Basic_Map
   m_EditorClassIdentifier: Assembly-CSharp::StartingPositionSO
-  mapName: 
+  mapName: Basic
   width: 32
   height: 32
   maxPlayers: 4
@@ -329,9 +329,6 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 3
-    ownerId: 4
-    territoryId: 0
   - type: 1
     ownerId: 0
     territoryId: 0
@@ -374,8 +371,11 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 3
-    ownerId: 2
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
     territoryId: 0
   - type: 1
     ownerId: 0
@@ -794,57 +794,6 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 3
-    ownerId: 4
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
   - type: 1
     ownerId: 0
     territoryId: 0
@@ -869,48 +818,6 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 3
-    ownerId: 2
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
   - type: 1
     ownerId: 0
     territoryId: 0
@@ -1199,13 +1106,13 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 5
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 5
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 5
     ownerId: 0
     territoryId: 0
   - type: 1
@@ -1220,13 +1127,13 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 5
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 5
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 5
     ownerId: 0
     territoryId: 0
   - type: 1
@@ -1295,7 +1202,7 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 5
     ownerId: 0
     territoryId: 0
   - type: 1
@@ -1322,7 +1229,7 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 5
     ownerId: 0
     territoryId: 0
   - type: 1
@@ -1391,7 +1298,7 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
+  - type: 5
     ownerId: 0
     territoryId: 0
   - type: 1
@@ -1415,207 +1322,15 @@ MonoBehaviour:
   - type: 6
     ownerId: 0
     territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 1
+  - type: 5
     ownerId: 0
     territoryId: 0
   - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
     ownerId: 0
     territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
   - type: 1
     ownerId: 0
     territoryId: 0
@@ -1683,15 +1398,6 @@ MonoBehaviour:
     ownerId: 0
     territoryId: 0
   - type: 1
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
-    ownerId: 0
-    territoryId: 0
-  - type: 6
     ownerId: 0
     territoryId: 0
   - type: 6
@@ -1790,6 +1496,150 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
   - type: 1
     ownerId: 0
     territoryId: 0
@@ -1838,6 +1688,78 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
   - type: 1
     ownerId: 0
     territoryId: 0
@@ -1856,6 +1778,60 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
+  - type: 5
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 6
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 5
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
+    territoryId: 0
   - type: 1
     ownerId: 0
     territoryId: 0
@@ -1896,6 +1872,9 @@ MonoBehaviour:
     ownerId: 0
     territoryId: 0
   - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 5
     ownerId: 0
     territoryId: 0
   - type: 1
@@ -1920,6 +1899,9 @@ MonoBehaviour:
     ownerId: 0
     territoryId: 0
   - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 5
     ownerId: 0
     territoryId: 0
   - type: 1
@@ -1986,6 +1968,15 @@ MonoBehaviour:
     ownerId: 0
     territoryId: 0
   - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 5
+    ownerId: 0
+    territoryId: 0
+  - type: 5
+    ownerId: 0
+    territoryId: 0
+  - type: 5
     ownerId: 0
     territoryId: 0
   - type: 1
@@ -1998,6 +1989,15 @@ MonoBehaviour:
     ownerId: 0
     territoryId: 0
   - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 5
+    ownerId: 0
+    territoryId: 0
+  - type: 5
+    ownerId: 0
+    territoryId: 0
+  - type: 5
     ownerId: 0
     territoryId: 0
   - type: 1
@@ -2234,8 +2234,8 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 3
-    ownerId: 1
+  - type: 1
+    ownerId: 0
     territoryId: 0
   - type: 1
     ownerId: 0
@@ -2309,8 +2309,8 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 3
-    ownerId: 3
+  - type: 1
+    ownerId: 0
     territoryId: 0
   - type: 1
     ownerId: 0
@@ -2729,9 +2729,6 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 3
-    ownerId: 1
-    territoryId: 0
   - type: 1
     ownerId: 0
     territoryId: 0
@@ -2774,8 +2771,11 @@ MonoBehaviour:
   - type: 1
     ownerId: 0
     territoryId: 0
-  - type: 3
-    ownerId: 3
+  - type: 1
+    ownerId: 0
+    territoryId: 0
+  - type: 1
+    ownerId: 0
     territoryId: 0
   - type: 1
     ownerId: 0
