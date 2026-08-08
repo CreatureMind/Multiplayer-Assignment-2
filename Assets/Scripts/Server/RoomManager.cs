@@ -191,6 +191,7 @@ public class RoomManager : MonoBehaviour
                 // out of the scene that the Single game-scene load unloads.
                 gM.transform.SetParent(null, true);
                 runner.MakeDontDestroyOnLoad(gM.gameObject);
+                gM.InstantiateMap(map);
             }
         }
 

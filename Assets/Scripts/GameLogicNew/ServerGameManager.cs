@@ -16,6 +16,7 @@ public sealed class ServerGameManager : NetworkBehaviour
     private TurnManager _turnManagerInstance;
     private TurnDiffBroadcaster _turnDiffBroadcaster;
     private List<ClientManager> _clientManagers = new();
+    private StartingPositionSO _startingPosition;
 
     private bool _boardManagerSpawned;
     private bool _TurnManagerSpawned;
@@ -183,7 +184,7 @@ public sealed class ServerGameManager : NetworkBehaviour
                 continue;
             }
 
-            clientManager.InstantiateClientManager(this, (byte)player.PlayerId, (short)data.StartingPosition.Width, (short)data.StartingPosition.Height);
+            clientManager.InstantiateClientManager(this, (byte)player.PlayerId, (short)_startingPosition.Width, (short)_startingPosition.Height);
             
             clientManager.SetTraceLoggingEnabled(TraceLogsEnabled);
             _clientManagers.Add(clientManager);
@@ -239,7 +240,7 @@ public sealed class ServerGameManager : NetworkBehaviour
 
         var keyList = _turnManagerInstance.GetKeyList();
         
-        _boardManagerInstance.InitializeBoardWithMadeMap_ServerOnly(data.StartingPosition, keyList);
+        _boardManagerInstance.InitializeBoardWithMadeMap_ServerOnly(_startingPosition, keyList);
         
         Debug.Log("Instantiated board manager...");
 
@@ -746,5 +747,10 @@ public sealed class ServerGameManager : NetworkBehaviour
         changedCells.Add(new Vector2Int(baseCoreOrigin.x + 1, baseCoreOrigin.y + 1));
         
         GameTraceLogger.Move(TraceLogsEnabled, "Added build-base core cells.");
+    }
+
+    public void InstantiateMap(string map)
+    {
+        _startingPosition = data.MapCatalog.GetMapByString(map);
     }
 }
