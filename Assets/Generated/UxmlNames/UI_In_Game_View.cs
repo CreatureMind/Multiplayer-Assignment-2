@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/In_Game_View.uxml
-// Updated: 2026-08-07 13:16 UTC
+// Updated: 2026-08-09 13:10 UTC
 
 using System.Collections.Generic;
 
@@ -14,8 +14,10 @@ public enum UI_In_Game_View
     bomb_button,
     base_button,
     ended_popup,
-    header,
     container,
+    panel,
+    header,
+    won_text,
     bottom_container,
     return_button,
 }
@@ -33,8 +35,10 @@ internal static class UI_In_Game_View_Map
             { UI_In_Game_View.bomb_button, "bomb-button" },
             { UI_In_Game_View.base_button, "base-button" },
             { UI_In_Game_View.ended_popup, "ended-popup" },
-            { UI_In_Game_View.header, "header" },
             { UI_In_Game_View.container, "container" },
+            { UI_In_Game_View.panel, "panel" },
+            { UI_In_Game_View.header, "header" },
+            { UI_In_Game_View.won_text, "won-text" },
             { UI_In_Game_View.bottom_container, "bottom-container" },
             { UI_In_Game_View.return_button, "return-button" },
         };

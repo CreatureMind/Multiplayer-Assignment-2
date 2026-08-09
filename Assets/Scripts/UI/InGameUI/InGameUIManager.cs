@@ -1,5 +1,6 @@
 using System;
 using Events;
+using Fusion;
 using UnityEngine;
 
 public class InGameUIManager : MonoBehaviour
@@ -31,15 +32,29 @@ public class InGameUIManager : MonoBehaviour
 
         _model = new InGameUIModel(_networkManager);
         _presenter = new InGameUIPresenter(_model, inGameView);
+
+        SubscribeToGlobalEvents();
     }
 
-    public void OnGameEnded()
+    private void SubscribeToGlobalEvents()
     {
-        _model?.NotifyGameEnded();
+        EventBus.Subscribe<MatchEndedEvent>(OnGameEnded);
+    }
+    
+    private void UnsubscribeGlobalEvents()
+    {
+        EventBus.Unsubscribe<MatchEndedEvent>(OnGameEnded);
+    }
+
+    private void OnGameEnded(MatchEndedEvent e)
+    {
+        _model?.NotifyGameEnded(e.PlayerRef);
     }
 
     private void OnDestroy()
     {
+        UnsubscribeGlobalEvents();
+        
         _presenter?.UnsubscribeFromEvents();
     }
 }

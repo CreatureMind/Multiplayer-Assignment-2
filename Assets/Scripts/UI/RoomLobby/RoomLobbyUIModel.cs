@@ -58,9 +58,9 @@ namespace UI.RoomLobby
             GetManager()?.KickPlayer(playerRef);
         }
 
-        public void StartMatch(string modeName, string mapName)
+        public void StartMatch()
         {
-            GetManager()?.StartMatch(modeName, mapName);
+            GetManager()?.StartMatch();
         }
     }
 }

@@ -1,3 +1,4 @@
+using Fusion;
 using UnityEngine;
 
 public class InGameUIPresenter
@@ -34,5 +35,5 @@ public class InGameUIPresenter
         _model.ReturnToLobby();
     }
 
-    private void HandleGameEnded() => _view.ShowEndGamePopup();
+    private void HandleGameEnded(string wonText) => _view.ShowEndGamePopup(wonText);
 }

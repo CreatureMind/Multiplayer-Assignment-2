@@ -12,8 +12,6 @@ namespace UI.RoomLobby
         private readonly RoomLobbyUIView _view;
 
         private readonly string _currentLobbyId;
-        private string          _modeName;
-        private string          _mapName;
 
         public RoomLobbyUIPresenter(RoomLobbyUIModel model, RoomLobbyUIView view, string currentLobbyId)
         {
@@ -54,8 +52,6 @@ namespace UI.RoomLobby
 
         public void SetupRoomDetails(string roomName, string modeName, string mapName, bool isPublic, string code)
         {
-            _modeName = modeName;
-            _mapName = mapName;
             _view.SetHeader(roomName, modeName, mapName);
             _view.SetCodeLabel(isPublic, code);
             RefreshRoomState();
@@ -134,7 +130,7 @@ namespace UI.RoomLobby
 
         private void HandleStartClicked()
         {
-            _model.StartMatch(_modeName, _mapName);
+            _model.StartMatch();
         }
 
         private void HandleKickClicked(PlayerRef playerRef)

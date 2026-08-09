@@ -1,4 +1,5 @@
 using System;
+using Fusion;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -14,6 +15,7 @@ public class InGameUIView : MonoBehaviour
     private VisualElement _root;
 
     private VisualElement _endGamePopup;
+    private Label         _wonText;
     private VisualElement _uiContainer;
     private Button        _leaveGameButton;
     private Button        _returnToLobbyButton;
@@ -39,6 +41,7 @@ public class InGameUIView : MonoBehaviour
         _root = document.rootVisualElement;
 
         _endGamePopup        = _root.Q<VisualElement>(UI_In_Game_View.ended_popup);
+        _wonText             = _root.Q<Label>        (UI_In_Game_View.won_text);
         _uiContainer         = _root.Q<VisualElement>(UI_In_Game_View.ui_container);
         _leaveGameButton     = _root.Q<Button>       (UI_In_Game_View.leave_button);
         _returnToLobbyButton = _root.Q<Button>       (UI_In_Game_View.return_button);
@@ -78,17 +81,12 @@ public class InGameUIView : MonoBehaviour
         }
     }
 
-    public void ShowEndGamePopup()
+    public void ShowEndGamePopup(string wonText)
     {
-        if (_endGamePopup != null)
-        {
-            _endGamePopup.ToggleInClassList("hidden");
-        }
+        _endGamePopup?.ToggleInClassList("hidden");
+        _uiContainer?.ToggleInClassList("hidden");
 
-        if (_uiContainer != null)
-        {
-            _uiContainer.ToggleInClassList("hidden");
-        }
+        _wonText.text = wonText;
     }
     
     public void Show()
