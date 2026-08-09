@@ -576,6 +576,15 @@ public sealed class ServerGameManager : NetworkBehaviour
         }
 
         GameTraceLogger.Move(TraceLogsEnabled, $"Game ended for winner P{requestPlayerId}.");
+
+        foreach (var pRef in Runner.ActivePlayers)
+        {
+            if (pRef.PlayerId != requestPlayerId) continue;
+            
+            GameTraceLogger.Move(TraceLogsEnabled, $"Sending game end to winner P{requestPlayerId}.");
+            EventBus.Raise(new MatchEndedEvent { PlayerRef = pRef });
+            break;
+        }
     }
 
     private void BroadcastTurnChanges(in MoveRequestContext request, MoveChangeSet changeSet)
