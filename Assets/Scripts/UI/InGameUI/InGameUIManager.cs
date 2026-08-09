@@ -6,6 +6,8 @@ using UnityEngine;
 public class InGameUIManager : MonoBehaviour
 {
     [SerializeField] private InGameUIView inGameView;
+    
+    public event Action<PlayerRef> OnMatchEnded;
 
     private InGameUIModel     _model;
     private InGameUIPresenter _presenter;
@@ -38,17 +40,17 @@ public class InGameUIManager : MonoBehaviour
 
     private void SubscribeToGlobalEvents()
     {
-        EventBus.Subscribe<MatchEndedEvent>(OnGameEnded);
+        OnMatchEnded += HandleGameEnded;
     }
     
     private void UnsubscribeGlobalEvents()
     {
-        EventBus.Unsubscribe<MatchEndedEvent>(OnGameEnded);
+        OnMatchEnded -= HandleGameEnded;
     }
 
-    private void OnGameEnded(MatchEndedEvent e)
+    private void HandleGameEnded(PlayerRef player)
     {
-        _model?.NotifyGameEnded(e.PlayerRef);
+        _model?.NotifyGameEnded(player);
     }
 
     private void OnDestroy()
