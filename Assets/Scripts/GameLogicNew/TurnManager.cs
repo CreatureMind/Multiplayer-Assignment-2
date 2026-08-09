@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class TurnManager : NetworkBehaviour
 {
-    public static TurnManager Instance;
     ServerGameManager _serverGameManager;
     [Networked] public NetworkBool TraceLogsEnabled { get; private set; }
     private TurnStatsSO _turnStats;
@@ -55,14 +54,6 @@ public class TurnManager : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (Instance && Instance != this)
-        {
-            Runner.Despawn(Object);
-            return;
-        }
-
-        Instance = this;
-        
         EventBus.Subscribe<PlayerLeftEvent>(OnPlayerLeft);
     }
     

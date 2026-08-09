@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class BoardManager : NetworkBehaviour
 {
-    public static BoardManager Instance { get; private set; }
-
     public const int MaxBoardTiles = 2500; // 50^2
 
     private int boardWidth = 8;
@@ -83,24 +81,6 @@ public class BoardManager : NetworkBehaviour
     #endregion
 
     #region Life Time Methods
-
-    public override void Spawned()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Runner.Despawn(Object);
-            return;
-        }
-
-        Instance = this;
-    }
-
-
-    public override void Despawned(NetworkRunner runner, bool hasState)
-    {
-        if (Instance == this)
-            Instance = null;
-    }
 
     public void SetTraceLoggingEnabled(NetworkBool enabled)
     {
