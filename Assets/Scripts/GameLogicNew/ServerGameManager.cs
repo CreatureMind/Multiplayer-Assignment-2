@@ -7,8 +7,6 @@ using UnityEngine;
 
 public sealed class ServerGameManager : NetworkBehaviour
 {
-    public static ServerGameManager Instance { get; private set; }
-
     [SerializeField] private GameDataSO data;
     [SerializeField] private bool _traceLogsEnabledAtStart = true;
     private BoardManager _boardManagerInstance;
@@ -19,26 +17,12 @@ public sealed class ServerGameManager : NetworkBehaviour
     private StartingPositionSO _startingPosition;
 
     private bool _boardManagerSpawned;
-    private bool _TurnManagerSpawned;
-    private bool _ClientManagerSpawned;
+    private bool _turnManagerSpawned;
+    private bool _clientManagerSpawned;
     private NetworkBool _initRequested;
     [Networked] public NetworkBool TraceLogsEnabled { get; private set; }
     private int _currentPlayerCount;
-
-    public override void Spawned()
-    {
-        if (Instance && Instance != this)
-            return;
-
-        Instance = this;
-    }
-
-    public override void Despawned(NetworkRunner runner, bool hasState)
-    {
-        if (Instance == this)
-            Instance = null;
-    }
-
+    
     public override void FixedUpdateNetwork()
     {
         if (!HasStateAuthority)
@@ -111,7 +95,7 @@ public sealed class ServerGameManager : NetworkBehaviour
             return;
         }
         
-        if (!_ClientManagerSpawned)
+        if (!_clientManagerSpawned)
         {
             Debug.LogWarning("ClientManagers have not been spawned yet. Cannot spawn TurnManager.");
             return;
@@ -138,7 +122,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         _turnDiffBroadcaster = new TurnDiffBroadcaster(_turnManagerInstance, _clientManagers);
         _turnManagerInstance.SetTraceLoggingEnabled(TraceLogsEnabled);
         _turnManagerInstance.InstantiateTurnManager(this, _clientManagers, data.TurnStats, _turnDiffBroadcaster);
-        _TurnManagerSpawned = true;
+        _turnManagerSpawned = true;
         
         Debug.Log("Successfully spawned turn manager.");
     }
@@ -195,7 +179,7 @@ public sealed class ServerGameManager : NetworkBehaviour
         if (_clientManagers.Count != _currentPlayerCount) throw new InvalidOperationException(
             $"Mismatch in spawned client managers ({_clientManagers.Count}) and expected player count ({_currentPlayerCount}).");
         
-        _ClientManagerSpawned = true;
+        _clientManagerSpawned = true;
         
         Debug.Log("Successfully spawned all client managers.");
         
@@ -218,7 +202,7 @@ public sealed class ServerGameManager : NetworkBehaviour
             return;
         }
         
-        while (!_turnManagerInstance || !_TurnManagerSpawned)
+        while (!_turnManagerInstance || !_turnManagerSpawned)
         {
             await Task.Yield();
         }
