@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -6,7 +7,7 @@ using Utils;
 
 public class InGameUIModel
 {
-    public event Action OnGameEnded;
+    public event Action<string> OnGameEnded;
     
     private NetworkManager _networkManager;
     
@@ -31,8 +32,17 @@ public class InGameUIModel
         }
     }
 
-    public void NotifyGameEnded()
+    public void NotifyGameEnded(PlayerRef player)
     {
-        OnGameEnded?.Invoke();
+        var isLocalPlayer = _networkManager.IsLocalPlayer(player);
+        var playersData = _networkManager.GetPlayerDataMap();
+
+        var winingPlayerName = playersData.Where(playerData => playerData.Key == player)
+            .Select(playerData => playerData.Value.DisplayName.ToString())
+            .FirstOrDefault();
+
+        var wonText = isLocalPlayer ? "Congratz, You won! :D" : $"You lost! :'( {winingPlayerName} Won!";
+        
+        OnGameEnded?.Invoke(wonText);
     }
 }

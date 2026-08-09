@@ -143,7 +143,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         RoomController.Instance.Rpc_RequestKick(player, LocalPlayer);
     }
 
-    public void StartMatch(string modeName, string mapName)
+    public void StartMatch()
     {
         if (!IsRoomOwner() || !RoomController.Instance) return;
         RoomController.Instance.Rpc_RequestStartMatch(LocalPlayer);

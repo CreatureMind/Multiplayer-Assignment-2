@@ -10,14 +10,16 @@
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="ended-popup" class="hidden" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.2);">
-        <ui:Label text="Game Ended" name="header" class="header" style="translate: 0 200px;"/>
-        <ui:VisualElement name="container" style="background-color: rgb(128, 128, 128); margin-top: 200px; margin-right: 400px; margin-bottom: 400px; margin-left: 400px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; flex-direction: column; align-items: stretch; align-content: auto; justify-content: flex-start; height: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;">
-            <ui:VisualElement style="flex-grow: 1; margin-left: 100px; margin-right: 100px; margin-top: 50px; margin-bottom: 50px;">
-                <ui:Label text="The Master Clinet has decided to end the game, thank you for playing!" class="lable Lable" style="white-space: normal;"/>
+        <ui:VisualElement name="container" class="overlay-container" style="margin-top: 0; margin-right: 400px; margin-bottom: 0; margin-left: 400px; flex-direction: column; align-items: stretch; align-content: auto; justify-content: center; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+            <ui:VisualElement name="panel" picking-mode="Ignore" style="flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; background-color: rgb(60, 60, 60); padding-top: 60px; padding-right: 60px; padding-bottom: 45px; padding-left: 60px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(128, 128, 128); border-right-color: rgb(128, 128, 128); border-top-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128);">
+                <GradientBox name="" end-color="rgba(0, 0, 0, 0.5)" start-color="rgba(0, 0, 0, 0)" style="width: 100%; height: 104px; position: absolute; top: -105px; align-self: center;"/>
+                <ui:Label text="Game Ended" name="header" class="header" style="position: absolute; align-self: center; top: -105px;"/>
+                <ui:Label text="Player XXX Won / You Won! " selectable="true" focusable="true" name="won-text" class="Lable" style="color: rgb(255, 255, 255); -unity-text-align: middle-center;"/>
+                <ui:Label text="&#10;Thank you for playing! " selectable="true" focusable="true" name="" class="Lable" style="color: rgb(255, 255, 255); -unity-text-align: middle-center;"/>
             </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="bottom-container" style="flex-grow: 1; position: absolute; top: auto; left: 400px; right: 400px; bottom: 0; flex-direction: row; height: 400px; justify-content: space-between; align-items: flex-start; padding-top: 5px;">
-            <ui:Button text="Return to the lobby" name="return-button" style="align-items: auto; align-self: auto; font-size: 32px;"/>
+            <ui:VisualElement name="bottom-container" style="flex-direction: row; justify-content: space-between; align-items: flex-start;">
+                <ui:Button text="Return to the lobby" name="return-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

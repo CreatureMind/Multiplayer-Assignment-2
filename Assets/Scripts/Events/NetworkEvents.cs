@@ -46,6 +46,11 @@ namespace Events
     
     public struct MatchStartedEvent { }
 
+    public struct MatchEndedEvent
+    {
+        public PlayerRef PlayerRef;
+    }
+
     public struct GameSceneLoadedEvent { }
 
     public struct SceneLoadStartedEvent { }
