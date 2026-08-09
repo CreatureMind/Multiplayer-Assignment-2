@@ -566,7 +566,7 @@ public sealed class ServerGameManager : NetworkBehaviour
             if (pRef.PlayerId != requestPlayerId) continue;
             
             GameTraceLogger.Move(TraceLogsEnabled, $"Sending game end to winner P{requestPlayerId}.");
-            EventBus.Raise(new MatchEndedEvent { PlayerRef = pRef });
+            NetworkManager.Instance?.InGameUIInstance?.OnMatchEnded?.Invoke(pRef);
             break;
         }
     }
