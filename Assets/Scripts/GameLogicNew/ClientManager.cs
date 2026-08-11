@@ -230,6 +230,13 @@ public class ClientManager : NetworkBehaviour
             _initialBoardApplied = true;
             _board.Apply(_pendingDiffs);
             _pendingDiffs.Clear();
+            
+            if (_isLoading)
+            {
+                _isLoading = false;
+                EventBus.Raise(new HideLoadingScreenEvent());
+                Debug.Log("[ClientManager] Initial board applied, hiding loading screen.");
+            }
             return;
         }
 
@@ -238,12 +245,7 @@ public class ClientManager : NetworkBehaviour
         _board.Apply(_pendingDiffs); // raises Changed once
         _pendingDiffs.Clear();
         
-        if (_isLoading)
-        {
-            _isLoading = false;
-            EventBus.Raise(new HideLoadingScreenEvent());
-            Debug.Log("[ClientManager] Initial board applied, hiding loading screen.");
-        }
+        
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
