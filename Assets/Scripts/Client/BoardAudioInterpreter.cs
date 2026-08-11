@@ -20,12 +20,9 @@ public sealed class BoardAudioInterpreter
 
     public void Interpret(IReadOnlyList<CellDiff> diffs)
     {
-        Debug.Log("[AUDIO] Trying to interpret diffs...");
+        Debug.Log($"[AUDIO] Trying to interpret {diffs.Count} diffs...");
         if (diffs == null || diffs.Count == 0)
-        {
-            Debug.Log("[AUDIO] No diffs");
             return;
-        }
 
         bool explosion = false, placed = false, iAte = false, iWasEaten = false, iBuiltBase = false, iCapturedBase = false, myBaseCaptured = false;
 
@@ -38,10 +35,10 @@ public sealed class BoardAudioInterpreter
             }
             
             if (!_board.TryGet(diff.Cell, out var oldView))
+            {
+                Debug.Log("[AUDIO] No oldView");
                 continue;
-            
-            if (oldView.VisualType == TileType.None)
-                continue;
+            }
 
             var newView = diff.ToView();
             var old = oldView.VisualType;
