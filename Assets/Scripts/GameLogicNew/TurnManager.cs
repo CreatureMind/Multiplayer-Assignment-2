@@ -158,10 +158,23 @@ public class TurnManager : NetworkBehaviour
         }
     }
 
+    public bool IsPlayerTurnEnded(int playerId)
+    {
+        if (!TryReadPlayerActionData(playerId, out _, out var playerActionData))
+        {
+            GameTraceLogger.Turn(TraceLogsEnabled, $"IsPlayerTurnEnded fallback=true: player {playerId} not found.");
+            return true;
+        }
+
+        var turnEnded = playerActionData.TurnEnded();
+        GameTraceLogger.Turn(TraceLogsEnabled, $"IsPlayerTurnEnded player={playerId}, current={playerActionData.CurrentActionAmount}, max={playerActionData.MaxActionAmountPerTurn}, result={turnEnded}.");
+        return turnEnded;
+    }
+
     private bool CanPlayerBuildBase(int playerId)
     {
         if (TryReadPlayerActionData(playerId, out _, out var playerActionData))
-            return playerActionData.HasEnoughToBuildBase();
+            return playerActionData.HasEnoughToBuildBase(_turnStats.PawnActionPrice);
 
         GameTraceLogger.Turn(TraceLogsEnabled, $"CanPlayerBuildBase failed: player {playerId} not found.");
         return false;

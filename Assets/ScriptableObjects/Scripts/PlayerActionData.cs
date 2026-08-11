@@ -32,9 +32,9 @@ public struct PlayerActionData : INetworkStruct
             CurrentActionAmount = 0;
     }
     
-    public bool HasEnoughToBuildBase() // needs to be changed if any other base building conditions are wanted
+    public bool HasEnoughToBuildBase(int priceOfPawn) // needs to be changed if any other base building conditions are wanted
     {
-        return CurrentActionAmount == MaxActionAmountPerTurn;
+        return CurrentActionAmount >= priceOfPawn;
     }
     
     public bool HasEnoughToPlaceBomb(int priceOfBomb)
