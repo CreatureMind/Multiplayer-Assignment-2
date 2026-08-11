@@ -80,9 +80,7 @@ public class ClientManager : NetworkBehaviour
     {
         if (!Object.HasInputAuthority)
             return; // someone else's ClientManager (incl. the server-side instance)
-        
-        EventBus.Raise(new ShowLoadingScreenEvent());
-        _isLoading = true;
+
 
         var context = ClientSceneContext.Instance;
         if (!context)
@@ -162,6 +160,10 @@ public class ClientManager : NetworkBehaviour
             return;
         }
         
+        EventBus.Raise(new ShowLoadingScreenEvent());
+        _isLoading = true;
+        Debug.Log("[ClientManager] Spawned loading screen.");
+        
         _mapper = new BoardCoordinateMapper(context.Grid, context.BoardCamera, context.BoardOriginCell, width, height);
         _board = new ClientBoardCache(width, height);
         _audio = new BoardAudioInterpreter(_board, playerId);
@@ -240,6 +242,7 @@ public class ClientManager : NetworkBehaviour
         {
             _isLoading = false;
             EventBus.Raise(new HideLoadingScreenEvent());
+            Debug.Log("[ClientManager] Initial board applied, hiding loading screen.");
         }
     }
     
