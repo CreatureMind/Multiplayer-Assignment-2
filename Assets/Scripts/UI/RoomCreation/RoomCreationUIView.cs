@@ -80,11 +80,12 @@ namespace UI.RoomCreation
         public void ResetView()
         {
             SetCreateButtonEnabled(true);
-            _roomNameField.value = string.Empty;
+            
+            _roomNameField.value    = string.Empty;
             _maxPlayersSlider.value = maxPlayersMinValue;
-            _mapsDropdown.index = 0;
-            _modesDropdown.index = 0;
-            _publicToggle.value = true;
+            _mapsDropdown.index     = 0;
+            _modesDropdown.index    = 0;
+            _publicToggle.value     = true;
         }
     }
 }

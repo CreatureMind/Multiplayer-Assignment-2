@@ -50,6 +50,7 @@ public class InGameUIManager : MonoBehaviour
 
     private void HandleGameEnded(PlayerRef player)
     {
+        Debug.LogWarning("[InGameUIManager] Received game ended event.");
         _model?.NotifyGameEnded(player);
     }
 

@@ -566,7 +566,23 @@ public sealed class ServerGameManager : NetworkBehaviour
             if (pRef.PlayerId != requestPlayerId) continue;
             
             GameTraceLogger.Move(TraceLogsEnabled, $"Sending game end to winner P{requestPlayerId}.");
-            NetworkManager.Instance?.InGameUIInstance?.OnMatchEnded?.Invoke(pRef);
+            
+            if (NetworkManager.Instance)
+            {
+                if (NetworkManager.Instance.InGameUIInstance)
+                {
+                    NetworkManager.Instance.InGameUIInstance?.OnMatchEnded?.Invoke(pRef);
+                }
+                else
+                {
+                    Debug.LogError("In game ui instance is null");
+                }
+            }
+            else
+            {
+                Debug.LogError("Network manager is null");
+            }
+            
             break;
         }
     }
