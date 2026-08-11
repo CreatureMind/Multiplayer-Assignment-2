@@ -226,7 +226,7 @@ public class ClientManager : NetworkBehaviour
             return;
 
         _board.Apply(_pendingDiffs); // raises Changed once
-        _audio?.Interpret(_pendingDiffs);
+        _audio.Interpret(_pendingDiffs);
         _pendingDiffs.Clear();
     }
     
