@@ -46,8 +46,6 @@ public class ClientManager : NetworkBehaviour
     
     // Diffs accumulate until the final chunk, so a multi-chunk blast is ONE cache update + recompute.
     private readonly List<CellDiff> _pendingDiffs = new(MaxDiffsPerRpc);
-
-    private bool _isLoading = false;
     
     // Server-side setup, called by ServerGameManager right after spawn.
     public void InstantiateClientManager(ServerGameManager server, byte playerId, short  width, short height)
@@ -79,10 +77,6 @@ public class ClientManager : NetworkBehaviour
         if (!Object.HasInputAuthority)
             return; // someone else's ClientManager (incl. the server-side instance)
         
-        NetworkManager.Instance.InGameUIInstance?.ShowLoadingPanel();
-        Debug.Log("ClientManager: showing loading screen.");
-        _isLoading = true;
-
         var context = ClientSceneContext.Instance;
         if (!context)
         {
@@ -223,13 +217,6 @@ public class ClientManager : NetworkBehaviour
         _board.Apply(_pendingDiffs); // raises Changed once
         _audio?.Interpret(_pendingDiffs);
         _pendingDiffs.Clear();
-        
-        if (_isLoading)
-        {
-            Debug.Log("ClientManager: finished loading board diffs, hiding loading screen.");
-            _isLoading = false;
-            NetworkManager.Instance.InGameUIInstance?.HideLoadingPanel();
-        }
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
