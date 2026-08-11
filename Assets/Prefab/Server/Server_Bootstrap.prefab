@@ -52,8 +52,8 @@ MonoBehaviour:
   serverGameManagerPrefab: {fileID: 4475268518373070431, guid: 3201282e8aab4c340b6e71ad520e4319, type: 3}
   hubLobbyName: TinySoldiersLobby
   maxRooms: 5
-  absoluteMaxPlayersPerRoom: 4
-  absoluteMinPlayersPerRoom: 2
+  absoluteMaxPlayersPerRoom: 5
+  absoluteMinPlayersPerRoom: 3
 --- !u!114 &7190952270355023835
 MonoBehaviour:
   m_ObjectHideFlags: 0
