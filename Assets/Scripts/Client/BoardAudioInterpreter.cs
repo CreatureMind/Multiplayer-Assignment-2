@@ -21,7 +21,8 @@ public sealed class BoardAudioInterpreter
     public void Interpret(IReadOnlyList<CellDiff> diffs)
     {
         Debug.Log($"[AUDIO] Trying to interpret {diffs.Count} diffs...");
-        if (diffs == null || diffs.Count == 0)
+        
+        if (diffs.Count == 0)
             return;
 
         bool explosion = false, placed = false, iAte = false, iWasEaten = false, iBuiltBase = false, iCapturedBase = false, myBaseCaptured = false;
@@ -122,8 +123,5 @@ public sealed class BoardAudioInterpreter
     }
 
     private static void Raise(SoundEffectEnum sound)
-    {
-        Debug.LogError($"Played sound with type {sound.ToString()}");
-        EventBus.Raise(new Events.PlaySoundEvent { SoundName = sound });
-    }
+        => EventBus.Raise(new Events.PlaySoundEvent { SoundName = sound });
 }
