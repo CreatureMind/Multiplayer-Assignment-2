@@ -225,8 +225,8 @@ public class ClientManager : NetworkBehaviour
         if (!isFinalChunk)
             return;
 
-        _board.Apply(_pendingDiffs); // raises Changed once
         _audio.Interpret(_pendingDiffs);
+        _board.Apply(_pendingDiffs); // raises Changed once
         _pendingDiffs.Clear();
     }
     
