@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public sealed class BoardAudioInterpreter
 {
@@ -79,7 +80,10 @@ public sealed class BoardAudioInterpreter
         if (wantsSpawn && !(_suppressSpawnOnMajorEvent && major))
             Raise(SoundEffectEnum.PAWN_SPAWN);
     }
-    
+
     private static void Raise(SoundEffectEnum sound)
-        => EventBus.Raise(new Events.PlaySoundEvent { SoundName = sound });
+    {
+        Debug.LogError($"Played sound with type {sound.ToString()}");
+        EventBus.Raise(new Events.PlaySoundEvent { SoundName = sound });
+    }
 }

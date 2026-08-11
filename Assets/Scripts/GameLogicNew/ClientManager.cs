@@ -314,6 +314,11 @@ public class ClientManager : NetworkBehaviour
         _bufferedRemainingBudget = upcomingPlayer.CurrentActionAmount;
         _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
         
+        foreach (var kvp in NetworkManager.Instance.GetPlayerDataMap().Where(kvp => upcomingPlayer.PlayerId == kvp.Key.PlayerId))
+        {
+            OnPlayerTurnChanged.Invoke(kvp.Value.DisplayName.ToString());
+        }
+        
         RaiseLocalTurnState();
     }
     #endregion
