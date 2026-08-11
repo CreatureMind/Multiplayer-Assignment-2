@@ -78,6 +78,10 @@ public class ClientManager : NetworkBehaviour
     {
         if (!Object.HasInputAuthority)
             return; // someone else's ClientManager (incl. the server-side instance)
+        
+        NetworkManager.Instance.InGameUIInstance?.ShowLoadingPanel();
+        Debug.Log("ClientManager: showing loading screen.");
+        _isLoading = true;
 
         var context = ClientSceneContext.Instance;
         if (!context)
@@ -157,10 +161,6 @@ public class ClientManager : NetworkBehaviour
             return;
         }
         
-        EventBus.Raise(new WaitingForFullBoard());
-        Debug.Log("ClientManager: showing loading screen.");
-        _isLoading = true;
-        
         _mapper = new BoardCoordinateMapper(context.Grid, context.BoardCamera, context.BoardOriginCell, width, height);
         _board = new ClientBoardCache(width, height);
         _audio = new BoardAudioInterpreter(_board, playerId);
@@ -227,8 +227,8 @@ public class ClientManager : NetworkBehaviour
         if (_isLoading)
         {
             Debug.Log("ClientManager: finished loading board diffs, hiding loading screen.");
-            EventBus.Raise(new FullBoardReady());
             _isLoading = false;
+            NetworkManager.Instance.InGameUIInstance?.HideLoadingPanel();
         }
     }
     

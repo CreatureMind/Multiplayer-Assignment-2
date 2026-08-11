@@ -27,10 +27,6 @@ namespace Events
 
     public struct HideLoadingScreenEvent { }
     
-    public struct WaitingForFullBoard { }
-    
-    public struct FullBoardReady { }
-    
     public struct PlayerListChangedEvent { }
 
     public struct PlayerLeftEvent
