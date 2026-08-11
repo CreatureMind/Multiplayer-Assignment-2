@@ -565,24 +565,12 @@ public sealed class ServerGameManager : NetworkBehaviour
         {
             if (pRef.PlayerId != requestPlayerId) continue;
             
-            GameTraceLogger.Move(TraceLogsEnabled, $"Sending game end to winner P{requestPlayerId}.");
-            
-            if (NetworkManager.Instance)
+            GameTraceLogger.Move(TraceLogsEnabled, $"Sending game end to all players P{requestPlayerId}.");
+
+            foreach (var client in _clientManagers)
             {
-                if (NetworkManager.Instance.InGameUIInstance)
-                {
-                    NetworkManager.Instance.InGameUIInstance?.OnMatchEnded?.Invoke(pRef);
-                }
-                else
-                {
-                    Debug.LogError("In game ui instance is null");
-                }
+                client.RPC_EndGame(pRef);
             }
-            else
-            {
-                Debug.LogError("Network manager is null");
-            }
-            
             break;
         }
     }

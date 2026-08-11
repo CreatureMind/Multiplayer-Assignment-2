@@ -225,8 +225,6 @@ public class ClientManager : NetworkBehaviour
         _board.Apply(_pendingDiffs); // raises Changed once
         _audio?.Interpret(_pendingDiffs);
         _pendingDiffs.Clear();
-        
-        
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
@@ -308,6 +306,21 @@ public class ClientManager : NetworkBehaviour
         
         RaiseLocalTurnState();
     }
+    
+    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
+    public void RPC_EndGame(PlayerRef winner)
+    {
+        GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_EndGame for {name} winner={winner}.");
+
+        if (!HasInputAuthority)
+        {
+            Debug.LogWarning("[ClientManager] RPC_EndGame on a non-input-authority peer.");
+            return;
+        }
+        
+        NetworkManager.Instance.InGameUIInstance?.OnMatchEnded?.Invoke(winner);
+    }
+    
     #endregion
 
     private void OnRequestSubmitted(MoveRequest request)
