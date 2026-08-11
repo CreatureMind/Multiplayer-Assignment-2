@@ -10,14 +10,14 @@ GameObject:
   m_Component:
   - component: {fileID: 5118730744084996241}
   - component: {fileID: 3972294438330136940}
-  - component: {fileID: 2743837903586713642}
+  - component: {fileID: 132345217198534443}
   m_Layer: 0
   m_Name: Loading_UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5118730744084996241
 Transform:
   m_ObjectHideFlags: 0
@@ -56,7 +56,7 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
---- !u!114 &2743837903586713642
+--- !u!114 &132345217198534443
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -65,6 +65,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 7259980683239559684}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 926d81beb92b41b183cd33fe1492d67a, type: 3}
+  m_Script: {fileID: 11500000, guid: 292a83a2da2d461e952b76f9d3b030b6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UI.Loading.LoadingUIView
+  m_EditorClassIdentifier: Assembly-CSharp::UI.Loading.LoadingUIPresenter

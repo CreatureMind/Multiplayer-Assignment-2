@@ -57,8 +57,7 @@ namespace UI
         private ChatUIController _chatViewInstance;
         
         //Loading
-        private static LoadingUIView      _loadingViewInstance;
-        private static LoadingUIPresenter _loadingPresenter;
+        private static LoadingUIView _loadingViewInstance;
 
         private void Start()
         {
@@ -257,8 +256,6 @@ namespace UI
             _loadingViewInstance = Instantiate(loadingViewPrefab);
             _loadingViewInstance.gameObject.SetActive(true);
             
-            var loadingModel = new LoadingUIModel();
-            _loadingPresenter = new LoadingUIPresenter(loadingModel, _loadingViewInstance);
             DontDestroyOnLoad(_loadingViewInstance);
         }
 
@@ -272,7 +269,6 @@ namespace UI
             _roomsListPresenter?.   UnsubscribeFromEvents();
             _roomCreationPresenter?.UnsubscribeFromEvents();
             _roomLobbyPresenter?.   UnsubscribeFromEvents();
-            _loadingPresenter?.     UnsubscribeFromEvents();
             _roomJoinPresenter?.    UnsubscribeFromEvents();
             _creditsPresenter?.     UnsubscribeFromEvents();
             _dialogPresenter?.      UnsubscribeFromEvents();

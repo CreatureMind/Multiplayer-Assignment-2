@@ -4,7 +4,6 @@ using UnityEngine.UIElements;
 
 namespace UI.Loading
 {
-    [RequireComponent(typeof(UIDocument))]
     public class LoadingUIView : MonoBehaviour
     {
         private UIDocument    _document;
