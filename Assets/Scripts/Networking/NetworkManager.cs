@@ -24,7 +24,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     
     public ChatNetworkManager ChatNetworkManager { get; private set; }
 
-    private const int MIN_PLAYERS_TO_START = 1;
+    private const int MIN_PLAYERS_TO_START = 2;
 
     private NetworkRunner _networkRunnerInstance;
     private bool _handlingDisconnect;
@@ -156,8 +156,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public bool AreAllPlayersReady() =>
         _playerDataMap.Count >= MIN_PLAYERS_TO_START && _playerDataMap.Values.All(IsReadyAndValid);
-
-    public int GetReadyPlayerCount() => _playerDataMap.Values.Count(IsReadyAndValid);
 
     public void SetLocalPlayerReady(bool isReady)
     {
