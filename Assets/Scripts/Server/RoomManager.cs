@@ -22,9 +22,9 @@ public class RoomManager : MonoBehaviour
     [SerializeField] private ServerGameManager serverGameManagerPrefab;
 
     [SerializeField] private string hubLobbyName = "TinySoldiersLobby";
-    [SerializeField] private int maxRooms = 5;
-    [SerializeField] private int absoluteMaxPlayersPerRoom = 4;
-    [SerializeField] private int absoluteMinPlayersPerRoom = 2;
+    [SerializeField] private int maxRooms = 10;
+    [SerializeField] private int absoluteMaxPlayersPerRoom = 5;
+    [SerializeField] private int absoluteMinPlayersPerRoom = 3;
 
     private const string DisplayNameProp = "DisplayName";
     private const string ModeNameProp = "ModeName";

@@ -628,9 +628,9 @@ MonoBehaviour:
   hoverTilemap: {fileID: 4300846326785381476}
   hoverFadeSeconds: 0.25
   catalog: {fileID: 11400000, guid: 294ebf722b4548d439f233de8e663e89, type: 2}
-  overlayTile: {fileID: 11400000, guid: a3d299c10bcc8bc43ad8aac265dc6e84, type: 2}
+  overlayTile: {fileID: 11400000, guid: 52b6cdee193a1834c87154c8b66869ca, type: 2}
   highlightColor: {r: 1, g: 1, b: 1, a: 0.35}
-  hoverColor: {r: 1, g: 0.95, b: 0.4, a: 0.5}
+  hoverColor: {r: 0.67058825, g: 0.67058825, b: 0.67058825, a: 0.5019608}
   animateBlasts: 1
   blastStepSeconds: 0.06
 --- !u!1 &6461283770778721209

@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/In_Game_View.uxml
-// Updated: 2026-08-11 19:07 UTC
+// Updated: 2026-08-11 21:34 UTC
 
 using System.Collections.Generic;
 
@@ -16,16 +16,16 @@ public enum UI_In_Game_View
     ui_container,
     buttons_container,
     leave_button,
-    end_turn_button,
-    pawn_button,
-    bomb_button,
-    base_button,
+    turn_container,
+    turn_value,
+    turn_caption,
     budget_container,
     budget_caption,
     budget_value,
-    turn_container,
-    turn_caption,
-    turn_value,
+    pawn_button,
+    bomb_button,
+    base_button,
+    end_turn_button,
 }
 
 internal static class UI_In_Game_View_Map
@@ -43,15 +43,15 @@ internal static class UI_In_Game_View_Map
             { UI_In_Game_View.ui_container, "ui-container" },
             { UI_In_Game_View.buttons_container, "buttons-container" },
             { UI_In_Game_View.leave_button, "leave-button" },
-            { UI_In_Game_View.end_turn_button, "end-turn-button" },
-            { UI_In_Game_View.pawn_button, "pawn-button" },
-            { UI_In_Game_View.bomb_button, "bomb-button" },
-            { UI_In_Game_View.base_button, "base-button" },
+            { UI_In_Game_View.turn_container, "turn-container" },
+            { UI_In_Game_View.turn_value, "turn-value" },
+            { UI_In_Game_View.turn_caption, "turn-caption" },
             { UI_In_Game_View.budget_container, "budget-container" },
             { UI_In_Game_View.budget_caption, "budget-caption" },
             { UI_In_Game_View.budget_value, "budget-value" },
-            { UI_In_Game_View.turn_container, "turn-container" },
-            { UI_In_Game_View.turn_caption, "turn-caption" },
-            { UI_In_Game_View.turn_value, "turn-value" },
+            { UI_In_Game_View.pawn_button, "pawn-button" },
+            { UI_In_Game_View.bomb_button, "bomb-button" },
+            { UI_In_Game_View.base_button, "base-button" },
+            { UI_In_Game_View.end_turn_button, "end-turn-button" },
         };
 }

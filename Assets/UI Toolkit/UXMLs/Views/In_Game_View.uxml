@@ -15,19 +15,21 @@
     </ui:VisualElement>
     <ui:VisualElement name="ui-container" style="flex-grow: 1; padding-left: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
         <ui:VisualElement name="buttons-container" picking-mode="Ignore" style="flex-grow: 0; flex-direction: row;">
-            <ui:Button text="Leave Game" name="leave-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative;"/>
-            <ui:Button text="end turn" name="end-turn-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative;"/>
+            <ui:Button text="Leave Game" name="leave-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative; background-color: rgb(128, 90, 90);"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="turn-container" picking-mode="Ignore" style="position: absolute; flex-direction: row; align-items: center; top: 1.5%; align-self: center;">
+            <ui:Label name="turn-value" picking-mode="Ignore" class="ingame-lable" style="color: rgb(255, 255, 255);"/>
+            <ui:Label text="Turn" name="turn-caption" picking-mode="Ignore" class="ingame-lable" style="color: rgb(255, 255, 255); margin-right: 8px;"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="budget-container" picking-mode="Ignore" style="position: absolute; flex-direction: row; align-items: center; bottom: 7%; align-self: center;">
+            <ui:Label text="Budget:" name="budget-caption" picking-mode="Ignore" class="ingame-lable" style="color: rgb(255, 255, 255); margin-right: 8px;"/>
+            <ui:Label text="0" name="budget-value" picking-mode="Ignore" class="ingame-lable" style="color: rgb(255, 255, 255);"/>
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 0; flex-direction: row; justify-content: center; bottom: 1%; position: absolute; align-self: center;">
             <ui:Button text="pawn" name="pawn-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative;"/>
             <ui:Button text="bomb" name="bomb-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative;"/>
             <ui:Button text="base" name="base-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative;"/>
-        </ui:VisualElement>
-        <ui:VisualElement name="budget-container" picking-mode="Ignore" style="position: absolute; right: 24px; bottom: 24px; flex-direction: row; align-items: center;">
-            <ui:Label text="Budget:" name="budget-caption" picking-mode="Ignore" style="font-size: 28px; color: rgb(255, 255, 255); margin-right: 8px; -unity-font-style: bold;"/>
-            <ui:Label text="0" name="budget-value" picking-mode="Ignore" style="font-size: 34px; color: rgb(255, 255, 255); -unity-font-style: bold;"/>
-        </ui:VisualElement>
-        <ui:VisualElement name="turn-container" picking-mode="Ignore" style="position: absolute; right: 24px; bottom: auto; flex-direction: row; align-items: center; left: auto; top: 24px;">
-            <ui:Label text="Turn:" name="turn-caption" picking-mode="Ignore" style="font-size: 28px; color: rgb(255, 255, 255); margin-right: 8px; -unity-font-style: bold;"/>
-            <ui:Label name="turn-value" picking-mode="Ignore" text="player_name" style="font-size: 28px; color: rgb(255, 255, 255); -unity-font-style: bold;"/>
+            <ui:Button text="end turn" name="end-turn-button" style="align-items: auto; align-self: auto; font-size: 32px; position: relative; background-color: rgb(128, 90, 90);"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
