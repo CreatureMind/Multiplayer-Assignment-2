@@ -24,6 +24,8 @@ namespace UI.Loading
             EventBus.Subscribe<SceneLoadStartedEvent> (OnShowLoadingScreen);
             EventBus.Subscribe<HideLoadingScreenEvent>(OnHideLoadingScreen);
             EventBus.Subscribe<SceneLoadDoneEvent>    (OnHideLoadingScreen);
+            EventBus.Subscribe<WaitingForFullBoard>   (OnShowLoadingScreen);
+            EventBus.Subscribe<FullBoardReady>        (OnHideLoadingScreen);
         }
 
         public void UnsubscribeFromEvents()
@@ -32,6 +34,8 @@ namespace UI.Loading
             EventBus.Unsubscribe<SceneLoadStartedEvent> (OnShowLoadingScreen);
             EventBus.Unsubscribe<HideLoadingScreenEvent>(OnHideLoadingScreen);
             EventBus.Unsubscribe<SceneLoadDoneEvent>    (OnHideLoadingScreen);
+            EventBus.Unsubscribe<WaitingForFullBoard>   (OnShowLoadingScreen);
+            EventBus.Unsubscribe<FullBoardReady>        (OnHideLoadingScreen);
         }
 
         private void OnShowLoadingScreen<T>(T e)

@@ -60,14 +60,4 @@ public class InGameUIManager : MonoBehaviour
         
         _presenter?.UnsubscribeFromEvents();
     }
-
-    public void ShowLoadingPanel()
-    {
-        EventBus.Raise(new ShowLoadingScreenEvent());
-    }
-
-    public void HideLoadingPanel()
-    {
-        EventBus.Raise(new HideLoadingScreenEvent());
-    }
 }
