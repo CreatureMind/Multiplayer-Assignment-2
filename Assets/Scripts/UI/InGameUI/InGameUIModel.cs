@@ -39,7 +39,7 @@ public class InGameUIModel
             .Select(playerData => playerData.Value.DisplayName.ToString())
             .FirstOrDefault();
 
-        var wonText = isLocalPlayer ? WON_TEXT : LOST_TEXT + $"{winingPlayerName} Won!";
+        var wonText = isLocalPlayer ? WON_TEXT : LOST_TEXT + $" <b>{winingPlayerName}</b> Won!";
         
         OnGameEnded?.Invoke(wonText);
     }
