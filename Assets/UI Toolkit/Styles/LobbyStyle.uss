@@ -61,6 +61,12 @@ Button:active {
     -unity-text-align: middle-left;
 }
 
+.ingame-lable {
+    -unity-font-definition: url("project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&guid=19184939772a7974a86fbd3229349203&type=3#Geometos");
+    font-size: 40px;
+    -unity-text-align: middle-left;
+}
+
 #chat-scroll-view .unity-scroll-view__content-container {
     flex-direction: column-reverse;
     flex-grow: 1;
