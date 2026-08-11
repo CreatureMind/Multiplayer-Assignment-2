@@ -34,8 +34,10 @@ public class ClientManager : NetworkBehaviour
     private InputHandler _inputHandler;
     private ClientConnectivityMap _connectivity;
     private BoardAudioInterpreter _audio;
+    private BlastGenerationStamper _blastStamper;
     private bool _clientReady;
     private bool _inputWired;
+    private bool _initialBoardApplied;
     private byte _localPlayerId;
     private bool _bufferedIsMyTurn;
     private int _bufferedRemainingBudget;
@@ -163,6 +165,7 @@ public class ClientManager : NetworkBehaviour
         _mapper = new BoardCoordinateMapper(context.Grid, context.BoardCamera, context.BoardOriginCell, width, height);
         _board = new ClientBoardCache(width, height);
         _audio = new BoardAudioInterpreter(_board, playerId);
+        _blastStamper = new BlastGenerationStamper(_board);
 
         _connectivity = new ClientConnectivityMap(_board, playerId);
         var legal = new LegalMoveCalculator(_board, playerId, _connectivity);
@@ -222,11 +225,21 @@ public class ClientManager : NetworkBehaviour
             for (var i = 0; i < safe; i++)
                 _pendingDiffs.Add(diffs[i]);
         }
+        
         if (!isFinalChunk)
             return;
 
+        if (!_initialBoardApplied)
+        {
+            _initialBoardApplied = true;
+            _board.Apply(_pendingDiffs);
+            _pendingDiffs.Clear();
+            return;
+        }
+
+        _blastStamper.Stamp(_pendingDiffs);
+        _audio.Interpret(_pendingDiffs);
         _board.Apply(_pendingDiffs); // raises Changed once
-        _audio?.Interpret(_pendingDiffs);
         _pendingDiffs.Clear();
     }
     
@@ -289,7 +302,9 @@ public class ClientManager : NetworkBehaviour
 
         foreach (var kvp in NetworkManager.Instance.GetPlayerDataMap().Where(kvp => currentPlayingPlayer.PlayerId == kvp.Key.PlayerId))
         {
-            OnPlayerTurnChanged.Invoke(kvp.Value.DisplayName.ToString());
+            OnPlayerTurnChanged.Invoke(currentPlayingPlayer.PlayerId == _localPlayerId
+                ? "Your"
+                : $"{kvp.Value.DisplayName.ToString()}'s");
         }
         
         RaiseLocalTurnState();
@@ -311,6 +326,13 @@ public class ClientManager : NetworkBehaviour
         _bufferedIsMyTurn = upcomingPlayer.PlayerId == _localPlayerId;
         _bufferedRemainingBudget = upcomingPlayer.CurrentActionAmount;
         _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
+        
+        foreach (var kvp in NetworkManager.Instance.GetPlayerDataMap().Where(kvp => upcomingPlayer.PlayerId == kvp.Key.PlayerId))
+        {
+            OnPlayerTurnChanged.Invoke(upcomingPlayer.PlayerId == _localPlayerId
+                ? "Your"
+                : $"{kvp.Value.DisplayName.ToString()}'s");
+        }
         
         RaiseLocalTurnState();
     }
