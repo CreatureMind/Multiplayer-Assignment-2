@@ -1,11 +1,18 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/In_Game_View.uxml
-// Updated: 2026-08-11 15:46 UTC
+// Updated: 2026-08-11 16:53 UTC
 
 using System.Collections.Generic;
 
 public enum UI_In_Game_View
 {
+    ended_popup,
+    container,
+    panel,
+    header,
+    won_text,
+    bottom_container,
+    return_button,
     ui_container,
     buttons_container,
     leave_button,
@@ -16,13 +23,6 @@ public enum UI_In_Game_View
     budget_container,
     budget_caption,
     budget_value,
-    ended_popup,
-    container,
-    panel,
-    header,
-    won_text,
-    bottom_container,
-    return_button,
 }
 
 internal static class UI_In_Game_View_Map
@@ -30,6 +30,13 @@ internal static class UI_In_Game_View_Map
     internal static readonly Dictionary<UI_In_Game_View, string> Names =
         new Dictionary<UI_In_Game_View, string>
         {
+            { UI_In_Game_View.ended_popup, "ended-popup" },
+            { UI_In_Game_View.container, "container" },
+            { UI_In_Game_View.panel, "panel" },
+            { UI_In_Game_View.header, "header" },
+            { UI_In_Game_View.won_text, "won-text" },
+            { UI_In_Game_View.bottom_container, "bottom-container" },
+            { UI_In_Game_View.return_button, "return-button" },
             { UI_In_Game_View.ui_container, "ui-container" },
             { UI_In_Game_View.buttons_container, "buttons-container" },
             { UI_In_Game_View.leave_button, "leave-button" },
@@ -40,12 +47,5 @@ internal static class UI_In_Game_View_Map
             { UI_In_Game_View.budget_container, "budget-container" },
             { UI_In_Game_View.budget_caption, "budget-caption" },
             { UI_In_Game_View.budget_value, "budget-value" },
-            { UI_In_Game_View.ended_popup, "ended-popup" },
-            { UI_In_Game_View.container, "container" },
-            { UI_In_Game_View.panel, "panel" },
-            { UI_In_Game_View.header, "header" },
-            { UI_In_Game_View.won_text, "won-text" },
-            { UI_In_Game_View.bottom_container, "bottom-container" },
-            { UI_In_Game_View.return_button, "return-button" },
         };
 }

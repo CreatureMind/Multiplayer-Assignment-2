@@ -3,7 +3,6 @@ using UnityEngine;
 
 public sealed class TurnEndChatAnnouncer : MonoBehaviour
 {
-    private const string SYSTEM = "System";
     private const string ALL = "All";
     
     private bool _wasMyTurn;
@@ -29,29 +28,23 @@ public sealed class TurnEndChatAnnouncer : MonoBehaviour
 
     private void Announce()
     {
-        var playerName = ResolveLocalName();
-        if (string.IsNullOrEmpty(playerName))
-            playerName = "A player";
-
         EventBus.Raise(new ChatMessageEvent
             {
-                Sender = SYSTEM,
+                Sender = GetLocalPlayerName(),
                 Target = ALL,
-                Message = $"{playerName} has ended their turn."
+                Message = $"I end my turn."
             }
         );
     }
     
-    private static string ResolveLocalName()
+    private string GetLocalPlayerName()
     {
-        var nm = NetworkManager.Instance;
-        if (!nm)
+        if (!NetworkManager.Instance)
             return string.Empty;
         
-        if (!string.IsNullOrEmpty(nm.LocalConfirmedName))
-            return nm.LocalConfirmedName;
-
-        var data = nm.GetLocalPlayerData();
+        if (!string.IsNullOrEmpty(NetworkManager.Instance.LocalConfirmedName))
+            return NetworkManager.Instance.LocalConfirmedName;
+        var data = NetworkManager.Instance.GetLocalPlayerData();
         return data ? data.DisplayName.ToString() : string.Empty;
     }
 }
