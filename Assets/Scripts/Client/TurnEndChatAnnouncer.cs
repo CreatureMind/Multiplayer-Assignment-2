@@ -9,13 +9,18 @@ public sealed class TurnEndChatAnnouncer : MonoBehaviour
     private bool _wasMyTurn;
     
     private void OnEnable()
-        => EventBus.Subscribe<LocalTurnStateChangedEvent>(OnTurnStateChanged);
+    {
+        EventBus.Subscribe<LocalTurnStateChangedEvent>(OnTurnStateChanged);
+        Debug.Log("[TurnEndAnnouncer] OnEnable — subscribed");
+    }
 
     private void OnDisable()
         => EventBus.Unsubscribe<LocalTurnStateChangedEvent>(OnTurnStateChanged);
 
     private void OnTurnStateChanged(LocalTurnStateChangedEvent e)
     {
+        Debug.Log($"[TurnEndAnnouncer] snapshot IsMyTurn={e.IsMyTurn} (was {_wasMyTurn})");
+        
         if (_wasMyTurn && !e.IsMyTurn)
             Announce();
         
