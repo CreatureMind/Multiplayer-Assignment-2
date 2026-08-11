@@ -4,6 +4,7 @@ using UnityEngine.UIElements;
 
 namespace UI.Loading
 {
+    [RequireComponent(typeof(UIDocument))]
     public class LoadingUIView : MonoBehaviour
     {
         private UIDocument    _document;
@@ -15,6 +16,8 @@ namespace UI.Loading
         private void Awake()
         {
             _document = GetComponent<UIDocument>();
+            
+            gameObject.AddComponent<LoadingUIPresenter>();
         }
 
         private void Start()
