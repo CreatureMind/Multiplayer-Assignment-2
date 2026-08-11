@@ -150,4 +150,11 @@ namespace Events
             OnTertiary = onTertiary;
         }
     }
+
+    public struct LocalTurnStateChangedEvent
+    {
+        public bool IsMyTurn;
+        public int CurrentBudget;
+        public int MaxBudget;
+    }
 }

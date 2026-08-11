@@ -11,6 +11,7 @@ public class GameHudController : MonoBehaviour
     private Button _soldierButton;
     private Button _bombButton;
     private Button _baseButton;
+    private BudgetHudView _budgetView;
     private bool _wired;
     
     private void Reset() => document = GetComponent<UIDocument>();
@@ -23,6 +24,10 @@ public class GameHudController : MonoBehaviour
     {
         if (!_wired)
             return;
+        
+        _budgetView?.Disable();
+        _budgetView = null;
+        
         if (_endTurnButton != null)
             _endTurnButton.clicked -= OnEndTurn;
         if (_soldierButton != null)
@@ -56,6 +61,12 @@ public class GameHudController : MonoBehaviour
         Wire(_soldierButton, "pawn-button", OnSoldier);
         Wire(_bombButton, "bomb-button", OnBomb);
         Wire(_baseButton, "base-button", OnBase);
+        
+        var budgetValueLabel = root.Q<Label>("budget-value");
+        if (budgetValueLabel == null)
+            Debug.LogError("[GameHudController] Label 'budget-value' not found in the UXML.");
+        _budgetView = new BudgetHudView(budgetValueLabel);
+        _budgetView.Enable();
 
         _wired = true;
     }

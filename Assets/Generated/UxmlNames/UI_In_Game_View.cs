@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/In_Game_View.uxml
-// Updated: 2026-08-09 13:10 UTC
+// Updated: 2026-08-11 15:46 UTC
 
 using System.Collections.Generic;
 
@@ -13,6 +13,9 @@ public enum UI_In_Game_View
     pawn_button,
     bomb_button,
     base_button,
+    budget_container,
+    budget_caption,
+    budget_value,
     ended_popup,
     container,
     panel,
@@ -34,6 +37,9 @@ internal static class UI_In_Game_View_Map
             { UI_In_Game_View.pawn_button, "pawn-button" },
             { UI_In_Game_View.bomb_button, "bomb-button" },
             { UI_In_Game_View.base_button, "base-button" },
+            { UI_In_Game_View.budget_container, "budget-container" },
+            { UI_In_Game_View.budget_caption, "budget-caption" },
+            { UI_In_Game_View.budget_value, "budget-value" },
             { UI_In_Game_View.ended_popup, "ended-popup" },
             { UI_In_Game_View.container, "container" },
             { UI_In_Game_View.panel, "panel" },
