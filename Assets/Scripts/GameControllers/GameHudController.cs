@@ -67,6 +67,11 @@ public class GameHudController : MonoBehaviour
             Debug.LogError("[GameHudController] Label 'budget-value' not found in the UXML.");
         _budgetView = new BudgetHudView(budgetValueLabel);
         _budgetView.Enable();
+        
+        var turnValueLabel = root.Q<Label>("turn-value");
+        if (turnValueLabel == null)
+            Debug.LogError("[GameHudController] Label 'turn-value' not found in the UXML.");
+        // TODO: wire label value to current player's name
 
         _wired = true;
     }

@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/In_Game_View.uxml
-// Updated: 2026-08-11 16:53 UTC
+// Updated: 2026-08-11 17:12 UTC
 
 using System.Collections.Generic;
 
@@ -23,6 +23,9 @@ public enum UI_In_Game_View
     budget_container,
     budget_caption,
     budget_value,
+    turn_container,
+    turn_caption,
+    turn_value,
 }
 
 internal static class UI_In_Game_View_Map
@@ -47,5 +50,8 @@ internal static class UI_In_Game_View_Map
             { UI_In_Game_View.budget_container, "budget-container" },
             { UI_In_Game_View.budget_caption, "budget-caption" },
             { UI_In_Game_View.budget_value, "budget-value" },
+            { UI_In_Game_View.turn_container, "turn-container" },
+            { UI_In_Game_View.turn_caption, "turn-caption" },
+            { UI_In_Game_View.turn_value, "turn-value" },
         };
 }
