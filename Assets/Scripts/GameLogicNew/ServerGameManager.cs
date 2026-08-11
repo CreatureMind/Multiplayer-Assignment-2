@@ -533,8 +533,14 @@ public sealed class ServerGameManager : NetworkBehaviour
 
             if (!changeSet.ShouldEndGame)
             {
-                if (request.Intent == MoveIntent.BuildBase || actionResult == ActionResult.SuccessAndTurnEnded)
+                if (request.Intent == MoveIntent.BuildBase)
+                {
                     changeSet.ShouldEndTurn = true;
+                }
+                else
+                {
+                    changeSet.ShouldEndTurn = _turnManagerInstance.IsPlayerTurnEnded(request.PlayerId);
+                }
             }
         }
 

@@ -199,12 +199,6 @@ public class ClientManager : NetworkBehaviour
         _clientReady = true;
         
         _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
-
-        if (_isLoading)
-        {
-            _isLoading = false;
-            EventBus.Raise(new HideLoadingScreenEvent());
-        }
     }
 
     // A chunk of this player's projected diff. Reliable + cumulative: a dropped chunk desyncs permanently.
@@ -241,6 +235,12 @@ public class ClientManager : NetworkBehaviour
         _audio.Interpret(_pendingDiffs);
         _board.Apply(_pendingDiffs); // raises Changed once
         _pendingDiffs.Clear();
+        
+        if (_isLoading)
+        {
+            _isLoading = false;
+            EventBus.Raise(new HideLoadingScreenEvent());
+        }
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
