@@ -20,6 +20,7 @@ public sealed class BoardAudioInterpreter
 
     public void Interpret(IReadOnlyList<CellDiff> diffs)
     {
+        Debug.Log("[AUDIO] Trying to interpret diffs...");
         if (diffs == null || diffs.Count == 0)
             return;
 
@@ -28,7 +29,10 @@ public sealed class BoardAudioInterpreter
         foreach (var diff in diffs)
         {
             if (diff.Generation > 0)
+            {
+                Debug.Log("[AUDIO] Has explosion");
                 explosion = true;
+            }
             
             if (!_board.TryGet(diff.Cell, out var oldView))
                 continue;
@@ -41,26 +45,44 @@ public sealed class BoardAudioInterpreter
             var nue = newView.VisualType;
             
             if (old == TileType.Empty && nue == TileType.Soldier && IsMine(newView.OwnerId))
+            {
+                Debug.Log("[AUDIO] Soldier placed");
                 placed = true;
+            }
             
             if (old == TileType.Soldier && nue == TileType.Soldier)
             {
                 if (IsEnemy(oldView.OwnerId) && IsMine(newView.OwnerId))
+                {
+                    Debug.Log("[AUDIO] I ate another's soldier");
                     iAte = true;
+                }
                 else if (IsMine(oldView.OwnerId) && IsEnemy(newView.OwnerId))
+                {
+                    Debug.Log("[AUDIO] Another player ate my soldier");
                     iWasEaten = true;
+                }
             }
             
             if (old is TileType.Soldier or TileType.Bomb
                 && nue == TileType.Base && IsMine(newView.OwnerId) && IsMine(newView.OwnerId))
+            {
+                Debug.Log("[AUDIO] I built a base");
                 iBuiltBase = true;
+            }
 
             if (old == TileType.Base && nue == TileType.Base)
             {
                 if (IsEnemy(oldView.OwnerId) && IsMine(newView.OwnerId))
+                {
+                    Debug.Log("[AUDIO] I captured a base");
                     iCapturedBase = true;
+                }
                 else if (IsMine(oldView.OwnerId) && IsEnemy(newView.OwnerId))
+                {
+                    Debug.Log("[AUDIO] My base was captured");
                     myBaseCaptured = true;
+                }
             }
         }
         
@@ -68,17 +90,35 @@ public sealed class BoardAudioInterpreter
         var wantsSpawn = placed || iAte;
         
         if (explosion)
+        {
+            Debug.Log("[AUDIO] Raised explosion");
             Raise(SoundEffectEnum.PAWN_EXPLOSION);
+        }
         if (iCapturedBase)
+        {
+            Debug.Log("[AUDIO] Raised base conquer");
             Raise(SoundEffectEnum.ENEMY_BASE_CONQUERED);
+        }
         if (myBaseCaptured)
+        {
+            Debug.Log("[AUDIO] Raised base lost");
             Raise(SoundEffectEnum.YOUR_BASE_CONQUERED);
+        }
         if (iBuiltBase)
+        {
+            Debug.Log("[AUDIO] Raised base built");
             Raise(SoundEffectEnum.BASE_PLACEMENT);
+        }
         if (iWasEaten)
+        {
+            Debug.Log("[AUDIO] Raised soldier eaten");
             Raise(SoundEffectEnum.PAWN_EATEN);
+        }
         if (wantsSpawn && !(_suppressSpawnOnMajorEvent && major))
+        {
+            Debug.Log("[AUDIO] Raised soldier spawned");
             Raise(SoundEffectEnum.PAWN_SPAWN);
+        }
     }
 
     private static void Raise(SoundEffectEnum sound)
