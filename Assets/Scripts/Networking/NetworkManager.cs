@@ -34,8 +34,9 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     
     public bool IsReturningFromMatch { get; private set; }
     private bool _unloading = false;
-    private InGameUIManager _inGameUIInstance;
-    
+    public InGameUIManager InGameUIInstance { get; private set; }
+
+
     public string LocalConfirmedName { get; set; }
     
     private string _pendingOwnerToken;
@@ -360,7 +361,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         if (flushDelay > 0f)
             await Task.Delay((int)(flushDelay * 1000));
         
-        _inGameUIInstance = null;
+        InGameUIInstance = null;
         _unloading = false;
 
         await ShutdownRunner();
@@ -549,10 +550,16 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     
     private void SpawnInGameUI()
     {
-        if (!inGameUIPrefab || _inGameUIInstance) return;
-        _inGameUIInstance = Instantiate(inGameUIPrefab);
-        _inGameUIInstance.name = $"InGameUI_{LocalConfirmedName}";
-        _inGameUIInstance.NetworkManager = this;
+        StartCoroutine(SpawnInGameUICoroutine());
+    }
+
+    private IEnumerator SpawnInGameUICoroutine()
+    {
+        if (!inGameUIPrefab || InGameUIInstance) yield break;
+        yield return new WaitForSeconds(2f);
+        InGameUIInstance = Instantiate(inGameUIPrefab);
+        InGameUIInstance.name = $"InGameUI_{LocalConfirmedName}";
+        InGameUIInstance.NetworkManager = this;
     }
 
     private static Scene FindOtherLoadedScene(Scene exclude)

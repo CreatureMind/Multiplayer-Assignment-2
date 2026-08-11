@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Events;
 using Fusion;
 using UnityEngine;
+using Events;
 
 // Implemented by BoardView. Interface so ClientManager compiles before the renderer and is mockable in tests.
 public interface IBoardRenderer
@@ -193,6 +194,11 @@ public class ClientManager : NetworkBehaviour
         
         _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
 
+        if (_isLoading)
+        {
+            _isLoading = false;
+            EventBus.Raise(new HideLoadingScreenEvent());
+        }
     }
 
     // A chunk of this player's projected diff. Reliable + cumulative: a dropped chunk desyncs permanently.
@@ -220,11 +226,7 @@ public class ClientManager : NetworkBehaviour
         _audio?.Interpret(_pendingDiffs);
         _pendingDiffs.Clear();
         
-        if (_isLoading)
-        {
-            _isLoading = false;
-            EventBus.Raise(new HideLoadingScreenEvent());
-        }
+        
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
@@ -255,6 +257,8 @@ public class ClientManager : NetworkBehaviour
             payload[i] = actionData;
             _playerActionsById[actionData.PlayerId] = actionData;
         }
+
+        RaiseLocalTurnState();
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
@@ -282,6 +286,7 @@ public class ClientManager : NetworkBehaviour
         _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
         GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_CurrentPlayingPlayerChanged for {name} playerId={currentPlayingPlayer.PlayerId} current budget={_bufferedRemainingBudget}, is my turn={_bufferedIsMyTurn}.");
 
+        RaiseLocalTurnState();
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
@@ -300,6 +305,8 @@ public class ClientManager : NetworkBehaviour
         _bufferedIsMyTurn = upcomingPlayer.PlayerId == _localPlayerId;
         _bufferedRemainingBudget = upcomingPlayer.CurrentActionAmount;
         _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
+        
+        RaiseLocalTurnState();
     }
     #endregion
 
@@ -314,4 +321,23 @@ public class ClientManager : NetworkBehaviour
         => _renderer?.SetHighlights(_actions.CurrentHighlights);
     private void OnHoverChanged(Vector2Int? cell)
         => _renderer?.SetHover(cell);
+
+    private void RaiseLocalTurnState()
+    {
+        var current = 0;
+        var max = 0;
+        if (_playerActionsById.TryGetValue(_localPlayerId, out var localData))
+        {
+            current = localData.CurrentActionAmount;
+            max = localData.MaxActionAmountPerTurn;
+        }
+
+        EventBus.Raise(new LocalTurnStateChangedEvent
+            {
+                IsMyTurn = _bufferedIsMyTurn,
+                CurrentBudget = current,
+                MaxBudget = max
+            }
+        );
+    }
 }

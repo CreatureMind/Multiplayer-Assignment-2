@@ -185,7 +185,6 @@ public class RoomManager : MonoBehaviour
             {
                 gM.name = $"ServerGameManager_{sessionName}";
                 gM.transform.SetParent(null, true);
-                runner.MakeDontDestroyOnLoad(gM.gameObject);
                 gM.InstantiateMap(map);
             }
         }

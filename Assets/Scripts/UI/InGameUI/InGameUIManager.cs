@@ -7,7 +7,7 @@ public class InGameUIManager : MonoBehaviour
 {
     [SerializeField] private InGameUIView inGameView;
     
-    public event Action<PlayerRef> OnMatchEnded;
+    public Action<PlayerRef> OnMatchEnded;
 
     private InGameUIModel     _model;
     private InGameUIPresenter _presenter;

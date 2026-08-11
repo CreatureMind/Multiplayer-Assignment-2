@@ -69,8 +69,16 @@ public sealed class InputHandler : MonoBehaviour
         
         var panelPos = RuntimePanelUtils.ScreenToPanel(
             root.panel, new Vector2(screenPos.x, Screen.height - screenPos.y));
+        
+        var picked = root.panel.Pick(panelPos);
+        
+        for (var element = picked; element != null; element = element.parent)
+        {
+            if (element is Button)
+                return true;
+        }
 
-        return root.panel.Pick(panelPos) != null;
+        return false;
     }
 
     private void OnDisable()

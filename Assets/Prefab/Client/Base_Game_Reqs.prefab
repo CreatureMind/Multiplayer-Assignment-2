@@ -626,6 +626,7 @@ MonoBehaviour:
   baseTilemap: {fileID: 4670490685891084429}
   highlightTilemap: {fileID: 2169590485979154604}
   hoverTilemap: {fileID: 4300846326785381476}
+  hoverFadeSeconds: 0.25
   catalog: {fileID: 11400000, guid: 294ebf722b4548d439f233de8e663e89, type: 2}
   overlayTile: {fileID: 11400000, guid: a3d299c10bcc8bc43ad8aac265dc6e84, type: 2}
   highlightColor: {r: 1, g: 1, b: 1, a: 0.35}
