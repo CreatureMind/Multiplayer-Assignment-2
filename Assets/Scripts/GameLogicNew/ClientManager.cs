@@ -37,6 +37,7 @@ public class ClientManager : NetworkBehaviour
     private BlastGenerationStamper _blastStamper;
     private bool _clientReady;
     private bool _inputWired;
+    private bool _initialBoardApplied;
     private byte _localPlayerId;
     private bool _bufferedIsMyTurn;
     private int _bufferedRemainingBudget;
@@ -224,8 +225,17 @@ public class ClientManager : NetworkBehaviour
             for (var i = 0; i < safe; i++)
                 _pendingDiffs.Add(diffs[i]);
         }
+        
         if (!isFinalChunk)
             return;
+
+        if (!_initialBoardApplied)
+        {
+            _initialBoardApplied = true;
+            _board.Apply(_pendingDiffs);
+            _pendingDiffs.Clear();
+            return;
+        }
 
         _blastStamper.Stamp(_pendingDiffs);
         _audio.Interpret(_pendingDiffs);
