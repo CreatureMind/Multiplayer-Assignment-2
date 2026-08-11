@@ -289,7 +289,9 @@ public class ClientManager : NetworkBehaviour
 
         foreach (var kvp in NetworkManager.Instance.GetPlayerDataMap().Where(kvp => currentPlayingPlayer.PlayerId == kvp.Key.PlayerId))
         {
-            OnPlayerTurnChanged.Invoke(kvp.Value.DisplayName.ToString());
+            OnPlayerTurnChanged.Invoke(currentPlayingPlayer.PlayerId == _localPlayerId
+                ? "Your Turn"
+                : kvp.Value.DisplayName.ToString());
         }
         
         RaiseLocalTurnState();
@@ -314,7 +316,9 @@ public class ClientManager : NetworkBehaviour
         
         foreach (var kvp in NetworkManager.Instance.GetPlayerDataMap().Where(kvp => upcomingPlayer.PlayerId == kvp.Key.PlayerId))
         {
-            OnPlayerTurnChanged.Invoke(kvp.Value.DisplayName.ToString());
+            OnPlayerTurnChanged.Invoke(upcomingPlayer.PlayerId == _localPlayerId
+                ? "Your Turn"
+                : kvp.Value.DisplayName.ToString());
         }
         
         RaiseLocalTurnState();
