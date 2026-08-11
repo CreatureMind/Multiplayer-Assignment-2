@@ -22,7 +22,10 @@ public sealed class BoardAudioInterpreter
     {
         Debug.Log("[AUDIO] Trying to interpret diffs...");
         if (diffs == null || diffs.Count == 0)
+        {
+            Debug.Log("[AUDIO] No diffs");
             return;
+        }
 
         bool explosion = false, placed = false, iAte = false, iWasEaten = false, iBuiltBase = false, iCapturedBase = false, myBaseCaptured = false;
 
