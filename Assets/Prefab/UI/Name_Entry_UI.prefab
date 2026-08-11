@@ -66,7 +66,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 267866014712077358}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 292e8cea118f8a94d966d5b16f71c75a, type: 3}
+  m_Script: {fileID: 11500000, guid: c046e0b67ce84228811d79d191a258ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NameEntryUIController
 --- !u!114 &2877310724241460529
@@ -81,4 +81,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4133b5b81950849178380bbe0121fcf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlobalButtonEventListener
-  debug: 0

@@ -550,13 +550,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     
     private void SpawnInGameUI()
     {
-        StartCoroutine(SpawnInGameUICoroutine());
-    }
-
-    private IEnumerator SpawnInGameUICoroutine()
-    {
-        if (!inGameUIPrefab || InGameUIInstance) yield break;
-        yield return new WaitForSeconds(2f);
+        if (!inGameUIPrefab || InGameUIInstance) return;
+        
         InGameUIInstance = Instantiate(inGameUIPrefab);
         InGameUIInstance.name = $"InGameUI_{LocalConfirmedName}";
         InGameUIInstance.NetworkManager = this;
