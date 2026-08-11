@@ -51,7 +51,7 @@ public class RoomController : NetworkBehaviour
         if (requester != Owner) return; // only the owner may kick
         if (target == Owner) return; // owner can't kick themselves
 
-        // Tell the target to leave explicitly, then disconnect them server-side.
+        //Tell the player to leave explicitly, then disconnect them server-side.
         Rpc_NotifyKicked(target, "Kicked by room owner.");
         Runner.Disconnect(target);
     }
@@ -72,7 +72,7 @@ public class RoomController : NetworkBehaviour
 
         MatchStarted = true;
 
-        // Close the room so no new players join a match in progress.
+        // Closing the room so no new players join a match in progress.
         if (RoomManager.Instance)
             RoomManager.Instance.SetRoomOpen(_roomId, false);
         Runner.SessionInfo.IsOpen = false;

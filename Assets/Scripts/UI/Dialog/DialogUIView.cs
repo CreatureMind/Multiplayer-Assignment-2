@@ -68,13 +68,23 @@ namespace UI.Dialog
 
         public void SetContent(string title, string message, DialogType type)
         {
-            if (_titleLabel != null) _titleLabel.text = title;
-            
-            else Debug.LogError("[DialogUIView] Could not find Label named 'header' in Dialog_View.");
-            
-            if (_messageLabel != null) _messageLabel.text = message;
-            
-            else Debug.LogError("[DialogUIView] Could not find Label named 'dialog-message' in Dialog_View.");
+            if (_titleLabel != null)
+            {
+                _titleLabel.text = title;
+            }
+            else
+            {
+                Debug.LogError("[DialogUIView] Could not find Label named 'header' in Dialog_View.");
+            }
+
+            if (_messageLabel != null)
+            {
+                _messageLabel.text = message;
+            }
+            else
+            {
+                Debug.LogError("[DialogUIView] Could not find Label named 'dialog-message' in Dialog_View.");
+            }
         }
 
         public void SetButtons(string primaryText, string secondaryText, string tertiaryText)

@@ -45,10 +45,10 @@ public class DynamicGlobalButtonListener : MonoBehaviour
     {
         if (root == null) return;
 
-        // 1. Listen for structural layout resets (when a new UXML layout finishes rendering)
+        //Listen for structural layout resets (when a new UXML layout finishes rendering)
         root.RegisterCallback<GeometryChangedEvent>(OnHierarchyRebuilt);
 
-        // 2. Bind your universal click and hover listeners
+        //Bind universal click and hover listeners
         root.RegisterCallback<PointerEnterEvent>(OnGlobalPointerEnter, TrickleDown.TrickleDown);
         root.RegisterCallback<PointerLeaveEvent>(OnGlobalPointerLeave, TrickleDown.TrickleDown);
         root.RegisterCallback<NavigationSubmitEvent>(OnGlobalSubmit, TrickleDown.TrickleDown);
@@ -68,8 +68,6 @@ public class DynamicGlobalButtonListener : MonoBehaviour
 
     private void OnHierarchyRebuilt(GeometryChangedEvent evt)
     {
-        // When your manager instantiates a new UXML, the layout geometry calculation shifts.
-        // If the root object reference itself shifted, we realign.
         if (uiDocument.rootVisualElement != currentRoot)
         {
             ResetSubscriptions();
@@ -102,18 +100,13 @@ public class DynamicGlobalButtonListener : MonoBehaviour
     private void OnButtonHoverEnter(Button button)
     {
         EventBus.Raise(new PlaySoundEvent(){ SoundName = SoundEffectEnum.BTN_HOVER});
-        //Debug.Log($"[Hover Enter] {button.name}");
     }
 
-    private void OnButtonHoverExit(Button button)
-    {
-        //Debug.Log($"[Hover Exit] {button.name}");
-    }
+    private void OnButtonHoverExit(Button button) { }
 
     private void OnButtonClick(Button button)
     {
         EventBus.Raise(new PlaySoundEvent(){ SoundName = SoundEffectEnum.BTN_CLICK});
-        //Debug.Log($"[Click / Submit] {button.name}");
     }
 
     #endregion

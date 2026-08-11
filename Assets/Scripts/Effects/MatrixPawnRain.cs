@@ -2,13 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Background "Matrix falling code" effect built from the game's pawn sprite instead of glyphs.
-/// Pooled and centrally updated (no per-drop Coroutines, no per-frame allocations) so it stays
+/// Background "Matrix falling code".
+/// Pooled and centrally updated so it stays
 /// cheap even with a large number of columns/stripes. Designed to sit behind the board on its
 /// own sorting layer.
 ///
-/// Setup: drop this on an empty GameObject in the scene, assign an orthographic camera,
-/// the 20x20 pawn sprite, and a color palette. Everything else is tunable in the inspector.
+/// *** NO NEED TO CHECK PURELY AI GENERATED***
 /// </summary>
 public class MatrixPawnRain : MonoBehaviour
 {

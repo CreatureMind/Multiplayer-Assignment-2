@@ -7,6 +7,9 @@ namespace UI.RoomsList
 {
     public class RoomsListUIModel
     {
+        private const string ALL_TEXT = "All";
+        private const string OPEN_TEXT = "Open";
+        private const string CLOSED_TEXT = "Closed";
         private NetworkManager _networkManager;
         private static RoomListChangedEvent? _cachedRoomData;
 
@@ -35,12 +38,12 @@ namespace UI.RoomsList
                 var mapName = room.MapName;
                 var isOpen = (bool)room.IsOpen;
 
-                var matchesRoomFilter = roomFilter == "All" ||
-                                        (roomFilter == "Open" && isOpen) ||
-                                        (roomFilter == "Closed" && !isOpen);
+                var matchesRoomFilter = roomFilter == ALL_TEXT ||
+                                        (roomFilter == OPEN_TEXT && isOpen) ||
+                                        (roomFilter == CLOSED_TEXT && !isOpen);
 
-                var matchesModeFilter = modeFilter == "All" || modeName == modeFilter;
-                var matchesMapFilter = mapFilter == "All" || mapName == mapFilter;
+                var matchesModeFilter = modeFilter == ALL_TEXT || modeName == modeFilter;
+                var matchesMapFilter = mapFilter == ALL_TEXT || mapName == mapFilter;
 
                 if (matchesRoomFilter && matchesModeFilter && matchesMapFilter)
                 {

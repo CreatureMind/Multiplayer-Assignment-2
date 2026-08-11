@@ -24,7 +24,6 @@ public class PlayerData : NetworkBehaviour
     
     public override void Spawned()
     {
-        // The server owns PlayerData now; only it seeds initial values.
         if (HasStateAuthority && string.IsNullOrEmpty(DisplayName.Value))
         {
             DisplayName = $"Player_{Object.InputAuthority.PlayerId}";
@@ -32,7 +31,6 @@ public class PlayerData : NetworkBehaviour
             HasSelectedCharacter = false;
         }
 
-        // NetworkManager only exists on client builds.
         if (NetworkManager.Instance)
             NetworkManager.Instance.RegisterPlayer(Object.InputAuthority, this);
     }
@@ -74,8 +72,7 @@ public class PlayerData : NetworkBehaviour
     private void Rpc_SetReady(NetworkBool ready)
     {
         IsReady = ready;
-
-        // Dedicated server builds don't run the client-side ChatNetworkManager; announce ready here.
+        
         if (HasStateAuthority)
         {
             var announcer = Runner ? Runner.GetComponent<RunnerChatAnnouncer>() : null;

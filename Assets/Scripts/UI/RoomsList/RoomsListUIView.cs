@@ -8,6 +8,11 @@ namespace UI.RoomsList
     [RequireComponent(typeof(UIDocument))]
     public class RoomsListUIView : MonoBehaviour
     {
+        private const string ALL_ROOM_FILTER = "All";
+        private const string WAITING_FOR_PLAYERS_TEXT = "Waiting for players";
+        private const string MATCH_IN_PROGRESS_TEXT = "Match is in progress";
+        private const string GREEN_CLASS_NAME = "green";
+
         [SerializeField] private VisualTreeAsset roomRowTemplate;
 
         public event Action OnFilterChanged;
@@ -31,9 +36,9 @@ namespace UI.RoomsList
         private Button        _createBtn;
         private Button        _refreshBtn;
 
-        public string SelectedRoomFilter => _roomsDropdown?.value ?? "All";
-        public string SelectedModeFilter => _modesDropdown?.value ?? "All";
-        public string SelectedMapFilter  => _mapsDropdown?.value ?? "All";
+        public string SelectedRoomFilter => _roomsDropdown?.value ?? ALL_ROOM_FILTER;
+        public string SelectedModeFilter => _modesDropdown?.value ?? ALL_ROOM_FILTER;
+        public string SelectedMapFilter  => _mapsDropdown?.value ?? ALL_ROOM_FILTER;
 
         private void Awake()
         {
@@ -144,10 +149,10 @@ namespace UI.RoomsList
                 var mapName = room.MapName;
                 var isOpen = (bool)room.IsOpen;
 
-                roomRow.tooltip = isOpen ? "Waiting for players" : "Match is in progress";
+                roomRow.tooltip = isOpen ? WAITING_FOR_PLAYERS_TEXT : MATCH_IN_PROGRESS_TEXT;
 
                 var playIndicator = roomRow.Q<VisualElement>(UI_Room_Row_Template.play_indicator);
-                playIndicator?.EnableInClassList("green", isOpen);
+                playIndicator?.EnableInClassList(GREEN_CLASS_NAME, isOpen);
 
                 var roomNameLabel = roomRow.Q<Label>(UI_Room_Row_Template.room_name);
                 if (roomNameLabel != null) roomNameLabel.text = displayName;

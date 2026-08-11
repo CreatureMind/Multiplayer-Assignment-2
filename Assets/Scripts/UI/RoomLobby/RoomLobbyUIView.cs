@@ -10,7 +10,11 @@ namespace UI.RoomLobby
     public class RoomLobbyUIView : MonoBehaviour
     {
         private const string ROOM_CODE_TEXT = "Room Code: ";
-        
+        private const string NOT_READY_TEXT = "Not Ready";
+        private const string READY_TEXT = "Ready";
+        private const string IS_READY_TEXT = "is Ready!";
+        private const string IS_NOT_READY_TEXT = "is Not Ready.";
+
         [SerializeField] private VisualTreeAsset playerRowTemplate;
 
         public event Action            OnLeaveClicked;
@@ -97,7 +101,7 @@ namespace UI.RoomLobby
         public void SetReadyButtonText(bool isReady)
         {
             if (_readyButton != null)
-                _readyButton.text = isReady ? "Not Ready" : "Ready";
+                _readyButton.text = isReady ? NOT_READY_TEXT : READY_TEXT;
         }
 
         public void SetStartButtonState(bool isVisible, bool isEnabled)
@@ -139,7 +143,7 @@ namespace UI.RoomLobby
 
                 var readyLabel = row.Q<Label>(UI_Player_Row_Template.ready_status);
                 if (readyLabel != null)
-                    readyLabel.text = playerData.IsReady ? "is Ready!" : "is Not Ready.";
+                    readyLabel.text = playerData.IsReady ? IS_READY_TEXT : IS_NOT_READY_TEXT;
 
                 var kickBtn = row.Q<Button>(UI_Player_Row_Template.kick_button);
                 if (kickBtn != null)

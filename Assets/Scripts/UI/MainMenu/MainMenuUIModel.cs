@@ -20,7 +20,7 @@ namespace UI.MainMenu
                 return;
             }
 
-            // Connects to the server Lobby Hub (or re-surfaces the cached list if already connected)
+            // Connects to the server Lobby Hub or re-surfaces the cached list if already connected
             _ = manager.ConnectToCustomLobby();
         }
     }

@@ -40,11 +40,11 @@ namespace UI.Loading
         private void StartSpinning()
         {
             _canSpin = true;
-            float currentAngle = 0f;
+            var currentAngle = 0f;
 
             _loadingSpinner.schedule.Execute(() =>
             {
-                currentAngle += 1.5f; // degrees per tick (approx 360°/sec at ~60 FPS)
+                currentAngle += 2f; // degrees per tick
                 if (currentAngle >= 360f) currentAngle -= 360f;
 
                 _loadingSpinner.style.rotate = new Rotate(new Angle(currentAngle, AngleUnit.Degree));

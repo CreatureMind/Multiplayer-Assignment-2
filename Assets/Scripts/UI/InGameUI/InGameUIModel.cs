@@ -7,6 +7,8 @@ using Utils;
 
 public class InGameUIModel
 {
+    private const string WON_TEXT = "Congratz, You won! :D";
+    private const string LOST_TEXT = "You lost! :'(";
     public event Action<string> OnGameEnded;
     
     private NetworkManager _networkManager;
@@ -18,16 +20,12 @@ public class InGameUIModel
 
     public void ReturnToLobby(float flushDelay = 0f)
     {
-        Debug.Log("[InGameUIModel] Returning to lobby...");
-        
         if (_networkManager)
         {
-            Debug.Log("[InGameUIModel] Returning to lobby through network manager.");
             _ = _networkManager.ReturnToLobbyAsync(flushDelay);
         }
         else
         {
-            Debug.Log("[InGameUIModel] Returning to lobby (no network manager).");
             SceneManager.LoadSceneAsync((int)SceneDefs.MENU, LoadSceneMode.Single);
         }
     }
@@ -41,7 +39,7 @@ public class InGameUIModel
             .Select(playerData => playerData.Value.DisplayName.ToString())
             .FirstOrDefault();
 
-        var wonText = isLocalPlayer ? "Congratz, You won! :D" : $"You lost! :'( {winingPlayerName} Won!";
+        var wonText = isLocalPlayer ? WON_TEXT : LOST_TEXT + $"{winingPlayerName} Won!";
         
         OnGameEnded?.Invoke(wonText);
     }

@@ -9,6 +9,7 @@ namespace UI.NameEntry
     {
         private const string RandomNameApi = "https://randomuser.me/api/?inc=login";
 
+        //Fallback
         private static readonly string[] RandomAdjectives =
             { "Swift", "Brave", "Silent", "Crimson", "Lucky", "Shadow", "Iron", "Golden", "Wild", "Frost" };
         private static readonly string[] RandomNouns =

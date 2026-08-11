@@ -39,8 +39,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public string LocalConfirmedName { get; set; }
     
     private string _pendingOwnerToken;
-
-    // Pending create request, so we can raise RoomCreatedEvent once the server approves.
+    
     private RoomCreatedEvent? _pendingCreatedRoom;
 
     private RoomListChangedEvent? _cachedRoomList;
@@ -131,8 +130,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public bool IsLocalPlayer(PlayerRef player) => _networkRunnerInstance && _networkRunnerInstance.LocalPlayer == player;
 
     public PlayerRef LocalPlayer => _networkRunnerInstance ? _networkRunnerInstance.LocalPlayer : default;
-
-    // The server decides owner-only actions; the client only asks.
+    
     public bool IsRoomOwner() =>
         RoomController.Instance && _networkRunnerInstance &&
         RoomController.Instance.Owner == _networkRunnerInstance.LocalPlayer;

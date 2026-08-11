@@ -163,10 +163,7 @@ public class RoomManager : MonoBehaviour
             if (relay)
             {
                 relay.name = $"ChatRelay_{sessionName}";
-                // One relay serves the room for its whole life (lobby + match), so keep it
-                // out of the scene that the Single game-scene load unloads. In Multiple-Peer
-                // mode the spawned object is parented under the scene root, so detach it first
-                // (MakeDontDestroyOnLoad asserts the object is unparented before reparenting it).
+
                 relay.transform.SetParent(null, true);
                 runner.MakeDontDestroyOnLoad(relay.gameObject);
             }
@@ -187,8 +184,6 @@ public class RoomManager : MonoBehaviour
             if (gM)
             {
                 gM.name = $"ServerGameManager_{sessionName}";
-                // One relay serves the room for its whole life (lobby + match), so keep it
-                // out of the scene that the Single game-scene load unloads.
                 gM.transform.SetParent(null, true);
                 runner.MakeDontDestroyOnLoad(gM.gameObject);
                 gM.InstantiateMap(map);

@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 
 public class InGameUIView : MonoBehaviour
 {
+    private const string HIDDEN_CLASS_NAME = "hidden";
     public event Action OnLeaveButtonClicked;
     public event Action OnReturnButtonClicked;
 
@@ -83,8 +84,8 @@ public class InGameUIView : MonoBehaviour
 
     public void ShowEndGamePopup(string wonText)
     {
-        _endGamePopup?.ToggleInClassList("hidden");
-        _uiContainer?.ToggleInClassList("hidden");
+        _endGamePopup?.ToggleInClassList(HIDDEN_CLASS_NAME);
+        _uiContainer?.ToggleInClassList(HIDDEN_CLASS_NAME);
 
         _wonText.text = wonText;
     }

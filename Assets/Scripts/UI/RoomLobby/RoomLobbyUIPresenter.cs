@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Events;
 using Fusion;
 using UnityEngine;
@@ -76,11 +77,12 @@ namespace UI.RoomLobby
         {
             // Render list
             var players = _model.GetAllPlayers();
-            _view.RenderPlayerList(players, _model.CanKick(), _model.IsLocalPlayer);
+            var playerDatas = players.ToList();
+            _view.RenderPlayerList(playerDatas, _model.CanKick(), _model.IsLocalPlayer);
 
             // Notify cross-system chatter
             var nameList = new List<string>();
-            foreach (var p in players)
+            foreach (var p in playerDatas)
             {
                 if (p != null && p.DisplayName.Value != null)
                     nameList.Add(p.DisplayName.Value);
