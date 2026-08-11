@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Events;
 using Fusion;
 using UnityEngine;
@@ -22,6 +23,8 @@ public class ClientManager : NetworkBehaviour
     
     [Networked] public byte PlayerId { get; private set; } // 1-based; 0 = no owner
     [Networked] public NetworkBool TraceLogsEnabled { get; private set; }
+
+    public static Action<string> OnPlayerTurnChanged;
     
     private ServerGameManager _server; // server-side only
     private ClientBoardCache _board; // client-side only
@@ -284,6 +287,11 @@ public class ClientManager : NetworkBehaviour
         _actions.SetTurnState(_bufferedIsMyTurn, _bufferedRemainingBudget);
         GameTraceLogger.Rpc(TraceLogsEnabled, $"RPC_CurrentPlayingPlayerChanged for {name} playerId={currentPlayingPlayer.PlayerId} current budget={_bufferedRemainingBudget}, is my turn={_bufferedIsMyTurn}.");
 
+        foreach (var kvp in NetworkManager.Instance.GetPlayerDataMap().Where(kvp => currentPlayingPlayer.PlayerId == kvp.Key.PlayerId))
+        {
+            OnPlayerTurnChanged.Invoke(kvp.Value.DisplayName.ToString());
+        }
+        
         RaiseLocalTurnState();
     }
 

@@ -12,13 +12,19 @@ public class GameHudController : MonoBehaviour
     private Button _bombButton;
     private Button _baseButton;
     private BudgetHudView _budgetView;
+    private Label _turnValueLabel;
     private bool _wired;
     
     private void Reset() => document = GetComponent<UIDocument>();
 
     // OnEnable catches re-enables (tree already built), Start catches the first spawn
     private void OnEnable() => TryWire();
-    private void Start() => TryWire();
+
+    private void Start()
+    {
+        TryWire();
+        ClientManager.OnPlayerTurnChanged += HandleTurnChange;
+    }
 
     private void OnDisable()
     {
@@ -68,12 +74,16 @@ public class GameHudController : MonoBehaviour
         _budgetView = new BudgetHudView(budgetValueLabel);
         _budgetView.Enable();
         
-        var turnValueLabel = root.Q<Label>("turn-value");
-        if (turnValueLabel == null)
+        _turnValueLabel = root.Q<Label>("turn-value");
+        if (_turnValueLabel == null)
             Debug.LogError("[GameHudController] Label 'turn-value' not found in the UXML.");
-        // TODO: wire label value to current player's name
 
         _wired = true;
+    }
+
+    private void HandleTurnChange(string value)
+    {
+        _turnValueLabel.text = value;
     }
     
     private static void Wire(Button button, string id, System.Action handler)
