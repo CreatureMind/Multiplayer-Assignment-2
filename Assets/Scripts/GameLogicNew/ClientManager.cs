@@ -291,7 +291,7 @@ public class ClientManager : NetworkBehaviour
         {
             OnPlayerTurnChanged.Invoke(currentPlayingPlayer.PlayerId == _localPlayerId
                 ? "Your"
-                : kvp.Value.DisplayName.ToString());
+                : $"{kvp.Value.DisplayName.ToString()}'s");
         }
         
         RaiseLocalTurnState();
@@ -318,7 +318,7 @@ public class ClientManager : NetworkBehaviour
         {
             OnPlayerTurnChanged.Invoke(upcomingPlayer.PlayerId == _localPlayerId
                 ? "Your"
-                : kvp.Value.DisplayName.ToString());
+                : $"{kvp.Value.DisplayName.ToString()}'s");
         }
         
         RaiseLocalTurnState();
