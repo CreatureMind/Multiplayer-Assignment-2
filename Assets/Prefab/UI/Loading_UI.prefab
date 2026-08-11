@@ -10,14 +10,14 @@ GameObject:
   m_Component:
   - component: {fileID: 5118730744084996241}
   - component: {fileID: 3972294438330136940}
-  - component: {fileID: 2743837903586713642}
+  - component: {fileID: 1381271480080473454}
   m_Layer: 0
   m_Name: Loading_UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5118730744084996241
 Transform:
   m_ObjectHideFlags: 0
@@ -56,7 +56,7 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
---- !u!114 &2743837903586713642
+--- !u!114 &1381271480080473454
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

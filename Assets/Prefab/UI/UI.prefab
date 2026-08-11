@@ -87,7 +87,7 @@ MonoBehaviour:
   roomLobbyView: {fileID: 7525119234567143642}
   optionsView: {fileID: 6377384859667689557}
   roomCreationView: {fileID: 2921044859621760522}
-  loadingViewPrefab: {fileID: 2743837903586713642, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
+  loadingViewPrefab: {fileID: 1381271480080473454, guid: 6bf245c470f673d469bb0195a0bcd618, type: 3}
   chatViewPrefab: {fileID: 6575760504648723879, guid: 046a7adf8e10133479ecfb5dccccb912, type: 3}
   roomJoinView: {fileID: 6506015586623474931}
   creditsView: {fileID: 3383420762383255393}

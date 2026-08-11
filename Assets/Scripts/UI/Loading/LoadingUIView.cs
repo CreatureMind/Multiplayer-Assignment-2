@@ -16,6 +16,8 @@ namespace UI.Loading
         private void Awake()
         {
             _document = GetComponent<UIDocument>();
+            
+            gameObject.AddComponent<LoadingUIPresenter>();
         }
 
         private void Start()

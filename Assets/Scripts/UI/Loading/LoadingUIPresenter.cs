@@ -1,20 +1,21 @@
+using System;
 using Events;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace UI.Loading
 {
-    public class LoadingUIPresenter
+    public class LoadingUIPresenter : MonoBehaviour
     {
-        private readonly LoadingUIModel _model;
-        private readonly LoadingUIView _view;
+        private readonly LoadingUIModel _model = new();
+        private LoadingUIView _view;
         
         private bool _isVisible = false;
 
-        public LoadingUIPresenter(LoadingUIModel model, LoadingUIView view)
+        private void Awake()
         {
-            _model = model;
-            _view = view;
-
+            _view = GetComponent<LoadingUIView>();
+            
             SubscribeToEventBus();
         }
 
@@ -26,7 +27,7 @@ namespace UI.Loading
             EventBus.Subscribe<SceneLoadDoneEvent>    (OnHideLoadingScreen);
         }
 
-        public void UnsubscribeFromEvents()
+        private void UnsubscribeFromEvents()
         {
             EventBus.Unsubscribe<ShowLoadingScreenEvent>(OnShowLoadingScreen);
             EventBus.Unsubscribe<SceneLoadStartedEvent> (OnShowLoadingScreen);
@@ -50,6 +51,11 @@ namespace UI.Loading
 
             _view.Hide();
             _model.EndSound();
+        }
+
+        private void OnDestroy()
+        {
+            UnsubscribeFromEvents();
         }
     }
 }
