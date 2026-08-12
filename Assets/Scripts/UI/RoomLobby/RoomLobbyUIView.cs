@@ -35,10 +35,7 @@ namespace UI.RoomLobby
         private void Awake()
         {
             _document = GetComponent<UIDocument>();
-        }
-
-        private void Start()
-        {
+            
             if (!_document)
             {
                 Debug.LogError("[RoomLobbyUIView] UIDocument is null!");
@@ -90,6 +87,8 @@ namespace UI.RoomLobby
             {
                 Debug.LogError("[RoomLobbyUIView] Could not find Button named 'start-btn' in Room_View.");
             }
+            
+            Hide();
         }
 
         public void SetHeader(string roomName, string modeName, string mapName)

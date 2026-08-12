@@ -21,10 +21,7 @@ namespace UI.MainMenu
         private void Awake()
         {
             _document = GetComponent<UIDocument>();
-        }
-
-        private void Start()
-        {
+            
             if (!_document)
             {
                 Debug.LogError("[MainMenuUIView] UIDocument is null!");

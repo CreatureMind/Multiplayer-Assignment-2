@@ -43,10 +43,7 @@ namespace UI.RoomsList
         private void Awake()
         {
             _document = GetComponent<UIDocument>();
-        }
-
-        private void Start()
-        {
+            
             if (!_document)
             {
                 Debug.LogError("[RoomsListUIView] UIDocument is null!");
@@ -117,6 +114,8 @@ namespace UI.RoomsList
             {
                 Debug.LogError("[RoomsListUIView] Could not find Button named 'refresh-btn' in Room_List_View.");
             }
+            
+            Hide();
         }
 
         public void SetHeader(string text)

@@ -24,10 +24,7 @@ public class InGameUIView : MonoBehaviour
     private void Awake()
     {
         _document = GetComponent<UIDocument>();
-    }
-
-    private void Start()
-    {
+        
         if (!_document)
         {
             Debug.LogError("[InGameUIView] UIDocument is null");

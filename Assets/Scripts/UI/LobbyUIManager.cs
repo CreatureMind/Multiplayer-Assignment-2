@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Events;
 using UI.Dialog;
@@ -59,8 +60,9 @@ namespace UI
         //Loading
         private static LoadingUIView _loadingViewInstance;
 
-        private void Start()
+        private IEnumerator Start()
         {
+            yield return null;
             InitializePresenters();
         }
 
