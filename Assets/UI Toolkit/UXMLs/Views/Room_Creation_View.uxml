@@ -1,24 +1,18 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/Styles/LobbyStyle.uss?fileID=7433441132597879392&amp;guid=c1ae93633323eed4e9baa1825210ea51&amp;type=3#LobbyStyle"/>
-    <ui:VisualElement name="tint" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.4);">
-        <ui:VisualElement name="container" style="flex-grow: 1;">
-            <ui:Label text="Create a room" name="header" class="header" style="translate: 0 200px;"/>
-            <ui:VisualElement name="container" style="margin-top: 0; margin-right: 400px; margin-bottom: 0; margin-left: 400px; flex-direction: column; align-items: stretch; align-content: auto; justify-content: center; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
-                <ui:VisualElement name="VisualElement" style="flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; background-color: rgb(128, 128, 128); border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 50px; padding-right: 100px; padding-bottom: 50px; padding-left: 100px;">
-                    <ui:TextField label="Room name" placeholder-text="Pompo lo pompo" name="room-name" class="Lable"/>
-                    <ui:VisualElement name="spacer" style="flex-basis: 10px;"/>
-                    <ui:SliderInt label="Max Players" value="4" high-value="8" show-input-field="true" low-value="1" name="max-players" enabled="true" class="Lable" style="justify-content: flex-start; align-items: stretch;"/>
-                    <ui:VisualElement name="spacer" style="flex-basis: 10px;"/>
-                    <ui:DropdownField label="Mode" choices="Free for All,2 vs 2" index="0" name="modes-dropdown" class="Lable" style="padding-right: 400px;"/>
-                    <ui:VisualElement name="spacer" style="flex-basis: 10px;"/>
-                    <ui:DropdownField label="Map" choices="Basic,Plus,Chokepoint" index="0" name="maps-dropdown" class="Lable" style="padding-right: 400px;"/>
-                    <ui:VisualElement name="spacer" style="flex-basis: 10px;"/>
-                    <ui:Toggle label="Public" name="public-toggle" value="true" class="Lable" style="align-self: auto;"/>
-                </ui:VisualElement>
-                <ui:VisualElement name="bottom-container" style="flex-direction: row; justify-content: space-between; align-items: flex-start; margin-top: 5px;">
-                    <ui:Button text="Back" name="back-button" style="align-items: auto; align-self: auto; font-size: 32px;"/>
-                    <ui:Button text="Create" enabled="true" name="create-button" style="align-items: auto; align-self: auto; font-size: 32px;"/>
-                </ui:VisualElement>
+    <ui:VisualElement name="tint" class="overlay-tint" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.4);">
+        <ui:VisualElement name="container" class="overlay-container" style="margin-top: 0; margin-right: 400px; margin-bottom: 0; margin-left: 400px; flex-direction: column; align-items: stretch; align-content: auto; justify-content: center; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+            <ui:VisualElement name="panel" style="flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; background-color: rgb(60, 60, 60); padding-top: 60px; padding-right: 60px; padding-bottom: 45px; padding-left: 60px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(128, 128, 128); border-right-color: rgb(128, 128, 128); border-top-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128);">
+                <ui:Label text="Create a Room" name="header" class="header" style="position: absolute; align-self: center; top: -105px;"/>
+                <ui:TextField label="Room name" name="room-name" focusable="true" class="Lable creation-room name"/>
+                <ui:SliderInt label="Max Players" value="4" high-value="4" show-input-field="true" low-value="2" name="max-players" enabled="true" focusable="false" fill="true" class="Lable creation-room players" style="justify-content: flex-start; align-items: stretch;"/>
+                <ui:DropdownField label="Mode" choices="Free for All" index="0" name="modes-dropdown" focusable="false" class="top-dropdown creation-room mode" style="align-self: auto;"/>
+                <ui:DropdownField label="Map" choices="Basic,Plus,Chokepoint" index="0" name="maps-dropdown" focusable="false" class="top-dropdown creation-room map" style="align-self: auto;"/>
+                <ui:Toggle label="Public" name="public-toggle" value="true" focusable="false" class="Lable creation-room public"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="bottom-container" style="flex-direction: row; justify-content: space-between; align-items: flex-start;">
+                <ui:Button text="Back" name="back-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+                <ui:Button text="Create" enabled="true" name="create-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

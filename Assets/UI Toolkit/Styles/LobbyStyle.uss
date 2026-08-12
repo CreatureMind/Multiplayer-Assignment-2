@@ -6,33 +6,64 @@
     color: rgb(255, 255, 255);
     -unity-text-align: upper-center;
     -unity-font-style: normal;
-    -unity-font-definition: url("project://database/Assets/Fonts/GoogleSans/GoogleSansFlex_72pt-Bold.ttf?fileID=12800000&guid=8606e6655ab624262af18f5dea3d5535&type=3#GoogleSansFlex_72pt-Bold");
+    -unity-font-definition: url("project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&guid=19184939772a7974a86fbd3229349203&type=3#Geometos");
+    padding-top: 20px;
 }
 
 Button {
     font-size: 20px;
     align-self: center;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
     -unity-font-style: normal;
-    border-left-color: rgb(0, 0, 0);
-    border-right-color: rgb(0, 0, 0);
-    border-top-color: rgb(0, 0, 0);
-    border-bottom-color: rgb(0, 0, 0);
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
-    -unity-font-definition: url("project://database/Assets/Fonts/GoogleSans/GoogleSansFlex_72pt-Bold.ttf?fileID=12800000&guid=8606e6655ab624262af18f5dea3d5535&type=3#GoogleSansFlex_72pt-Bold");
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    -unity-font-definition: url("project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&guid=19184939772a7974a86fbd3229349203&type=3#Geometos");
     padding-left: 25px;
     padding-right: 25px;
+    background-color: rgb(128, 128, 128);
+    -unity-text-align: middle-left;
+    padding-top: 18px;
+}
+
+Button:hover {
+    font-size: 20px;
+    align-self: center;
+    -unity-font-style: normal;
+    -unity-font-definition: url("project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&guid=19184939772a7974a86fbd3229349203&type=3#Geometos");
+    padding-left: 25px;
+    padding-right: 25px;
+    background-color: rgb(153, 153, 153);
+    -unity-text-align: middle-left;
+    padding-top: 18px;
+}
+
+Button:active {
+    font-size: 20px;
+    align-self: center;
+    -unity-font-style: normal;
+    -unity-font-definition: url("project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&guid=19184939772a7974a86fbd3229349203&type=3#Geometos");
+    padding-left: 25px;
+    padding-right: 25px;
+    background-color: rgb(102, 102, 102);
+    -unity-text-align: middle-left;
+    padding-top: 18px;
+    scale: 0.95 0.95;
 }
 
 .Lable {
     -unity-font-definition: url("project://database/Assets/Fonts/GoogleSans/GoogleSansFlex_72pt-Medium.ttf?fileID=12800000&guid=8ef1adb5892f043ad949ae5259924043&type=3#GoogleSansFlex_72pt-Medium");
-    font-size: 35px;
+    font-size: 32px;
+    -unity-text-align: middle-left;
+}
+
+.ingame-lable {
+    -unity-font-definition: url("project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&guid=19184939772a7974a86fbd3229349203&type=3#Geometos");
+    font-size: 40px;
     -unity-text-align: middle-left;
 }
 
@@ -42,8 +73,8 @@ Button {
     align-content: flex-end;
 }
 
-.unity-text-element {
-    -unity-font-definition: url("project://database/Assets/Fonts/GoogleSans/GoogleSansFlex_72pt-Medium.ttf?fileID=12800000&guid=8ef1adb5892f043ad949ae5259924043&type=3#GoogleSansFlex_72pt-Medium");
+.unity-text-element1 {
+    -unity-font-definition: url("project://database/Assets/Fonts/Geometos/Geometos.ttf?fileID=12800000&guid=19184939772a7974a86fbd3229349203&type=3#Geometos");
 }
 
 .chat-msg {
@@ -52,6 +83,7 @@ Button {
     margin-top: -7px;
     margin-bottom: -7px;
     font-size: 18px;
+    -unity-font-definition: url("project://database/Assets/Fonts/GoogleSans/GoogleSansFlex_72pt-Medium.ttf?fileID=12800000&guid=8ef1adb5892f043ad949ae5259924043&type=3#GoogleSansFlex_72pt-Medium");
 }
 
 .chat-msg__body {
@@ -90,8 +122,11 @@ Button {
 .top-dropdown {
     align-items: center;
     align-self: center;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    border-left-color: rgb(128, 128, 128);
+    border-right-color: rgb(128, 128, 128);
+    border-top-color: rgb(128, 128, 128);
+    border-bottom-color: rgb(128, 128, 128);
+    -unity-font-definition: url("project://database/Assets/Fonts/GoogleSans/GoogleSansFlex_72pt-Medium.ttf?fileID=12800000&guid=8ef1adb5892f043ad949ae5259924043&type=3#GoogleSansFlex_72pt-Medium");
 }
 
 .top-dropdown > .unity-base-field__label {
@@ -102,8 +137,16 @@ Button {
     align-items: center;
     align-self: center;
     margin-left: 4px;
-    font-size: 18px;
+    font-size: 32px;
     -unity-text-align: middle-left;
+}
+
+.unity-base-popup-field__text {
+    align-items: center;
+    align-self: center;
+    margin-left: 0;
+    font-size: 20px;
+    margin-right: 0;
 }
 
 .top-dropdown > .unity-base-field__input {
@@ -111,6 +154,11 @@ Button {
     align-self: center;
     margin-left: 0;
     width: 150px;
+    font-size: 20px;
+    border-left-color: rgb(128, 128, 128);
+    border-right-color: rgb(128, 128, 128);
+    border-top-color: rgb(128, 128, 128);
+    border-bottom-color: rgb(128, 128, 128);
 }
 
 .play-indicator {
@@ -120,8 +168,150 @@ Button {
     background-color: rgb(255, 117, 0);
 }
 
-
-
 .play-indicator.green .unity-radio-button__checkmark {
     background-color: rgb(40, 154, 0);
+}
+
+.unity-text-field > .unity-base-field__input {
+    height: 48px;
+    border-left-color: rgb(128, 128, 128);
+    border-right-color: rgb(128, 128, 128);
+    border-top-color: rgb(128, 128, 128);
+    border-bottom-color: rgb(128, 128, 128);
+}
+
+.creation-room {
+}
+
+.creation-room.name > .unity-base-field__input {
+    align-self: center;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 5px;
+}
+
+.creation-room > .unity-base-field__label {
+    color: rgb(255, 255, 255);
+    padding-right: 10px;
+}
+
+.creation-room.players > .unity-base-field__label {
+    color: rgb(255, 255, 255);
+    margin-right: 7px;
+}
+
+.creation-room.mode > .unity-base-field__label {
+    color: rgb(255, 255, 255);
+    margin-right: 91px;
+}
+
+.creation-room.map > .unity-base-field__label {
+    color: rgb(255, 255, 255);
+    margin-right: 110px;
+}
+
+.creation-room.public > .unity-base-field__label {
+    color: rgb(255, 255, 255);
+    margin-right: 38px;
+}
+
+.creation-room.players > .unity-base-slider__input > .unity-text-field > .unity-base-field__input {
+    align-self: center;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    -unity-text-align: middle-center;
+    font-size: 32px;
+    margin-left: 8px;
+}
+
+.spacer {
+    flex-basis: 0;
+}
+
+.name-entry.text-field > .unity-base-field__input {
+    align-self: center;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 5px;
+}
+
+.main-menu {
+}
+
+.main-menu.btn {
+    transition-property: rotate;
+    transition-duration: 0.1s;
+    transition-timing-function: ease-in;
+    rotate: 0;
+}
+
+.main-menu.btn:hover {
+    rotate: 5deg;
+}
+
+.options {
+}
+
+.options > .unity-base-field__label {
+    color: rgb(255, 255, 255);
+    padding-right: 10px;
+}
+
+.options.volume > .unity-base-field__label {
+    color: rgb(255, 255, 255);
+    margin-right: 7px;
+}
+
+.options.volume > .unity-base-slider__input > .unity-text-field > .unity-base-field__input {
+    align-self: center;
+    -unity-text-align: middle-center;
+    font-size: 32px;
+    margin-left: 8px;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+}
+
+.options.pallete > .unity-base-field__label {
+    color: rgb(255, 255, 255);
+    margin-right: 20px;
+}
+
+.options.shapes > .unity-base-field__label {
+    color: rgb(255, 255, 255);
+    margin-right: -21px;
+}
+
+.options.mute > .unity-base-field__label {
+    color: rgb(255, 255, 255);
+    margin-right: 40px;
+}
+
+.overlay-tint {
+    transition-property: opacity;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+    opacity: 1;
+}
+
+.overlay-tint--hidden {
+    opacity: 0;
+}
+
+.overlay-container {
+    transition-property: opacity, scale;
+    transition-duration: 0.18s, 0.28s;
+    transition-timing-function: ease-out, ease-out-back;
+    opacity: 1;
+    scale: 1 1;
+}
+
+.overlay-container--hidden {
+    opacity: 0;
+    scale: 0.92 0.92;
 }

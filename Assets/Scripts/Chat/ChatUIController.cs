@@ -13,58 +13,103 @@ public enum MessageType {
 
 public class ChatUIController : MonoBehaviour
 {
-    private ScrollView _chatScrollView;
-    private TextField _chatTextField;
+    private UIDocument    _document;
+    private VisualElement _root;
+    
+    private ScrollView    _chatScrollView;
+    private TextField     _chatTextField;
     private DropdownField _chatDropdown;
+    private VisualElement _chatContainer;
+
+    private Button _chatBtn;
 
     private string _currentTarget = ALL_OPTION;
     private const string ALL_OPTION = "All";
     
+    //class names
+    private const string CHAT_HIDDEN = "chat--hidden";
+    private const string CHAT_MSG = "chat-msg";
+    private const string CHAT_MSG_PREFIX = "chat-msg__prefix";
+    private const string CHAT_MSG_BODY = "chat-msg__body";
+    private const string CHAT_MSG_PREFIX_SYSTEM = "chat-msg__prefix--system";
+    private const string CHAT_MSG_PREFIX_ALL = "chat-msg__prefix--all";
+    private const string CHAT_MSG_PREFIX_WHISPER_FROM = "chat-msg__prefix--whisper-from";
+    private const string CHAT_MSG_PREFIX_WHISPER_TO = "chat-msg__prefix--whisper-to";
+
+    private bool _isVisible = true;
+    
     private void OnEnable()
     {
-        EventBus.Subscribe<OnMessageReceivedEvent>(RenderMessage);
-        EventBus.Subscribe<PlayerListChangedEvent>(OnPlayerListChanged);
-        EventBus.Subscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
+        EventBus.Subscribe<OnMessageReceivedEvent>   (RenderMessage);
+        EventBus.Subscribe<PlayerListChangedEvent>   (OnPlayerListChanged);
+        EventBus.Subscribe<PlayerDataChangedEvent>   (OnPlayerDataChanged);
         EventBus.Subscribe<OnChatRelayDespawnedEvent>(OnChatRelayDespawned);
+        EventBus.Subscribe<PlayerNameConfirmedEvent> (Show);
+        EventBus.Subscribe<HideChatEvent>            (Hide);
     }
 
     private void OnDisable()
     {
-        EventBus.Unsubscribe<OnMessageReceivedEvent>(RenderMessage);
-        EventBus.Unsubscribe<PlayerListChangedEvent>(OnPlayerListChanged);
-        EventBus.Unsubscribe<PlayerDataChangedEvent>(OnPlayerDataChanged);
+        EventBus.Unsubscribe<OnMessageReceivedEvent>   (RenderMessage);
+        EventBus.Unsubscribe<PlayerListChangedEvent>   (OnPlayerListChanged);
+        EventBus.Unsubscribe<PlayerDataChangedEvent>   (OnPlayerDataChanged);
         EventBus.Unsubscribe<OnChatRelayDespawnedEvent>(OnChatRelayDespawned);
+        EventBus.Unsubscribe<PlayerNameConfirmedEvent> (Show);
+        EventBus.Unsubscribe<HideChatEvent>            (Hide);
 
         _chatTextField?.UnregisterCallback<KeyDownEvent>(OnTextFieldKeyDown, TrickleDown.TrickleDown);
     }
 
+    private void Awake()
+    {
+        _document = GetComponent<UIDocument>();
+    }
+
     private void Start()
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
-        _chatScrollView = root.Q<ScrollView>(UI_Chat_View.chat_scroll_view);
-        _chatScrollView.Clear();
-        _chatTextField = root.Q<TextField>(UI_Chat_View.text_field);
-        _chatDropdown = root.Q<DropdownField>(UI_Chat_View.dropdown_field);
-
-        var chatContainer = root.Q<VisualElement>(UI_Chat_View.chat_container);
-
-        var chatBtn = root.Q<Button>(UI_Chat_View.chat_btn);
-        if (chatBtn != null)
+        if (!_document)
         {
-            chatBtn.clicked += () =>
-            {
-                chatContainer.ToggleInClassList("chat--hidden");
-            };
+            Debug.LogError("[ChatUIController] UIDocument is null!");
+            return;
         }
         
-        RefreshPlayerDropdown();
-        
-        _chatTextField.RegisterCallback<KeyDownEvent>(OnTextFieldKeyDown, TrickleDown.TrickleDown);
-        _chatScrollView.contentContainer.RegisterCallback<GeometryChangedEvent>(ScrollToBottom);
-        _chatDropdown.RegisterValueChangedCallback(OnDropDownValueChanged);
+        InitializeUI(_document);
         
         EventBus.Raise(new ChatCreatedEvent());
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void InitializeUI(UIDocument document)
+    {
+        _root = document.rootVisualElement;
+
+        _chatScrollView = _root.Q<ScrollView>  (UI_Chat_View.chat_scroll_view);
+        _chatScrollView.Clear();
+        
+        _chatTextField = _root.Q<TextField>    (UI_Chat_View.text_field);
+        _chatDropdown  = _root.Q<DropdownField>(UI_Chat_View.dropdown_field);
+        _chatContainer = _root.Q<VisualElement>(UI_Chat_View.chat_container);
+        _chatBtn       = _root.Q<Button>       (UI_Chat_View.chat_btn);
+        
+        RefreshPlayerDropdown();
+        
+        SetupCallbacks();
+    }
+    
+    private void SetupCallbacks()
+    {
+        if (_chatBtn != null)
+        {
+            _chatBtn.clicked += () => _chatContainer.ToggleInClassList(CHAT_HIDDEN);
+        }
+        else
+        {
+            Debug.LogError("[ChatUIController] Could not find Button named 'chat-btn' in Chat_View.");
+        }
+
+        _chatTextField.RegisterCallback<KeyDownEvent>(OnTextFieldKeyDown, TrickleDown.TrickleDown);
+        _chatScrollView.contentContainer.RegisterCallback<GeometryChangedEvent>(ScrollToBottom);
+        _chatDropdown.RegisterValueChangedCallback(OnDropDownValueChanged);
     }
 
     private void OnPlayerListChanged(PlayerListChangedEvent _) => RefreshPlayerDropdown();
@@ -159,13 +204,13 @@ public class ChatUIController : MonoBehaviour
         if (_chatScrollView == null) return;
 
         var row =  new VisualElement();
-        row.AddToClassList("chat-msg");
+        row.AddToClassList(CHAT_MSG);
 
         var prefix = new Label();
-        prefix.AddToClassList("chat-msg__prefix");
+        prefix.AddToClassList(CHAT_MSG_PREFIX);
         
         var body = new Label(e.Message);
-        body.AddToClassList("chat-msg__body");
+        body.AddToClassList(CHAT_MSG_BODY);
 
         ApplyPrefix(prefix, e.MessageType, e.Sender, e.Target);
         
@@ -182,23 +227,23 @@ public class ChatUIController : MonoBehaviour
         {
             case MessageType.System:
                 prefix.text = "System:";
-                prefix.AddToClassList("chat-msg__prefix--system");
+                prefix.AddToClassList(CHAT_MSG_PREFIX_SYSTEM);
                 break;
             case MessageType.All:
                 prefix.text = $"#{sender}:";
-                prefix.AddToClassList("chat-msg__prefix--all");
+                prefix.AddToClassList(CHAT_MSG_PREFIX_ALL);
                 break;
             case MessageType.WhisperFrom:
                 prefix.text = $"@From {sender}:";
-                prefix.AddToClassList("chat-msg__prefix--whisper-from");
+                prefix.AddToClassList(CHAT_MSG_PREFIX_WHISPER_FROM);
                 break;
             case MessageType.WhisperTo:
                 prefix.text = $"@To {target}:";
-                prefix.AddToClassList("chat-msg__prefix--whisper-to");
+                prefix.AddToClassList(CHAT_MSG_PREFIX_WHISPER_TO);
                 break;
             default:
                 prefix.text = $"#{sender}:";
-                prefix.AddToClassList("chat-msg__prefix--all");
+                prefix.AddToClassList(CHAT_MSG_PREFIX_ALL);
                 break;
         }
     }
@@ -210,13 +255,33 @@ public class ChatUIController : MonoBehaviour
     
     private string GetLocalPlayerName()
     {
-        var data = NetworkManager.Instance ? NetworkManager.Instance.GetLocalPlayerData() : null;
+        if (!NetworkManager.Instance) return string.Empty;
+        
+        if (!string.IsNullOrEmpty(NetworkManager.Instance.LocalConfirmedName))
+            return NetworkManager.Instance.LocalConfirmedName;
+        var data = NetworkManager.Instance.GetLocalPlayerData();
         return data ? data.DisplayName.ToString() : string.Empty;
     }
     
     private void OnChatRelayDespawned(OnChatRelayDespawnedEvent e)
     {
-        Debug.Log("OnChatRelayDespawned");
+        Debug.Log("[ChatUIController] Chat relay despawned");
         Destroy(gameObject);
+    }
+    
+    private void Show(PlayerNameConfirmedEvent e)
+    {
+        if (_isVisible) return;
+        _isVisible = true;
+
+        if (_root != null) _root.style.display = DisplayStyle.Flex;
+    }
+
+    private void Hide(HideChatEvent e)
+    {
+        if (!_isVisible) return;
+        _isVisible = false;
+
+        if (_root != null) _root.style.display = DisplayStyle.None;
     }
 }

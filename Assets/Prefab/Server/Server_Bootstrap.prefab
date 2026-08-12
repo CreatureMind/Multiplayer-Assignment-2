@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7913520251025849637
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5625527433740928131}
+  - component: {fileID: 3800557479239131395}
+  - component: {fileID: 7190952270355023835}
+  m_Layer: 0
+  m_Name: Server_Bootstrap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5625527433740928131
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7913520251025849637}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3800557479239131395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7913520251025849637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e045a5c1bb056ef478730a560d4c7c41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoomManager
+  roomRunnerPrefab: {fileID: 7706314431963058946, guid: 4f5377e4c5bfcbb4c86b84f4a299471d, type: 3}
+  roomControllerPrefab: {fileID: 7458274329203951455, guid: c826e7fd4b875bd4bb55425716d7af7e, type: 3}
+  playerDataPrefab: {fileID: 4968519751102832067, guid: b15ba0f7073085f4db99bc19739497ed, type: 3}
+  chatRelayPrefab: {fileID: 4636337649601192298, guid: 586e1286dd37efd45a39688bea54edd0, type: 3}
+  serverGameManagerPrefab: {fileID: 4475268518373070431, guid: 3201282e8aab4c340b6e71ad520e4319, type: 3}
+  hubLobbyName: TinySoldiersLobby
+  maxRooms: 5
+  absoluteMaxPlayersPerRoom: 5
+  absoluteMinPlayersPerRoom: 3
+--- !u!114 &7190952270355023835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7913520251025849637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0171ec5427c2372429c342b44102d31e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ServerBootstrap
+  runnerPrefab: {fileID: 7706314431963058946, guid: 4f5377e4c5bfcbb4c86b84f4a299471d, type: 3}
+  lobbyHubServicePrefab: {fileID: 7599737645971647539, guid: 3e34a4efc2ad99b4caf68ba192ff94e5, type: 3}
+  chatRelayPrefab: {fileID: 4636337649601192298, guid: 586e1286dd37efd45a39688bea54edd0, type: 3}
+  hubPlayerDataPrefab: {fileID: 4968519751102832067, guid: b15ba0f7073085f4db99bc19739497ed, type: 3}
+  hubSessionName: LobbyHub
+  hubLobbyName: TinySoldiersLobby
+  maxLobbyPlayers: 200
+  hubNetSceneBuildIndex: 3
+  targetFPS: 30

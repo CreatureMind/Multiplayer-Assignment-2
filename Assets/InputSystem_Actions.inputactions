@@ -40,7 +40,7 @@
                 {
                     "name": "",
                     "id": "3973e3a9-030a-41a3-9279-b4f639604492",
-                    "path": "<Mouse>/position",
+                    "path": "<Pointer>/position",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -103,6 +103,15 @@
                     "name": "RightClick",
                     "type": "PassThrough",
                     "id": "44b200b1-1557-4083-816c-b22cbdf77ddf",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftClick",
+                    "type": "PassThrough",
+                    "id": "d638218f-b3dc-4e18-81f5-6d82e5434d67",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -528,6 +537,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "RightClick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4f7499a4-e021-4ac1-a3aa-65e186040ff1",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "LeftClick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

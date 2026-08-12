@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Room_View.uxml
-// Updated: 2026-07-27 15:29 UTC
+// Updated: 2026-08-07 13:16 UTC
 
 using System.Collections.Generic;
 
@@ -13,6 +13,7 @@ public enum UI_Room_View
     leave_button,
     ready_button,
     start_button,
+    code_label,
 }
 
 internal static class UI_Room_View_Map
@@ -27,5 +28,6 @@ internal static class UI_Room_View_Map
             { UI_Room_View.leave_button, "leave-button" },
             { UI_Room_View.ready_button, "ready-button" },
             { UI_Room_View.start_button, "start-button" },
+            { UI_Room_View.code_label, "code-label" },
         };
 }

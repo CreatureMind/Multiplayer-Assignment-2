@@ -1,6 +1,6 @@
 // AUTO-GENERATED — DO NOT EDIT
 // Source : Assets/UI Toolkit/UXMLs/Views/Chat_View.uxml
-// Updated: 2026-07-27 15:29 UTC
+// Updated: 2026-08-07 13:16 UTC
 
 using System.Collections.Generic;
 

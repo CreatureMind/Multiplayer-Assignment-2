@@ -1,0 +1,60 @@
+﻿using Fusion;
+using UnityEngine;
+
+public struct PlayerActionData : INetworkStruct
+{
+    public int PlayerId;
+    public int MaxActionAmountPerTurn;
+    public int CurrentActionAmount;
+
+    public PlayerActionData(int maxActionAmountPerTurn, int playerId)
+    {
+        PlayerId = playerId;
+        MaxActionAmountPerTurn = maxActionAmountPerTurn;
+        CurrentActionAmount = maxActionAmountPerTurn;
+    }
+    
+    public void ResetCurrentActionAmount()
+    {
+        CurrentActionAmount = MaxActionAmountPerTurn;
+    }
+
+    public void UpdateMaxActionAmountPerTurn(int amountToAdd)
+    {
+        MaxActionAmountPerTurn += amountToAdd;
+        CurrentActionAmount += amountToAdd;
+    }
+
+    public void UpdateCurrentActionAmount(int amountToReduce)
+    {
+        CurrentActionAmount -= amountToReduce;
+        if (CurrentActionAmount < 0)
+            CurrentActionAmount = 0;
+    }
+    
+    public bool HasEnoughToBuildBase(int priceOfPawn) // needs to be changed if any other base building conditions are wanted
+    {
+        return CurrentActionAmount >= priceOfPawn;
+    }
+    
+    public bool HasEnoughToPlaceBomb(int priceOfBomb)
+    {
+        return CurrentActionAmount >= priceOfBomb;
+    }
+    
+    public bool HasEnoughToPlacePawn(int priceOfPawn)
+    {
+        return CurrentActionAmount >= priceOfPawn;
+    }
+    
+    public bool TurnEnded()
+    {
+        return CurrentActionAmount == 0;
+    }
+
+    public void ReduceMaxActionAmountPerTurn(int turnStatsActionGainPerBase)
+    {
+        MaxActionAmountPerTurn = Mathf.Max(0, MaxActionAmountPerTurn - turnStatsActionGainPerBase);
+        CurrentActionAmount = Mathf.Min(CurrentActionAmount, MaxActionAmountPerTurn);
+    }
+}   

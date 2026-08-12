@@ -1,20 +1,22 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/Styles/LobbyStyle.uss?fileID=7433441132597879392&amp;guid=c1ae93633323eed4e9baa1825210ea51&amp;type=3#LobbyStyle"/>
-    <ui:VisualElement name="container" tooltip="Waiting for player" style="flex-grow: 1; background-color: rgb(128, 128, 128); margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; flex-direction: row; align-items: center; align-content: auto; justify-content: space-between;">
-        <ui:RadioButton label="" focusable="false" toggle-on-label-click="false" value="true" name="play-indicator" class="play-indicator" style="position: absolute; margin-top: 0; margin-right: 16px; margin-bottom: 0; margin-left: 16px;"/>
-        <ui:Label text="Room name" name="room-name" class="Lable" style="width: 30%; height: 100%; padding-left: 4px; padding-right: 4px; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 50px; align-content: auto;">
-            <Bindings>
-                <ui:DataBinding property="value" data-source-path="sessionName" binding-mode="ToTarget"/>
-            </Bindings>
-        </ui:Label>
-        <ui:Label text="|" name="seperator" class="Lable"/>
-        <ui:Label text="Mode" name="room-mode" class="Lable"/>
-        <ui:Label text="|" name="seperator" class="Lable"/>
-        <ui:Label text="Map&#10;" name="room-map" class="Lable"/>
-        <ui:Label text="|" name="seperator" class="Lable"/>
-        <ui:VisualElement name="VisualElement" style="flex-grow: 0; flex-direction: row; justify-content: flex-end; align-self: auto; align-items: center; align-content: auto; width: 30%; height: 100%;">
-            <ui:Label text="0/0" name="player-count" class="Lable" style="padding-left: 4px; padding-right: 4px; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px; align-items: stretch;"/>
-            <ui:Button text="Enter" name="enter-button" style="-unity-text-align: middle-center; justify-content: flex-start; align-items: auto; align-self: auto; align-content: auto; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;"/>
+    <ui:VisualElement style="flex-grow: 1; flex-direction: row; margin-bottom: 5px;">
+        <ui:VisualElement name="container" tooltip="Waiting for player" style="flex-grow: 1; background-color: rgb(128, 128, 128); flex-direction: row; align-items: center; align-content: auto; justify-content: space-between;">
+            <ui:RadioButton label="" focusable="false" toggle-on-label-click="false" value="true" name="play-indicator" class="play-indicator" style="position: absolute; margin-top: 0; margin-right: 16px; margin-bottom: 0; margin-left: 16px;"/>
+            <ui:Label text="Room name" name="room-name" class="Lable" style="width: 30%; height: 100%; padding-left: 4px; padding-right: 4px; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 50px; align-content: auto;">
+                <Bindings>
+                    <ui:DataBinding property="value" data-source-path="sessionName" binding-mode="ToTarget"/>
+                </Bindings>
+            </ui:Label>
+            <ui:Label text="|" name="seperator" class="Lable"/>
+            <ui:Label text="Mode" name="room-mode" class="Lable"/>
+            <ui:Label text="|" name="seperator" class="Lable"/>
+            <ui:Label text="Map&#10;" name="room-map" class="Lable"/>
+            <ui:Label text="|" name="seperator" class="Lable"/>
+            <ui:VisualElement name="VisualElement" style="flex-grow: 0; flex-direction: row; justify-content: flex-end; align-self: auto; align-items: center; align-content: auto; width: 30%; height: 100%;">
+                <ui:Label text="0/0" name="player-count" class="Lable" style="padding-left: 4px; padding-right: 4px; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px; align-items: stretch;"/>
+            </ui:VisualElement>
         </ui:VisualElement>
+        <ui:Button text="Enter" name="enter-button" enabled="true" style="-unity-text-align: middle-center; justify-content: flex-start; align-items: auto; align-self: auto; align-content: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 5px;"/>
     </ui:VisualElement>
 </ui:UXML>

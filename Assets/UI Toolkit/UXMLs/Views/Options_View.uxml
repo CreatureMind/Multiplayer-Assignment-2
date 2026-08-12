@@ -1,0 +1,25 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Styles/LobbyStyle.uss?fileID=7433441132597879392&amp;guid=c1ae93633323eed4e9baa1825210ea51&amp;type=3#LobbyStyle"/>
+    <ui:VisualElement name="tint" class="overlay-tint" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.4);">
+        <ui:VisualElement name="container" class="overlay-container" style="margin-top: 0; margin-right: 400px; margin-bottom: 0; margin-left: 400px; flex-direction: column; align-items: stretch; align-content: auto; justify-content: center; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+            <ui:VisualElement name="panel" style="flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; background-color: rgb(60, 60, 60); padding-top: 60px; padding-right: 60px; padding-bottom: 45px; padding-left: 60px; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(128, 128, 128); border-right-color: rgb(128, 128, 128); border-top-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128);">
+                <GradientBox name="" end-color="rgba(0, 0, 0, 0.5)" start-color="rgba(0, 0, 0, 0)" style="width: 100%; height: 104px; position: absolute; top: -105px; align-self: center;"/>
+                <ui:Label text="Options" name="header" class="header" style="position: absolute; align-self: center; top: -105px;"/>
+                <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+                    <ui:SliderInt label="Music Volume" value="10" high-value="10" show-input-field="true" low-value="0" name="music-volume-slider" enabled="true" focusable="false" fill="true" inverted="false" class="Lable options volume" style="justify-content: flex-start; align-items: stretch; flex-grow: 1;"/>
+                    <ui:SliderInt label="SFX Volume" value="10" high-value="10" show-input-field="true" low-value="0" name="sfx-volume-slider" enabled="true" focusable="false" fill="true" inverted="false" class="Lable options volume" style="justify-content: flex-start; align-items: stretch; flex-grow: 1;"/>
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+                    <ui:Toggle label="Mute Music" name="mute-music-toggle" focusable="false" class="Lable options mute"/>
+                    <ui:VisualElement style="flex-grow: 0; flex-basis: 260px;"/>
+                    <ui:Toggle label="Mute SFX" name="mute-sfx-toggle" focusable="false" class="Lable options mute"/>
+                </ui:VisualElement>
+                <ui:DropdownField label="Pallete" choices="Regular,Okabe-Ito,IBM Color Blind Safe palette" index="0" name="modes-dropdown" focusable="false" class="top-dropdown pallete options" style="align-self: auto;"/>
+                <ui:Toggle label="Shapes" name="shapes-toggle" focusable="false" class="Lable options shapes"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="bottom-container" style="flex-direction: row; justify-content: space-between; align-items: flex-start;">
+                <ui:Button text="Back" name="back-button" style="align-items: auto; align-self: auto; font-size: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
