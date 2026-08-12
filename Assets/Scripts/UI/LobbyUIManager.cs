@@ -206,12 +206,10 @@ namespace UI
             // If name is already confirmed (or returning from match), go to Rooms list directly
             if (NetworkManager.Instance && NetworkManager.Instance.IsReturningFromMatch)
             {
-                HideAllScreens();
                 ShowScreen(LobbyScreen.None);
             }
             else
             {
-                HideAllScreens();
                 ShowScreen(LobbyScreen.MainMenu);
             }
         }
