@@ -45,7 +45,7 @@ public sealed class BoardAudioInterpreter
             var old = oldView.VisualType;
             var nue = newView.VisualType;
             
-            if (old == TileType.Empty && nue == TileType.Soldier && IsMine(newView.OwnerId))
+            if (old == TileType.Empty && nue == TileType.Soldier)
             {
                 Debug.Log("[AUDIO] Soldier placed");
                 placed = true;
@@ -79,7 +79,7 @@ public sealed class BoardAudioInterpreter
                     Debug.Log("[AUDIO] I captured a base");
                     iCapturedBase = true;
                 }
-                else if (IsMine(oldView.OwnerId) && IsEnemy(newView.OwnerId))
+                else if (IsEnemy(newView.OwnerId))
                 {
                     Debug.Log("[AUDIO] My base was captured");
                     myBaseCaptured = true;
@@ -110,7 +110,7 @@ public sealed class BoardAudioInterpreter
             Debug.Log("[AUDIO] Raised base built");
             Raise(SoundEffectEnum.BASE_PLACEMENT);
         }
-        if (iWasEaten)
+        if (iAte || iWasEaten)
         {
             Debug.Log("[AUDIO] Raised soldier eaten");
             Raise(SoundEffectEnum.PAWN_EATEN);

@@ -120,8 +120,9 @@ public class BoardView : MonoBehaviour, IBoardRenderer
 
         if (animateBlasts && blastStepSeconds > 0f && HasBlastWave(diffs))
         {
-            _runningBlast = diffs;
-            _blastRoutine = StartCoroutine(AnimateBatch(diffs));
+            var snapshot = new List<CellDiff>(diffs);
+            _runningBlast = snapshot;
+            _blastRoutine = StartCoroutine(AnimateBatch(snapshot));
         }
         else
         {
